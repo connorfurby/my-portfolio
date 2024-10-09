@@ -7,8 +7,11 @@ import Script from 'next/script'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Your Portfolio',
+  title: 'Connor Furby',
   description: 'A showcase of your skills and achievements',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({

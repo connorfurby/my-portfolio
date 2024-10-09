@@ -108,7 +108,7 @@ const PassionCard: React.FC<PassionCardProps> = ({ icon: Icon, title, descriptio
         }`}
         style={{
           transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-          zIndex: isHovered ? 9999 : 'auto', // Significantly increased z-index when hovered
+          zIndex: isHovered ? 40 : 'auto', // Changed from 9999 to 40
         }}
       >
         <div className="p-4">
@@ -321,10 +321,10 @@ export default function Portfolio() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center">
           <div className="mr-4 flex">
-            <GraduationCap className="ml-6 h-6 w-6" />
+            <Image src="/imgs/logo.png" alt="Logo" width={24} height={24} className="ml-6 h-6 w-6" />
             <span className="ml-2 font-bold hidden sm:inline">Connor Furby</span>
           </div>
           <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 mx-6">
@@ -415,7 +415,7 @@ export default function Portfolio() {
             <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">Welcome to My Portfolio</h1>
             <p className="text-xl mb-8 drop-shadow-md">Aspiring Software Engineer | Passionate Learner | Future Innovator</p>
             <Image
-              src="/imgs/pfp1.jpg"
+              src="/imgs/pfp2.png"
               alt="Connor Furby"
               width={180}
               height={180}
@@ -431,13 +431,90 @@ export default function Portfolio() {
         <div className="container mx-auto px-4 py-8 bg-background">
           <AnimatedSection id="experience" className="mb-12 pt-16">
             <h2 className="text-3xl font-bold mb-6 text-center">Experience</h2>
-            <Tabs defaultValue="internships" className="w-full">
+            <Tabs defaultValue="projects" className="w-full">
               <TabsList className="grid w-full grid-cols-4 mb-4">
                 <TabsTrigger value="projects">Projects</TabsTrigger>
                 <TabsTrigger value="internships">Internships</TabsTrigger>
                 <TabsTrigger value="work">Work</TabsTrigger>
                 <TabsTrigger value="volunteering">Volunteering</TabsTrigger>
               </TabsList>
+              <TabsContent value="projects">
+                {projects.map((project, index) => (
+                  <Card key={index} className="mb-6">
+                    <CardHeader>
+                      <CardTitle>{project.title}</CardTitle>
+                      <CardDescription>{project.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col md:flex-row gap-4">
+                      <div className="w-full md:w-1/2">
+                        <ul className="list-disc pl-5 space-y-2">
+                          {project.bullets.map((bullet, bulletIndex) => (
+                            <li key={bulletIndex}>{bullet}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="w-full md:w-1/2">
+                        <Carousel className="w-full max-w-md mx-auto">
+                          <CarouselContent>
+                            {project.images.map((image, imageIndex) => (
+                              <CarouselItem key={imageIndex}>
+                                <div className="p-1">
+                                  <Card>
+                                    <CardContent className="p-2">
+                                      <AspectRatio ratio={4/3} className="bg-muted">
+                                        <div className="relative w-full h-full">
+                                          {image.isVideo ? (
+                                            <video
+                                              src={image.src}
+                                              autoPlay
+                                              loop
+                                              muted
+                                              playsInline
+                                              className="absolute inset-0 w-full h-full object-cover"
+                                            />
+                                          ) : (
+                                            <>
+                                              <Image
+                                                src={image.src}
+                                                alt={image.alt}
+                                                fill
+                                                className="object-contain"
+                                              />
+                                              <div 
+                                                className="absolute inset-0 z-10"
+                                                style={{
+                                                  backgroundImage: `url(${image.src})`,
+                                                  backgroundSize: 'cover',
+                                                  backgroundPosition: 'center',
+                                                  filter: 'blur(20px)',
+                                                  opacity: 0.5,
+                                                }}
+                                              />
+                                              <Image
+                                                src={image.src}
+                                                alt={image.alt}
+                                                fill
+                                                className="object-contain z-20"
+                                              />
+                                            </>
+                                          )}
+                                        </div>
+                                      </AspectRatio>
+                                    </CardContent>
+                                  </Card>
+                                  <p className="text-center mt-2 text-sm">{image.description}</p>
+                                </div>
+                              </CarouselItem>
+                            ))}
+                          </CarouselContent>
+                          <CarouselPrevious />
+                          <CarouselNext />
+                        </Carousel>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </TabsContent>
               <TabsContent value="internships">
                 <Card className="mb-4">
                   <CardHeader>
@@ -555,83 +632,6 @@ export default function Portfolio() {
                   </CardContent>
                 </Card>
               </TabsContent>
-              <TabsContent value="projects">
-                {projects.map((project, index) => (
-                  <Card key={index} className="mb-6">
-                    <CardHeader>
-                      <CardTitle>{project.title}</CardTitle>
-                      <CardDescription>{project.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex flex-col md:flex-row gap-4">
-                      <div className="w-full md:w-1/2">
-                        <ul className="list-disc pl-5 space-y-2">
-                          {project.bullets.map((bullet, bulletIndex) => (
-                            <li key={bulletIndex}>{bullet}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="w-full md:w-1/2">
-                        <Carousel className="w-full max-w-md mx-auto">
-                          <CarouselContent>
-                            {project.images.map((image, imageIndex) => (
-                              <CarouselItem key={imageIndex}>
-                                <div className="p-1">
-                                  <Card>
-                                    <CardContent className="p-2">
-                                      <AspectRatio ratio={4/3} className="bg-muted">
-                                        <div className="relative w-full h-full">
-                                          {image.isVideo ? (
-                                            <video
-                                              src={image.src}
-                                              autoPlay
-                                              loop
-                                              muted
-                                              playsInline
-                                              className="absolute inset-0 w-full h-full object-cover"
-                                            />
-                                          ) : (
-                                            <>
-                                              <Image
-                                                src={image.src}
-                                                alt={image.alt}
-                                                fill
-                                                className="object-contain"
-                                              />
-                                              <div 
-                                                className="absolute inset-0 z-10"
-                                                style={{
-                                                  backgroundImage: `url(${image.src})`,
-                                                  backgroundSize: 'cover',
-                                                  backgroundPosition: 'center',
-                                                  filter: 'blur(20px)',
-                                                  opacity: 0.5,
-                                                }}
-                                              />
-                                              <Image
-                                                src={image.src}
-                                                alt={image.alt}
-                                                fill
-                                                className="object-contain z-20"
-                                              />
-                                            </>
-                                          )}
-                                        </div>
-                                      </AspectRatio>
-                                    </CardContent>
-                                  </Card>
-                                  <p className="text-center mt-2 text-sm">{image.description}</p>
-                                </div>
-                              </CarouselItem>
-                            ))}
-                          </CarouselContent>
-                          <CarouselPrevious />
-                          <CarouselNext />
-                        </Carousel>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </TabsContent>
             </Tabs>
           </AnimatedSection>
 
@@ -734,61 +734,61 @@ export default function Portfolio() {
             </Tabs>
           </AnimatedSection>
 
-          <AnimatedSection id="passions" className="mb-12 pt-16 relative z-50">
+          <AnimatedSection id="passions" className="mb-12 pt-16 relative z-30">
             <h2 className="text-3xl font-bold mb-6 text-center">Passions</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <PassionCard 
                 icon={Book} 
                 title="Reading" 
-                description="I love diving into fantasy worlds and learning new things through books. Reading allows me to explore different perspectives and expand my knowledge across various subjects."
+                description="I have always loved reading a good book, especially sci-fi and dystopian novels."
                 imageSrc="/imgs/passions/reading.JPG"
               />
               <PassionCard 
                 icon={Waves} 
                 title="Water Sports" 
-                description="Jet skiing and wakeboarding are my favorite summer activities. The thrill of gliding across the water and feeling the spray on my face is unmatched. It's a perfect blend of excitement and relaxation."
+                description="Jet skiing, wakeboarding, and water skiing are my favorite summer activities. On mornings at the lake, I always wake up at the crack of dawn to glide on the smooth glass water."
                 imageSrc="/imgs/passions/watersports.jpg"
               />
               <PassionCard 
                 icon={Snowflake} 
                 title="Snow Skiing" 
-                description="Carving down snowy slopes is an exhilarating winter pastime."
+                description="Skiing has been a big part of my family for generations, so I fell in love with the winter sport too."
                 imageSrc="/imgs/passions/skiing.jpg"
               />
               <PassionCard 
                 icon={Code} 
                 title="Software Development" 
-                description="Creating innovative solutions through code is my true passion."
+                description="Creating innovative solutions through code and learning new technologies is one of my favorite things to do."
                 imageSrc="/imgs/passions/softwaredevelopment.png"
               />
               <PassionCard 
                 icon={Heart} 
                 title="Volunteering" 
-                description="Giving back to the community brings joy and fulfillment."
+                description="This is a picture of me instrucing middle schoolers at a coding camp. Giving back to the community brings joy and fulfillment, especially when I can share my passions with others."
                 imageSrc="/imgs/passions/volunteering.JPG"
               />
               <PassionCard 
                 icon={Gamepad2} 
                 title="The Legend of Zelda" 
-                description="Exploring Hyrule and solving puzzles is my favorite gaming experience."
+                description="Since I was young, Zelda is what made me fall in love with games. I have beat all 20 games over time. Exploring Hyrule and solving puzzles is my favorite gaming experience."
                 imageSrc="/imgs/passions/zelda.jpg"
               />
               <PassionCard 
                 icon={Music} 
                 title="Music" 
-                description="Music is the soundtrack to my life, always inspiring and motivating me."
+                description="Music and making playlists is something I have been doing for a long time. I love to create playlists for different activities and moods."
                 imageSrc="/imgs/passions/music.jpg"
               />
               <PassionCard 
                 icon={Users} 
                 title="Family & Friends" 
-                description="Spending quality time with loved ones is what life is all about."
+                description="Hanging out with friends and family is something I value a lot. I love to make memories with the people I care about."
                 imageSrc="/imgs/passions/family.jpg"
               />
               <PassionCard 
                 icon={Medal} 
                 title="Running" 
-                description="Pushing my limits and staying fit through running is a rewarding challenge."
+                description="I began running in middle school, and it has become a big part of my life. Pushing my limits and staying fit through running is a rewarding challenge."
                 imageSrc="/imgs/passions/running.png"
               />
               <PassionCard 
@@ -800,20 +800,20 @@ export default function Portfolio() {
               <PassionCard 
                 icon={Film} 
                 title="Movies" 
-                description="Getting lost in cinematic stories and experiencing different worlds."
+                description="A picture of me with Stan Lee, the creator of the Marvel Universe. Marvel and Disney movies are my favorite."
                 imageSrc="/imgs/passions/movies.jpg"
               />
               <PassionCard 
                 icon={Utensils} 
                 title="Food" 
-                description="Exploring diverse cuisines and flavors is a delicious adventure."
+                description="Exploring diverse cuisines and flavors is always a blast, I love trying new foods from different cultures."
                 imageSrc="/imgs/passions/food.png"
               />
             </div>
           </AnimatedSection>
 
           <AnimatedSection className="text-center">
-            <h2 className="text-3xl font-bold mb-6">Let's Connect!</h2>
+            <h2 className="text-3xl font-bold mb-6 mt-10">Let's Connect!</h2>
             <p className="mb-4">
               I'm always eager to learn and grow. Feel free to reach out if you have any questions or would like to know
               more about my experiences and aspirations.
