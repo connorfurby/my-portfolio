@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from "@/components/theme-provider"
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,8 +18,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script id="theme-script" strategy="beforeInteractive">
+          {`
+            (function() {
+              try {
+                var mode = localStorage.getItem('theme');
+                if (!mode) document.documentElement.classList.add('dark');
+              } catch (e) {}
+            })();
+          `}
+        </Script>
+      </head>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
         </ThemeProvider>
       </body>
