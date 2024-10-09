@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Moon, Sun, GraduationCap, Book, Trophy, Briefcase, Heart, Music, Menu, Waves, Snowflake, Code, Gamepad2, Users, Medal, Palette, Film, Utensils } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { Moon, Sun, Book, Heart, Music, Menu, Waves, Snowflake, Code, Gamepad2, Users, Medal, Palette, Film, Utensils } from "lucide-react"
+import { motion} from "framer-motion"
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
@@ -25,6 +25,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+/* eslint-disable react/no-unescaped-entities */
 
 function useIntersectionObserver(callback: IntersectionObserverCallback, options: IntersectionObserverInit = {}) {
   const ref = useRef<HTMLElement | null>(null)
@@ -147,7 +148,6 @@ export default function Portfolio() {
 
     const handleScroll = () => {
       const sections = ["about", "education", "experience", "skills", "passions"]
-      const scrollPosition = window.scrollY
 
       for (const section of sections) {
         const element = document.getElementById(section)
