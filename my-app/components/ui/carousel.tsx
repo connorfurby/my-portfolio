@@ -8,6 +8,7 @@ import useEmblaCarousel, {
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { ExpandIcon, Minimize } from "lucide-react"
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
@@ -176,20 +177,14 @@ const CarouselPrevious = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof Button>
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
-  const { orientation, scrollPrev, canScrollPrev } = useCarousel()
+  const { scrollPrev, canScrollPrev } = useCarousel()
 
   return (
     <Button
       ref={ref}
       variant={variant}
       size={size}
-      className={cn(
-        "absolute h-8 w-8 rounded-full",
-        orientation === "horizontal"
-          ? "-left-14 top-1/2 -translate-y-1/2"
-          : "-top-14 left-1/2 -translate-x-1/2 rotate-90",
-        className
-      )}
+      className={cn("h-8 w-8 rounded-full", className)}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
       {...props}
@@ -205,20 +200,14 @@ const CarouselNext = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof Button>
 >(({ className, variant = "outline", size = "icon", ...props }, ref) => {
-  const { orientation, scrollNext, canScrollNext } = useCarousel()
+  const { scrollNext, canScrollNext } = useCarousel()
 
   return (
     <Button
       ref={ref}
       variant={variant}
       size={size}
-      className={cn(
-        "absolute h-8 w-8 rounded-full",
-        orientation === "horizontal"
-          ? "-right-14 top-1/2 -translate-y-1/2"
-          : "-bottom-14 left-1/2 -translate-x-1/2 rotate-90",
-        className
-      )}
+      className={cn("h-8 w-8 rounded-full", className)}
       disabled={!canScrollNext}
       onClick={scrollNext}
       {...props}
@@ -230,6 +219,25 @@ const CarouselNext = React.forwardRef<
 })
 CarouselNext.displayName = "CarouselNext"
 
+const CarouselFullscreen = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<typeof Button>
+>(({ className, variant = "outline", size = "icon", ...props }, ref) => {
+  return (
+    <Button
+      ref={ref}
+      variant={variant}
+      size={size}
+      className={cn("h-8 w-8", className)}
+      {...props}
+    >
+      <ExpandIcon className="h-4 w-4" />
+      <span className="sr-only">Fullscreen</span>
+    </Button>
+  )
+})
+CarouselFullscreen.displayName = "CarouselFullscreen"
+
 export {
   type CarouselApi,
   Carousel,
@@ -237,4 +245,5 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
+  CarouselFullscreen,
 }

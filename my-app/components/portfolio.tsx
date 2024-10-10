@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { Moon, Sun, Book, Heart, Music, Menu, Waves, Snowflake, Code, Gamepad2, Users, Medal, Palette, Film, Utensils } from "lucide-react"
+import { useState, useEffect, useRef, useCallback } from "react"
+import { Moon, Sun, Book, Heart, Music, Menu, Waves, Snowflake, Code, Gamepad2, Users, Medal, Palette, Film, Utensils, Expand } from "lucide-react"
 import { motion} from "framer-motion"
 import { useTheme } from "next-themes"
 import Image from "next/image"
@@ -24,7 +24,10 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  CarouselFullscreen,
 } from "@/components/ui/carousel"
+import { FullscreenModal } from "@/components/ui/fullscreen-modal"
+import useEmblaCarousel from 'embla-carousel-react'
 /* eslint-disable react/no-unescaped-entities */
 
 function useIntersectionObserver(callback: IntersectionObserverCallback, options: IntersectionObserverInit = {}) {
@@ -142,53 +145,12 @@ export default function Portfolio() {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
   const [activeSection, setActiveSection] = useState("about")
+  const [isFullscreenOpen, setIsFullscreenOpen] = useState(false)
+  const [currentProjectImages, setCurrentProjectImages] = useState<typeof projects[0]['images']>([])
+  const [fullscreenIndex, setFullscreenIndex] = useState(0)
+  const [carouselApis, setCarouselApis] = useState<{ [key: string]: ReturnType<typeof useEmblaCarousel>[1] }>({})
 
-  useEffect(() => {
-    setMounted(true)
-
-    const handleScroll = () => {
-      const sections = ["about", "education", "experience", "skills", "passions"]
-
-      for (const section of sections) {
-        const element = document.getElementById(section)
-        if (element) {
-          const { top, bottom } = element.getBoundingClientRect()
-          if (top <= 100 && bottom > 100) {
-            setActiveSection(section)
-            break
-          }
-        }
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  if (!mounted) return null
-
-  const navItems = [
-    { name: "About", href: "#about" },
-    { name: "Experience", href: "#experience" },
-    { name: "Education", href: "#education" },
-    { name: "Skills", href: "#skills" },
-    { name: "Passions", href: "#passions" },
-  ]
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId)
-    if (element) {
-      const navbarHeight = 56 // Adjust this value to match your navbar height
-      const elementPosition = element.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight - 20 // Added extra 20px for visual padding
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      })
-    }
-  }
-
+  // Move the projects array definition here, before the useEffect hooks
   const projects = [
     {
       title: "SlideCentral",
@@ -244,7 +206,7 @@ export default function Portfolio() {
           { 
             src: "/imgs/icedodo/icedodo4.png", 
             alt: "UI Update", 
-            description: "A screenshot from my UI update, which was my first web development experience" 
+            description: "A screenshot from my first UI update" 
           },
         ]
       },
@@ -283,7 +245,7 @@ export default function Portfolio() {
       images: [
         { src: "/imgs/slashercrush/scimg1.png", alt: "SlasherCrush Title Screen", description: "Simple Title screen of SlasherCrush" },
         { src: "/imgs/slashercrush/scimg2.png", alt: "Gameplay Screenshot", description: "In-game screenshot showing game board" },
-        { src: "/imgs/slashercrush/scimg3.png", alt: "Scaling Gameplay", description: "Scaling Gameplay to level 20, changing to a darker theme, and progressively adding more icons and difficulty" },
+        { src: "/imgs/slashercrush/scimg3.png", alt: "Scaling Gameplay", description: "Scaling Gameplay to level 20" },
         { src: "/imgs/slashercrush/scimg4.png", alt: "Game Over Screen", description: "Game over screen functionality and score" }
       ]
     },
@@ -313,11 +275,93 @@ export default function Portfolio() {
       ],
       images: [
         { src: "/imgs/github1.png", alt: "GitHub projects", description: "Just some of my many tests and GitHub projects" },
-        { src: "/imgs/Replit1.png", alt: "Replit projects", description: "Replit is where I started my programming journey and made many projects, as well as many failures (Learning Experiences)" },
+        { src: "/imgs/Replit1.png", alt: "Replit projects", description: "Replit is where I started my programming journey" },
       ]
     },
 
   ]
+
+  const scrollNext = useCallback((projectTitle: string) => {
+    if (carouselApis[projectTitle]) {
+      carouselApis[projectTitle].scrollNext()
+    }
+  }, [carouselApis])
+
+  useEffect(() => {
+    const intervals: { [key: string]: NodeJS.Timeout } = {}
+
+    Object.entries(carouselApis).forEach(([projectTitle, api]) => {
+      if (api) {
+        intervals[projectTitle] = setInterval(() => {
+          scrollNext(projectTitle)
+        }, 10000)
+
+        const onSelect = () => {
+          clearInterval(intervals[projectTitle])
+          intervals[projectTitle] = setInterval(() => {
+            scrollNext(projectTitle)
+          }, 10000)
+        }
+
+        api.on('select', onSelect)
+      }
+    })
+
+    return () => {
+      Object.values(intervals).forEach(clearInterval)
+      Object.values(carouselApis).forEach(api => {
+        if (api && typeof api.off === 'function') {
+          api.off('select', () => {})
+        }
+      })
+    }
+  }, [carouselApis, scrollNext])
+
+  useEffect(() => {
+    setMounted(true)
+
+    const handleScroll = () => {
+      const sections = ["about", "education", "experience", "skills", "passions"]
+
+      for (const section of sections) {
+        const element = document.getElementById(section)
+        if (element) {
+          const { top, bottom } = element.getBoundingClientRect()
+          if (top <= 100 && bottom > 100) {
+            setActiveSection(section)
+            break
+          }
+        }
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  if (!mounted) return null
+
+  const navItems = [
+    { name: "About", href: "#about" },
+    { name: "Experience", href: "#experience" },
+    { name: "Education", href: "#education" },
+    { name: "Skills", href: "#skills" },
+    { name: "Passions", href: "#passions" },
+  ]
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId)
+    if (element) {
+      const navbarHeight = 56 // Adjust this value to match your navbar height
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight - 20 // Added extra 20px for visual padding
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      })
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -454,7 +498,20 @@ export default function Portfolio() {
                         </ul>
                       </div>
                       <div className="w-full md:w-1/2">
-                        <Carousel className="w-full max-w-md mx-auto">
+                        <Carousel 
+                          className="w-full max-w-md mx-auto"
+                          opts={{ loop: true }}
+                          setApi={(api) => {
+                            if (api) {
+                              setCarouselApis(prev => {
+                                if (prev[project.title] !== api) {
+                                  return { ...prev, [project.title]: api }
+                                }
+                                return prev
+                              })
+                            }
+                          }}
+                        >
                           <CarouselContent>
                             {project.images.map((image, imageIndex) => (
                               <CarouselItem key={imageIndex}>
@@ -500,15 +557,30 @@ export default function Portfolio() {
                                           )}
                                         </div>
                                       </AspectRatio>
+                                      <p className="mt-2 text-center text-sm">{image.description}</p>
                                     </CardContent>
                                   </Card>
-                                  <p className="text-center mt-2 text-sm">{image.description}</p>
                                 </div>
                               </CarouselItem>
                             ))}
                           </CarouselContent>
-                          <CarouselPrevious />
-                          <CarouselNext />
+                          <div className="flex justify-center mt-4 space-x-2">
+                            <CarouselPrevious />
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => {
+                                const currentIndex = carouselApis[project.title]?.selectedScrollSnap() || 0
+                                setCurrentProjectImages(project.images)
+                                setFullscreenIndex(currentIndex)
+                                setIsFullscreenOpen(true)
+                              }}
+                              className="h-8 w-8"
+                            >
+                              <Expand className="h-4 w-4" />
+                            </Button>
+                            <CarouselNext />
+                          </div>
                         </Carousel>
                       </div>
                     </CardContent>
@@ -882,6 +954,13 @@ export default function Portfolio() {
           </p>
         </div>
       </footer>
+
+      <FullscreenModal
+        isOpen={isFullscreenOpen}
+        onClose={() => setIsFullscreenOpen(false)}
+        images={currentProjectImages}
+        initialIndex={fullscreenIndex}
+      />
     </div>
   )
 }
