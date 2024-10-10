@@ -24,7 +24,6 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  CarouselFullscreen,
 } from "@/components/ui/carousel"
 import { FullscreenModal } from "@/components/ui/fullscreen-modal"
 import useEmblaCarousel from 'embla-carousel-react'
