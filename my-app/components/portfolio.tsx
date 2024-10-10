@@ -807,7 +807,7 @@ export default function Portfolio() {
 
           <AnimatedSection id="passions" className="mb-12 pt-16 relative z-30">
             <h2 className="text-3xl font-bold mb-6 text-center">Passions</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               <PassionCard 
                 icon={Book} 
                 title="Reading" 
