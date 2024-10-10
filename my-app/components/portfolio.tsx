@@ -441,7 +441,7 @@ export default function Portfolio() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative w-full h-[70vh] overflow-hidden pt-16" // Added pt-16 for padding-top
+          className="relative w-full min-h-[70vh] overflow-hidden pt-20 pb-16 flex flex-col justify-center" // Updated classes
         >
           <div className="absolute inset-0 z-0">
             <Image
@@ -455,17 +455,17 @@ export default function Portfolio() {
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background banner-gradient"></div>
           </div>
           <div className="relative z-10 flex flex-col justify-center items-center text-center h-full px-4">
-            <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">Welcome to My Portfolio</h1>
-            <p className="text-xl mb-8 drop-shadow-md">Aspiring Software Engineer | Passionate Learner | Future Innovator</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">Welcome to My Portfolio</h1>
+            <p className="text-lg sm:text-xl mb-8 drop-shadow-md max-w-3xl">Aspiring Software Engineer | Passionate Learner | Future Innovator</p>
             <Image
               src="/imgs/pfp2.png"
               alt="Connor Furby"
               width={180}
               height={180}
-              className="rounded-full mx-auto mb-6 border-4 border-white shadow-lg" // Increased bottom margin
+              className="rounded-full mx-auto mb-6 border-4 border-white shadow-lg"
               priority
             />
-            <p className="max-w-4xl mx-auto bg-background/30 dark:bg-background/50 p-6 rounded-lg backdrop-blur-sm">
+            <p className="max-w-4xl mx-auto bg-background/30 dark:bg-background/50 p-6 rounded-lg backdrop-blur-sm text-sm sm:text-base">
               Hello! My name is Connor Furby, an ambitious and driven student with career aspirations in Computer Science, actively engaged in a variety of extracurricular and career exploration activities. A dedicated club member, athlete, and volunteer, who consistently excels academically. Participated in multiple internships and Hackathons, gaining hands-on experience in app development and programming across a range of languages. Comfortable adapting to new challenges and committed to continuous learning and personal growth.
             </p>
           </div>
