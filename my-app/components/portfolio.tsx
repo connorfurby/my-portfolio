@@ -155,9 +155,11 @@ export default function Portfolio() {
       title: "SlideCentral",
       description: "A web app that allows teachers and students who manage clubs or activities to create and manage slides for their meetings and events to be displayed throughout the school.",
       bullets: [
-        "Implemented depth-first search for maze generation",
-        "Used A* algorithm for efficient pathfinding",
-        "Visualized the maze and solution using Java Swing"
+        "Developed a comprehensive project using React JS, Express, Node, and the school database, completed over four sprints across seven months alongside three teammates.",
+        "Integrated Google authentication and dynamic user views tailored for roles such as admin, teacher, and student, enhancing user experience and security.",
+        "Implemented interactive image carousels with fullscreen and timer functionalities, providing a visually engaging platform for content display.",
+        "Created custom activity and club dashboards with auto-generated slides, built from form-collected data to streamline information sharing for clubs and activities.",
+        "Applied Agile methodologies, including sprints, retrospectives, and daily scrums, to maintain project momentum and continuous improvement, coordinated through Trello for task organization and collaboration."
       ],
       images: [
         { src: "/imgs/slidecentral/slcimg1.png", alt: "Homepage; authentication highlighted", description: "Home Page (Signed in)" },
@@ -174,11 +176,13 @@ export default function Portfolio() {
     },
     {
       title: "Ice Dodo",
-        description: "An animated cityscape created using Java and JavaFX.",
+        description: "A popular chrome extension game I contributed to, with over 600,000 users",
         bullets: [
-          "Implemented custom animation logic",
-          "Used JavaFX for rendering graphics",
-          "Created a day-night cycle with dynamic lighting"
+          "Revamped User Interface: Designed and implemented a completely new UI to enhance the game's visual appeal and user experience.",
+          "Level Creation: Developed 17 additional levels, expanding the game content for players.",
+          "Community Engagement: Actively participated in the game's Discord community, receiving positive feedback and support for my work.",
+          "Trailer Production: Produced a new game trailer, which attracted over 63,000 views, boosting the game's visibility.",
+          "Recognition: Earned a prominent spot in the game's credits, highlighting my contributions and dedication."
         ],
         images: [
           { 
@@ -212,11 +216,15 @@ export default function Portfolio() {
       
     {
       title: "Animated Cityscape",
-      description: "An animated cityscape created using Java and JavaFX.",
+      description: "An animated cityscape created using Java",
       bullets: [
-        "Implemented custom animation logic",
-        "Used JavaFX for rendering graphics",
-        "Created a day-night cycle with dynamic lighting"
+        "Cityscape Animation Framework: Made with Java, uses JFrame and JComponent to create and animate a cityscape scene with various elements like buildings, bridges, trees, and clouds.",
+        "Building Class: Handles dynamic building creation with a variety of visual characteristics, including randomized dimensions and positions, and window lighting based on a probability threshold, creating a day/night effect.",
+        "Billboards, Trees, Cars, etc: Adds diversity with various types of elements throughout the entire project",
+        "Multi-object Management: Contains logic to check overlapping positions, ensuring no buildings overlap and maintaining realistic spacing within the cityscape.",
+        "Animation and Frame Updates: Utilizes Runnable interface to animate buildings, moving them across the screen to simulate a scrolling city. The nextFrame() method updates the scene continuously.",
+        "Custom Colors and Graphics: Implements custom colors for buildings, windows, and sidewalks to create a visually cohesive cityscape.",
+        "Agile Techniques in Code Structure: The code is organized into functions and classes to modularize each cityscape component, demonstrating structured coding practices."
       ],
       images: [
         { 
@@ -236,10 +244,11 @@ export default function Portfolio() {
       title: "SlasherCrush",
       description: "A Candy Crush inspired game with a Halloween theme, made for AP Microeconomics as an extension to show the near perfect market of 'Match 3' games, and how easy it is to enter the market.",
       bullets: [
-        "Developed using Unity and C#",
-        "Implemented match-3 game mechanics with a spooky twist",
-        "Created custom artwork and animations for a Halloween theme",
-        "Integrated economic concepts into gameplay and design"
+        "Utilized a modern stack including NextJS, Tailwind CSS, ShadCN components, and various libraries, all hosted on Vercel, to develop the game.",
+        "Rapid Development: Completed in just a few days as part of an economics class project.",
+        "Game Development Insights: Gained practical knowledge on game mechanics and design principles, learning how to make gameplay engaging and intuitive.",
+        "Implemented Advanced Game Logic: Created features like progressive difficulty, move-based gameplay, and level balancing to ensure a challenging yet enjoyable experience.",
+        "Responsive and Adaptive Gameplay: Designed the game to respond dynamically to player actions, providing a personalized and fun gaming experience."
       ],
       images: [
         { src: "/imgs/slashercrush/scimg1.png", alt: "SlasherCrush Title Screen", description: "Simple Title screen of SlasherCrush" },
@@ -252,8 +261,12 @@ export default function Portfolio() {
       title: "Personal Portfolio Site",
       description: "This is the site you are currently on! It is a portfolio website that showcases my skills and achievements.",
       bullets: [
-        "Used NextJS 14, React, TailwindCSS, and ShadCN Components",
-        ""
+        "Built with a modern stack using NextJS, Tailwind CSS, ShadCN components, and various libraries, hosted on Vercel, to create a personal website.",
+        "Invested substantial time and effort to ensure the site reflects my personality and achievements effectively.",
+        "Gained experience with advanced features like embedding Spotify cards, implementing fullscreen modals, and integrating other dynamic elements.",
+        "Optimized for responsiveness across all screen sizes, providing a seamless experience on both mobile and desktop devices.",
+        "Adaptive Navigation: Navigation bars transform into a side dropdown menu on mobile, enhancing accessibility and usability.",
+        "Dynamic Adjustments for Immersive Experience: Various elements adapt to different devices, ensuring a consistent and engaging user experience."
       ],
       images: [
         { src: "/imgs/personalportfolio/ppimg1.png", alt: "Early Stages", description: "Early stages of development" },
