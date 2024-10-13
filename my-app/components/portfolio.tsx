@@ -468,7 +468,7 @@ export default function Portfolio() {
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background banner-gradient"></div>
           </div>
           <div className="relative z-10 flex flex-col justify-center items-center text-center h-full px-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">Welcome to My Portfolio</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">Connor Furby</h1>
             <p className="text-lg sm:text-xl mb-8 drop-shadow-md max-w-3xl">Aspiring Software Engineer | Passionate Learner | Future Innovator</p>
             <Image
               src="/imgs/pfp2.png"
@@ -808,7 +808,7 @@ export default function Portfolio() {
                       <li>4.0 Award every semester</li>
                       <li>Software Engineering May 2024 Student of the Month</li>
                       <li>Top 4 Project in HSHacks Hackathon 2024</li>
-                      <li>Completed requirementsto earn an endorsement in the IT Career Path from the state of Illinois at graduation</li>
+                      <li>Completed requirements to earn an endorsement in the IT Career Path from the state of Illinois at graduation</li>
                       <li>On pace to graduate with the Illinois Global Scholar Award</li>
                       <li>Earned a spot near the top of the credits of a popular Chrome Extension game with 600,000+ users: Ice Dodo</li>
                     </ul>
