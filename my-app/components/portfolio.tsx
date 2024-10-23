@@ -704,7 +704,7 @@ export default function Portfolio() {
                 </Card>
                 <Card className="mb-4">
                   <CardHeader>
-                    <CardTitle>Special NeedsSTEM Summer Camp - Volunteer Leader</CardTitle>
+                    <CardTitle>Special Needs STEM Summer Camp - Volunteer Leader</CardTitle>
                     <CardDescription>15 Hours</CardDescription>
                   </CardHeader>
                   <CardContent>

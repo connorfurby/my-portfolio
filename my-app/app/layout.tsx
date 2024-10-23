@@ -8,9 +8,9 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Connor Furby',
-  description: 'A showcase of your skills and achievements',
+  description: 'A showcase of my skills and achievements',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.ico', // Ensure this path is correct
   },
 }
 
@@ -22,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/favicon.ico" />
         <Script id="theme-script" strategy="beforeInteractive">
           {`
             (function() {
