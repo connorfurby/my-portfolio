@@ -761,7 +761,7 @@ export default function Portfolio() {
                       <li>Software Engineering 1</li>
                       <li>Software Engineering 2</li>
                       <li>AP Calculus BC (Taking exam in May)</li>
-                      <li>AP Physics 1 (Recived 4 on Exam)</li>
+                      <li>AP Physics 1 (Recieved 4 on Exam)</li>
                       <li>Honors Chemistry</li>
                       <li>AP Microeconomics (Taking exam in May)</li>
                       <li>AP Macroeconomics (Taking exam in May)</li>
@@ -848,7 +848,7 @@ export default function Portfolio() {
               <PassionCard 
                 icon={Heart} 
                 title="Volunteering" 
-                description="This is a picture of me instrucing middle schoolers at a coding camp. Giving back to the community brings joy and fulfillment, especially when I can share my passions with others."
+                description="This is a picture of me instructing middle schoolers at a coding camp. Giving back to the community brings joy and fulfillment, especially when I can share my passions with others."
                 imageSrc="/imgs/passions/volunteering.JPG"
               />
               <PassionCard 
@@ -890,7 +890,7 @@ export default function Portfolio() {
               <PassionCard 
                 icon={Utensils} 
                 title="Food" 
-                description="Exploring diverse cuisines and flavors is always a blast, I love trying new foods from different cultures."
+                description="Exploring diverse cuisines and flavors is always a blast. I love trying new foods from different cultures."
                 imageSrc="/imgs/passions/food.png"
               />
             </div>
