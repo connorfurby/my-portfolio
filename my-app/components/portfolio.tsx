@@ -757,11 +757,11 @@ export default function Portfolio() {
                     <ul className="list-disc pl-5 space-y-2">
                       <li>Computer Programming 1</li>
                       <li>Computer Programming 2</li>
-                      <li>AP Computer Science A (Recieved 5 on Exam)</li>
+                      <li>AP Computer Science A (Received 5 on Exam)</li>
                       <li>Software Engineering 1</li>
                       <li>Software Engineering 2</li>
                       <li>AP Calculus BC (Taking exam in May)</li>
-                      <li>AP Physics 1 (Recieved 4 on Exam)</li>
+                      <li>AP Physics 1 (Received 4 on Exam)</li>
                       <li>Honors Chemistry</li>
                       <li>AP Microeconomics (Taking exam in May)</li>
                       <li>AP Macroeconomics (Taking exam in May)</li>
