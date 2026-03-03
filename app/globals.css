@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 5%;
+    --card: 0 0% 97%;
+    --card-foreground: 0 0% 5%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 5%;
+    --primary: 174 72% 46%;
+    --primary-foreground: 0 0% 2%;
+    --secondary: 0 0% 94%;
+    --secondary-foreground: 0 0% 15%;
+    --muted: 0 0% 93%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 174 72% 46%;
+    --accent-foreground: 0 0% 2%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 174 72% 46%;
+    --radius: 0.75rem;
+    --glow: 174 72% 46%;
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 93%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 93%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 93%;
+    --primary: 174 72% 46%;
+    --primary-foreground: 0 0% 2%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 93%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 55%;
+    --accent: 174 72% 46%;
+    --accent-foreground: 0 0% 2%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 174 72% 46%;
+    --glow: 174 72% 46%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+.noise-bg::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.03;
+  z-index: 100;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+.grid-bg {
+  background-size: 60px 60px;
+  background-image:
+    linear-gradient(to right, hsl(var(--border) / 0.4) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
+}
+
+.glow {
+  box-shadow: 0 0 20px hsl(var(--glow) / 0.15), 0 0 60px hsl(var(--glow) / 0.05);
+}
+
+.glow-text {
+  text-shadow: 0 0 40px hsl(var(--glow) / 0.3);
+}
+
+.section-number {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    border-color: hsl(var(--glow) / 0.2);
+  }
+  50% {
+    border-color: hsl(var(--glow) / 0.5);
+  }
+}
+
+.animate-border-glow {
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(174 72% 66%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+::selection {
+  background: hsl(var(--primary) / 0.3);
+  color: hsl(var(--foreground));
+}
