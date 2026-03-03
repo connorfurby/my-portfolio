@@ -1,17 +1,31 @@
-import './globals.css'
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import "./globals.css"
+import type { Metadata, Viewport } from "next"
+import { Inter, Space_Grotesk } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
-import Script from 'next/script'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+})
 
 export const metadata: Metadata = {
-  title: 'Connor Furby',
-  description: 'A showcase of my skills and achievements',
-  icons: {
-    icon: '/favicon.ico', // Ensure this path is correct
-  },
+  title: "Connor Furby | Software Engineer",
+  description:
+    "Portfolio of Connor Furby - Aspiring Software Engineer, Passionate Learner, and Future Innovator.",
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
+  width: "device-width",
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -21,22 +35,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="icon" href="/favicon.ico" />
-        <Script id="theme-script" strategy="beforeInteractive">
-          {`
-            (function() {
-              try {
-                var mode = localStorage.getItem('theme');
-                if (!mode) document.documentElement.classList.add('dark');
-              } catch (e) {}
-            })();
-          `}
-        </Script>
-      </head>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          {children}
+          <div className="noise-bg">{children}</div>
         </ThemeProvider>
       </body>
     </html>
