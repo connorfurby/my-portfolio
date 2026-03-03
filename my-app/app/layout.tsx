@@ -1,7 +1,7 @@
 import "./globals.css"
 import type { Metadata, Viewport } from "next"
 import { Inter, Space_Grotesk } from "next/font/google"
-import { ThemeProvider } from "@/components/theme-provider"
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,11 +34,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <div className="noise-bg">{children}</div>
-        </ThemeProvider>
+    <html lang="en" className="dark">
+      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans bg-[#0a0a0a] text-white`}>
+        <div className="noise-bg">{children}</div>
       </body>
     </html>
   )
