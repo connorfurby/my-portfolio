@@ -99,6 +99,8 @@ type SpotifyDashboardResponse = {
   mode: "configured" | "unconfigured" | "error"
   updatedAt: string
   message: string
+  accountDataState: "ready" | "partial" | "rate_limited" | "needs_reauth" | "stale" | null
+  accountDataMessage: string | null
   topWindowLabel: string
   profile: {
     displayName: string | null
@@ -144,6 +146,13 @@ type SpotifyDashboardResponse = {
     url: string | null
     genres: string[]
   }>
+  recentPodcast: {
+    title: string
+    showName: string | null
+    imageUrl: string | null
+    url: string | null
+    playedAt: string | null
+  } | null
 }
 
 const statCards = [
@@ -371,7 +380,7 @@ export default function GitHubDashboard() {
   }, [])
 
   useEffect(() => {
-    if (!isIntegrationsVisible) {
+    if (!isIntegrationsVisible || activeTab !== "spotify") {
       return
     }
 
@@ -396,7 +405,7 @@ export default function GitHubDashboard() {
     }, 5000)
 
     return () => window.clearInterval(spotifyInterval)
-  }, [isIntegrationsVisible])
+  }, [activeTab, isIntegrationsVisible])
 
   const maxPulse = useMemo(
     () => Math.max(...(githubData?.activityPulse.map((point) => point.total) ?? [0]), 1),
@@ -875,6 +884,12 @@ export default function GitHubDashboard() {
                       ) : null}
                     </div>
 
+                    {spotifyData.accountDataMessage ? (
+                      <div className="rounded-[1rem] border border-foreground/10 bg-background/45 px-3 py-2 text-sm leading-6 text-muted-foreground">
+                        {spotifyData.accountDataMessage}
+                      </div>
+                    ) : null}
+
                     <div className="space-y-1.5">
                       <div className="h-1.5 rounded-full bg-foreground/8">
                         <div
@@ -902,6 +917,22 @@ export default function GitHubDashboard() {
                         </div>
                       </div>
                     </div>
+
+                    {spotifyData.recentPodcast &&
+                    spotifyData.recentPodcast.title !== spotifyData.playback?.title ? (
+                      <div className="rounded-[1rem] border border-foreground/10 bg-background/45 p-2.5">
+                        <div className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Recent podcast</div>
+                        <div className="text-sm font-medium text-foreground">{spotifyData.recentPodcast.title}</div>
+                        <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                          {spotifyData.recentPodcast.showName ?? "Podcast"}
+                        </div>
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          {spotifyData.recentPodcast.playedAt
+                            ? `Seen ${formatRelative(spotifyData.recentPodcast.playedAt)}`
+                            : "Saved from recent playback"}
+                        </div>
+                      </div>
+                    ) : null}
 
                     <div className="flex flex-wrap gap-2.5">
                       {spotifyData.playback?.url ? (
@@ -963,7 +994,11 @@ export default function GitHubDashboard() {
                           ))
                         ) : (
                           <div className="rounded-[1.3rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
-                            Top tracks will appear after Spotify returns affinity data.
+                            {spotifyData.accountDataState === "needs_reauth"
+                              ? "Top tracks need a fresh Spotify reconnect with the updated scopes."
+                              : spotifyData.accountDataState === "rate_limited"
+                                ? "Top tracks are temporarily rate-limited by Spotify."
+                                : spotifyData.accountDataMessage ?? "Top tracks will appear after Spotify returns affinity data."}
                           </div>
                         )}
                       </div>
@@ -998,7 +1033,11 @@ export default function GitHubDashboard() {
                           ))
                         ) : (
                           <div className="rounded-[1.3rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
-                            Top artists will appear after Spotify returns affinity data.
+                            {spotifyData.accountDataState === "needs_reauth"
+                              ? "Top artists need a fresh Spotify reconnect with the updated scopes."
+                              : spotifyData.accountDataState === "rate_limited"
+                                ? "Top artists are temporarily rate-limited by Spotify."
+                                : spotifyData.accountDataMessage ?? "Top artists will appear after Spotify returns affinity data."}
                           </div>
                         )}
                       </div>

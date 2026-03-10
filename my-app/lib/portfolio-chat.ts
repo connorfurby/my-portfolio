@@ -12,7 +12,9 @@ import {
   projects,
   proofHighlights,
   schoolActivities,
+  signatureStacks,
   skillGroups,
+  techClusters,
   volunteerEntries,
   workEntries,
 } from "@/components/portfolio/data"
@@ -240,14 +242,44 @@ function buildPortfolioChunks() {
     )
   )
 
+  techClusters.forEach((cluster) => {
+    chunks.push(
+      buildChunk(
+        `skills-${slugify(cluster.title)}`,
+        cluster.title,
+        "skills",
+        "Skills",
+        [
+          `Tech cluster ${cluster.title}: ${cluster.summary}`,
+          `Technologies: ${cluster.technologies.map((technology) => `${technology.name} (${technology.tier})`).join(", ")}.`,
+          `Focus areas: ${cluster.focus.join(", ")}.`,
+          `Project links: ${cluster.projects.join(", ")}.`,
+          `Proof points: ${cluster.proofs.join(" ")}`,
+        ].join("\n")
+      )
+    )
+  })
+
+  signatureStacks.forEach((stack) => {
+    chunks.push(
+      buildChunk(
+        `skills-stack-${slugify(stack.title)}`,
+        stack.title,
+        "skills",
+        "Skills",
+        `Signature stack ${stack.title}: ${stack.description} Technologies include ${stack.stack.join(", ")}.`
+      )
+    )
+  })
+
   skillGroups.forEach((group) => {
     chunks.push(
       buildChunk(
-        `skills-${slugify(group.title)}`,
-        group.title,
+        `skills-legacy-${slugify(group.title)}`,
+        `${group.title} foundations`,
         "skills",
         "Skills",
-        `Skill group ${group.title}: ${group.items.join(", ")}.`
+        `Legacy skill grouping for ${group.title}: ${group.items.join(", ")}.`
       )
     )
   })

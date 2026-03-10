@@ -188,10 +188,14 @@ export type SpotifyPodcastSummary = {
   playedAt: string | null
 }
 
+export type SpotifyAccountDataState = "ready" | "partial" | "rate_limited" | "needs_reauth" | "stale"
+
 export type SpotifyDashboardResponse = {
   mode: "configured" | "unconfigured" | "error"
   updatedAt: string
   message: string
+  accountDataState: SpotifyAccountDataState | null
+  accountDataMessage: string | null
   topWindowLabel: string
   profile: SpotifyProfileSummary | null
   playback: SpotifyPlaybackSummary | null
@@ -207,11 +211,32 @@ type SpotifyStaticCache = {
   topArtists: SpotifyTopArtistSummary[]
 }
 
+type SpotifyStaticDataResult = SpotifyStaticCache & {
+  accountDataState: SpotifyAccountDataState
+  accountDataMessage: string | null
+}
+
+type SpotifyStaticFailureState = {
+  retryAt: number
+  accountDataState: SpotifyAccountDataState
+  accountDataMessage: string | null
+}
+
+type SpotifyRequestFailureReason = "rate_limited" | "needs_reauth" | "unauthorized" | "other"
+
+type SpotifyAccessTokenCache = {
+  accessToken: string
+  expiresAt: number
+}
+
 const SPOTIFY_STATIC_CACHE_TTL_MS = 1000 * 60 * 30
+const SPOTIFY_STATIC_FAILURE_TTL_MS = 1000 * 60 * 2
 const SPOTIFY_RECENT_TRACK_CACHE_TTL_MS = 1000 * 60
 const SPOTIFY_RECENT_EPISODE_CACHE_TTL_MS = 1000 * 60 * 60 * 24
 
 let spotifyStaticCache: SpotifyStaticCache | null = null
+let spotifyStaticFailureState: SpotifyStaticFailureState | null = null
+let spotifyAccessTokenCache: SpotifyAccessTokenCache | null = null
 let spotifyRecentTrackCache: { fetchedAt: number; playback: SpotifyPlaybackSummary | null } | null = null
 let spotifyRecentEpisodeCache: { fetchedAt: number; episode: SpotifyPodcastSummary | null } | null = null
 
@@ -344,6 +369,73 @@ function isFresh(timestamp: number, ttlMs: number) {
   return Date.now() - timestamp < ttlMs
 }
 
+class SpotifyRequestError extends Error {
+  status: number
+  reason: SpotifyRequestFailureReason
+  retryAfterSeconds: number | null
+
+  constructor(message: string, status: number, reason: SpotifyRequestFailureReason, retryAfterSeconds: number | null = null) {
+    super(message)
+    this.name = "SpotifyRequestError"
+    this.status = status
+    this.reason = reason
+    this.retryAfterSeconds = retryAfterSeconds
+  }
+}
+
+function getRetryAfterSeconds(value: string | null) {
+  if (!value) {
+    return null
+  }
+
+  const parsed = Number.parseInt(value, 10)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+async function buildSpotifyRequestError(response: Response, resourceLabel: string) {
+  let apiMessage = ""
+
+  try {
+    const payload = (await response.json()) as {
+      error?: { message?: string } | string
+      error_description?: string
+    }
+
+    if (typeof payload.error === "string") {
+      apiMessage = payload.error
+    } else if (payload.error && typeof payload.error.message === "string") {
+      apiMessage = payload.error.message
+    } else if (typeof payload.error_description === "string") {
+      apiMessage = payload.error_description
+    }
+  } catch {
+    apiMessage = ""
+  }
+
+  const normalizedMessage = apiMessage.toLowerCase()
+  let reason: SpotifyRequestFailureReason = "other"
+
+  if (response.status === 429) {
+    reason = "rate_limited"
+  } else if (response.status === 401) {
+    reason = "unauthorized"
+  } else if (
+    response.status === 403 &&
+    (normalizedMessage.includes("scope") || normalizedMessage.includes("insufficient"))
+  ) {
+    reason = "needs_reauth"
+  }
+
+  return new SpotifyRequestError(
+    apiMessage
+      ? `Spotify ${resourceLabel} request failed with ${response.status}: ${apiMessage}`
+      : `Spotify ${resourceLabel} request failed with ${response.status}`,
+    response.status,
+    reason,
+    getRetryAfterSeconds(response.headers.get("retry-after"))
+  )
+}
+
 async function fetchSpotifyResource(path: string, accessToken: string, searchParams?: Record<string, string>) {
   const url = new URL(`${SPOTIFY_API_BASE}${path}`)
 
@@ -419,6 +511,14 @@ export async function getSpotifyAccessToken() {
     return null
   }
 
+  if (spotifyAccessTokenCache && Date.now() < spotifyAccessTokenCache.expiresAt) {
+    return {
+      access_token: spotifyAccessTokenCache.accessToken,
+      expires_in: Math.max(0, Math.floor((spotifyAccessTokenCache.expiresAt - Date.now()) / 1000)),
+      token_type: "Bearer",
+    } as SpotifyTokenResponse
+  }
+
   const response = await fetch(`${SPOTIFY_ACCOUNT_BASE}/api/token`, {
     method: "POST",
     headers: {
@@ -436,7 +536,17 @@ export async function getSpotifyAccessToken() {
     throw new Error(`Spotify token refresh failed with ${response.status}`)
   }
 
-  return (await response.json()) as SpotifyTokenResponse
+  const payload = (await response.json()) as SpotifyTokenResponse
+
+  if (payload.access_token) {
+    const expiresInMs = Math.max((payload.expires_in ?? 3600) - 60, 60) * 1000
+    spotifyAccessTokenCache = {
+      accessToken: payload.access_token,
+      expiresAt: Date.now() + expiresInMs,
+    }
+  }
+
+  return payload
 }
 
 async function fetchCurrentPlayback(accessToken: string): Promise<SpotifyPlaybackSummary | null> {
@@ -449,7 +559,7 @@ async function fetchCurrentPlayback(accessToken: string): Promise<SpotifyPlaybac
   }
 
   if (!response.ok) {
-    throw new Error(`Spotify playback request failed with ${response.status}`)
+    throw await buildSpotifyRequestError(response, "playback")
   }
 
   const payload = (await response.json()) as SpotifyPlaybackResponse
@@ -515,7 +625,7 @@ async function fetchRecentlyPlayed(
   }
 
   if (!response.ok) {
-    throw new Error(`Spotify recently played request failed with ${response.status}`)
+    throw await buildSpotifyRequestError(response, "recently played")
   }
 
   const payload = (await response.json()) as SpotifyRecentlyPlayedResponse
@@ -567,7 +677,7 @@ async function fetchCurrentUserProfile(accessToken: string): Promise<SpotifyProf
   const response = await fetchSpotifyResource("/me", accessToken)
 
   if (!response.ok) {
-    throw new Error(`Spotify profile request failed with ${response.status}`)
+    throw await buildSpotifyRequestError(response, "profile")
   }
 
   const payload = (await response.json()) as SpotifyUserProfileResponse
@@ -589,7 +699,7 @@ async function fetchTopTracks(accessToken: string): Promise<SpotifyTopTrackSumma
   })
 
   if (!response.ok) {
-    throw new Error(`Spotify top tracks request failed with ${response.status}`)
+    throw await buildSpotifyRequestError(response, "top tracks")
   }
 
   const payload = (await response.json()) as SpotifyTopTracksResponse
@@ -612,7 +722,7 @@ async function fetchTopArtists(accessToken: string): Promise<SpotifyTopArtistSum
   })
 
   if (!response.ok) {
-    throw new Error(`Spotify top artists request failed with ${response.status}`)
+    throw await buildSpotifyRequestError(response, "top artists")
   }
 
   const payload = (await response.json()) as SpotifyTopArtistsResponse
@@ -626,9 +736,63 @@ async function fetchTopArtists(accessToken: string): Promise<SpotifyTopArtistSum
   }))
 }
 
-async function fetchCachedSpotifyStaticData(accessToken: string) {
-  if (spotifyStaticCache && isFresh(spotifyStaticCache.fetchedAt, SPOTIFY_STATIC_CACHE_TTL_MS)) {
-    return spotifyStaticCache
+function getStaticCacheFallback() {
+  return spotifyStaticCache ?? {
+    fetchedAt: Date.now(),
+    profile: null,
+    topTracks: [] as SpotifyTopTrackSummary[],
+    topArtists: [] as SpotifyTopArtistSummary[],
+  }
+}
+
+function getStaticFailureState(errors: SpotifyRequestError[]) {
+  if (errors.some((error) => error.reason === "needs_reauth" || error.reason === "unauthorized")) {
+    return {
+      accountDataState: "needs_reauth" as const,
+      accountDataMessage:
+        "Reconnect Spotify once so this saved token can read your profile, top tracks, and top artists.",
+      retryAt: Date.now() + SPOTIFY_STATIC_FAILURE_TTL_MS,
+    }
+  }
+
+  if (errors.some((error) => error.reason === "rate_limited")) {
+    const retryDelayMs = Math.max(
+      ...errors.map((error) => (error.retryAfterSeconds ?? 0) * 1000),
+      SPOTIFY_STATIC_FAILURE_TTL_MS
+    )
+
+    return {
+      accountDataState: "rate_limited" as const,
+      accountDataMessage:
+        "Spotify is rate-limiting profile and top-listening data right now. Playback still works and this will retry automatically.",
+      retryAt: Date.now() + retryDelayMs,
+    }
+  }
+
+  return {
+    accountDataState: "partial" as const,
+    accountDataMessage: "Some Spotify profile and top-listening data is temporarily unavailable.",
+    retryAt: Date.now() + SPOTIFY_STATIC_FAILURE_TTL_MS,
+  }
+}
+
+async function fetchCachedSpotifyStaticData(accessToken: string): Promise<SpotifyStaticDataResult> {
+  const cached = spotifyStaticCache
+
+  if (cached && isFresh(cached.fetchedAt, SPOTIFY_STATIC_CACHE_TTL_MS)) {
+    return {
+      ...cached,
+      accountDataState: "ready",
+      accountDataMessage: null,
+    }
+  }
+
+  if (spotifyStaticFailureState && Date.now() < spotifyStaticFailureState.retryAt) {
+    return {
+      ...getStaticCacheFallback(),
+      accountDataState: spotifyStaticFailureState.accountDataState,
+      accountDataMessage: spotifyStaticFailureState.accountDataMessage,
+    }
   }
 
   const [profileResult, topTracksResult, topArtistsResult] = await Promise.allSettled([
@@ -637,23 +801,53 @@ async function fetchCachedSpotifyStaticData(accessToken: string) {
     fetchTopArtists(accessToken),
   ])
 
-  const allRateLimited = [profileResult, topTracksResult, topArtistsResult]
-    .filter((result) => result.status === "rejected")
-    .length === 3
+  const rejectedResults = [profileResult, topTracksResult, topArtistsResult]
+    .filter((result): result is PromiseRejectedResult => result.status === "rejected")
+    .map((result) =>
+      result.reason instanceof SpotifyRequestError
+        ? result.reason
+        : new SpotifyRequestError("Some Spotify account data is temporarily unavailable.", 500, "other")
+    )
 
-  if (allRateLimited && spotifyStaticCache) {
-    return spotifyStaticCache
+  const hasFreshStaticValue =
+    profileResult.status === "fulfilled" ||
+    topTracksResult.status === "fulfilled" ||
+    topArtistsResult.status === "fulfilled"
+
+  if (hasFreshStaticValue) {
+    spotifyStaticCache = {
+      fetchedAt: Date.now(),
+      profile: profileResult.status === "fulfilled" ? profileResult.value : spotifyStaticCache?.profile ?? null,
+      topTracks: topTracksResult.status === "fulfilled" ? topTracksResult.value : spotifyStaticCache?.topTracks ?? [],
+      topArtists: topArtistsResult.status === "fulfilled" ? topArtistsResult.value : spotifyStaticCache?.topArtists ?? [],
+    }
   }
 
-  const nextCache = {
-    fetchedAt: Date.now(),
-    profile: profileResult.status === "fulfilled" ? profileResult.value : spotifyStaticCache?.profile ?? null,
-    topTracks: topTracksResult.status === "fulfilled" ? topTracksResult.value : spotifyStaticCache?.topTracks ?? [],
-    topArtists: topArtistsResult.status === "fulfilled" ? topArtistsResult.value : spotifyStaticCache?.topArtists ?? [],
+  if (!rejectedResults.length) {
+    spotifyStaticFailureState = null
+
+    return {
+      ...getStaticCacheFallback(),
+      accountDataState: "ready",
+      accountDataMessage: null,
+    }
   }
 
-  spotifyStaticCache = nextCache
-  return nextCache
+  const failureState = getStaticFailureState(rejectedResults)
+  const fallback = getStaticCacheFallback()
+
+  spotifyStaticFailureState = {
+    retryAt: failureState.retryAt,
+    accountDataState:
+      fallback.profile || fallback.topTracks.length || fallback.topArtists.length ? "stale" : failureState.accountDataState,
+    accountDataMessage: failureState.accountDataMessage,
+  }
+
+  return {
+    ...fallback,
+    accountDataState: spotifyStaticFailureState.accountDataState,
+    accountDataMessage: spotifyStaticFailureState.accountDataMessage,
+  }
 }
 
 export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse> {
@@ -664,6 +858,8 @@ export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse>
       mode: "unconfigured",
       updatedAt: new Date().toISOString(),
       message: "Add SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET to start Spotify setup.",
+      accountDataState: null,
+      accountDataMessage: null,
       topWindowLabel: "past 28 days",
       profile: null,
       playback: null,
@@ -678,6 +874,8 @@ export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse>
       mode: "unconfigured",
       updatedAt: new Date().toISOString(),
       message: "Visit /api/spotify/login once to connect your Spotify account and generate SPOTIFY_REFRESH_TOKEN.",
+      accountDataState: null,
+      accountDataMessage: null,
       topWindowLabel: "past 28 days",
       profile: null,
       playback: null,
@@ -694,53 +892,64 @@ export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse>
       throw new Error("Spotify access token was missing from the refresh response.")
     }
 
-    const [playbackResult, recentResult, staticResult] = await Promise.allSettled([
+    const [playbackResult, staticResult] = await Promise.allSettled([
       fetchCurrentPlayback(tokenPayload.access_token),
-      fetchRecentlyPlayed(tokenPayload.access_token),
       fetchCachedSpotifyStaticData(tokenPayload.access_token),
     ])
 
     const livePlayback = playbackResult.status === "fulfilled" ? playbackResult.value : null
-    const recentBundle =
-      recentResult.status === "fulfilled"
-        ? recentResult.value
-        : null
+    const recentResult =
+      livePlayback
+        ? null
+        : await Promise.allSettled([fetchRecentlyPlayed(tokenPayload.access_token)]).then((results) => results[0])
+    const recentBundle = recentResult && recentResult.status === "fulfilled" ? recentResult.value : null
     const staticData =
       staticResult.status === "fulfilled"
         ? staticResult.value
-        : spotifyStaticCache ?? {
-            fetchedAt: Date.now(),
-            profile: null,
-            topTracks: [] as SpotifyTopTrackSummary[],
-            topArtists: [] as SpotifyTopArtistSummary[],
+        : {
+            ...getStaticCacheFallback(),
+            accountDataState: spotifyStaticFailureState?.accountDataState ?? "partial",
+            accountDataMessage:
+              spotifyStaticFailureState?.accountDataMessage ??
+              "Some Spotify profile and top-listening data is temporarily unavailable.",
           }
     const profile = staticData.profile
     const topTracks = staticData.topTracks
     const topArtists = staticData.topArtists
+    const accountDataState = staticData.accountDataState
+    const accountDataMessage = staticData.accountDataMessage
     const playback = livePlayback ?? recentBundle
     const recentPodcast =
       spotifyRecentEpisodeCache && isFresh(spotifyRecentEpisodeCache.fetchedAt, SPOTIFY_RECENT_EPISODE_CACHE_TTL_MS)
         ? spotifyRecentEpisodeCache.episode
         : null
 
-    const hadFailure = [playbackResult, recentResult, staticResult].some((result) => result.status === "rejected")
-    const hasData = Boolean(profile || playback || topTracks.length || topArtists.length)
+    const hadFailure = [playbackResult, recentResult, staticResult].some(
+      (result) => result !== null && result.status === "rejected"
+    )
+    const hasData = Boolean(profile || playback || recentPodcast || topTracks.length || topArtists.length)
+    let message = "Spotify account connected."
+
+    if (playback?.state === "playing") {
+      message = "Listening now."
+    } else if (playback?.state === "recent") {
+      message = "Showing your last played track."
+    } else if (recentPodcast) {
+      message = "Spotify connected. Showing the last podcast episode seen in playback."
+    } else if (!hasData && accountDataMessage) {
+      message = accountDataMessage
+    } else if (!hasData && hadFailure) {
+      message = "Spotify connected, but some data is temporarily rate-limited."
+    } else if (hadFailure) {
+      message = "Spotify connected with partial data."
+    }
 
     return {
       mode: "configured",
       updatedAt: new Date().toISOString(),
-      message:
-        playback?.state === "playing"
-          ? "Listening now."
-          : playback?.state === "recent"
-            ? "Showing your last played track."
-            : recentPodcast
-              ? "Spotify connected. Showing the last podcast episode seen in playback."
-              : !hasData && hadFailure
-                ? "Spotify connected, but some data is temporarily rate-limited."
-            : hadFailure
-              ? "Spotify connected with partial data."
-              : "Spotify account connected.",
+      message,
+      accountDataState,
+      accountDataMessage,
       topWindowLabel: "past 28 days",
       profile,
       playback,
@@ -753,6 +962,8 @@ export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse>
       mode: "error",
       updatedAt: new Date().toISOString(),
       message: "Spotify is temporarily unavailable.",
+      accountDataState: null,
+      accountDataMessage: null,
       topWindowLabel: "past 28 days",
       profile: null,
       playback: null,

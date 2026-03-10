@@ -52,6 +52,31 @@ export type SkillGroup = {
   items: string[]
 }
 
+export type TechClusterNode = {
+  name: string
+  tier: "core" | "strong" | "exploring"
+}
+
+export type TechCluster = {
+  id: string
+  title: string
+  shortLabel: string
+  summary: string
+  icon: LucideIcon
+  accent: string
+  accentSecondary: string
+  technologies: TechClusterNode[]
+  proofs: string[]
+  projects: string[]
+  focus: string[]
+}
+
+export type SignatureStack = {
+  title: string
+  description: string
+  stack: string[]
+}
+
 export type HeroPill = {
   label: string
 }
