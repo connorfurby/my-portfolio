@@ -19,8 +19,8 @@ export default function Education() {
           value: "stats",
           label: "Stats",
           content: (
-            <Card className="surface-card rounded-[2rem] border-border bg-card">
-              <CardHeader className="border-b border-border">
+            <Card className="liquid-panel rounded-[2rem]">
+              <CardHeader className="border-b border-border/50">
                 <CardTitle>Naperville Central High School</CardTitle>
                 <CardDescription>2021-2025</CardDescription>
               </CardHeader>
@@ -39,8 +39,8 @@ export default function Education() {
           value: "activities",
           label: "Activities",
           content: (
-            <Card className="surface-card rounded-[2rem] border-border bg-card">
-              <CardHeader className="border-b border-border">
+            <Card className="liquid-panel rounded-[2rem]">
+              <CardHeader className="border-b border-border/50">
                 <CardTitle>Naperville Central High School</CardTitle>
                 <CardDescription>2021-2025</CardDescription>
               </CardHeader>
@@ -59,8 +59,8 @@ export default function Education() {
           value: "coursework",
           label: "Coursework",
           content: (
-            <Card className="surface-card rounded-[2rem] border-border bg-card">
-              <CardHeader className="border-b border-border">
+            <Card className="liquid-panel rounded-[2rem]">
+              <CardHeader className="border-b border-border/50">
                 <CardTitle>Naperville Central High School</CardTitle>
                 <CardDescription>2021-2025</CardDescription>
               </CardHeader>

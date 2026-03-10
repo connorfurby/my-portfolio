@@ -1,0 +1,581 @@
+import { promises as fs } from "fs"
+import path from "path"
+
+import {
+  achievements,
+  academicStats,
+  contactLinks,
+  coursework,
+  heroPills,
+  internshipEntries,
+  passions,
+  projects,
+  proofHighlights,
+  schoolActivities,
+  skillGroups,
+  volunteerEntries,
+  workEntries,
+} from "@/components/portfolio/data"
+
+type KnowledgeChunkKind =
+  | "overview"
+  | "project"
+  | "experience"
+  | "education"
+  | "skills"
+  | "achievement"
+  | "passion"
+  | "contact"
+  | "resume"
+  | "transcript"
+  | "document"
+
+export type KnowledgeChunk = {
+  id: string
+  title: string
+  kind: KnowledgeChunkKind
+  source: string
+  content: string
+}
+
+type ChatHistoryMessage = {
+  role: "user" | "assistant"
+  content: string
+}
+
+const KNOWLEDGE_DIR = path.join(process.cwd(), "content", "portfolio-ai")
+const SUPPORTED_DOCUMENT_EXTENSIONS = new Set([".md", ".txt", ".json", ".tex"])
+const STOPWORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "are",
+  "about",
+  "as",
+  "at",
+  "be",
+  "for",
+  "from",
+  "how",
+  "i",
+  "in",
+  "is",
+  "it",
+  "me",
+  "my",
+  "of",
+  "on",
+  "or",
+  "the",
+  "to",
+  "what",
+  "with",
+  "you",
+  "your",
+])
+
+function normalizeWhitespace(value: string) {
+  return value.replace(/\r/g, "").replace(/\n{3,}/g, "\n\n").replace(/[ \t]+/g, " ").trim()
+}
+
+function stripLatexCommands(value: string) {
+  return normalizeWhitespace(
+    value
+      .replace(/%.*$/gm, "")
+      .replace(/\\begin\{[^}]+\}|\\end\{[^}]+\}/g, " ")
+      .replace(/\\(?:documentclass|usepackage|pagestyle|thispagestyle|geometry|setlength|newcommand|renewcommand)(?:\[[^\]]*\])?(?:\{[^}]*\})*/g, " ")
+      .replace(/\\(?:href|url)\{[^}]*\}\{([^}]*)\}/g, " $1 ")
+      .replace(/\\(?:href|url)\{([^}]*)\}/g, " $1 ")
+      .replace(/\\(?:section|subsection|subsubsection|textbf|textit|emph|underline|item|small|large|Large|huge|Huge)\*?(?:\[[^\]]*\])?\{([^}]*)\}/g, " $1 ")
+      .replace(/\\[a-zA-Z]+\*?(?:\[[^\]]*\])?(?:\{[^}]*\})?/g, " ")
+      .replace(/[{}]/g, " ")
+  )
+}
+
+function slugify(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+}
+
+function tokenize(value: string) {
+  return normalizeWhitespace(value)
+    .toLowerCase()
+    .split(/[^a-z0-9+#./-]+/)
+    .filter((token) => token.length > 1 && !STOPWORDS.has(token))
+}
+
+function buildChunk(id: string, title: string, kind: KnowledgeChunkKind, source: string, content: string): KnowledgeChunk {
+  return {
+    id,
+    title,
+    kind,
+    source,
+    content: normalizeWhitespace(content),
+  }
+}
+
+function chunkLongText(baseId: string, title: string, kind: KnowledgeChunkKind, source: string, text: string) {
+  const paragraphs = normalizeWhitespace(text)
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+
+  const chunks: KnowledgeChunk[] = []
+  let buffer = ""
+  let index = 0
+
+  for (const paragraph of paragraphs) {
+    const candidate = buffer ? `${buffer}\n\n${paragraph}` : paragraph
+
+    if (candidate.length > 900 && buffer) {
+      chunks.push(buildChunk(`${baseId}-${index}`, title, kind, source, buffer))
+      buffer = paragraph
+      index += 1
+      continue
+    }
+
+    buffer = candidate
+  }
+
+  if (buffer) {
+    chunks.push(buildChunk(`${baseId}-${index}`, title, kind, source, buffer))
+  }
+
+  return chunks.length ? chunks : [buildChunk(`${baseId}-0`, title, kind, source, text)]
+}
+
+function buildPortfolioChunks() {
+  const chunks: KnowledgeChunk[] = []
+
+  chunks.push(
+    buildChunk(
+      "overview-profile",
+      "Portfolio overview",
+      "overview",
+      "Portfolio",
+      [
+        "Connor Furby is a student software engineer focused on fast, polished, memorable software experiences.",
+        `Current themes: ${heroPills.map((pill) => pill.label).join(", ")}.`,
+        `Highlighted proof points: ${proofHighlights.map((highlight) => `${highlight.label}: ${highlight.value}`).join("; ")}.`,
+      ].join("\n")
+    )
+  )
+
+  projects.forEach((project) => {
+    chunks.push(
+      buildChunk(
+        `project-${slugify(project.title)}`,
+        project.title,
+        "project",
+        `Project: ${project.title}`,
+        [
+          project.description,
+          project.spotlight ? `Spotlight: ${project.spotlight}` : "",
+          project.stack?.length ? `Tech stack: ${project.stack.join(", ")}` : "",
+          `Key details: ${project.bullets.join(" ")}`,
+        ]
+          .filter(Boolean)
+          .join("\n")
+      )
+    )
+  })
+
+  internshipEntries.forEach((entry) => {
+    chunks.push(
+      buildChunk(
+        `internship-${slugify(entry.title)}`,
+        entry.title,
+        "experience",
+        "Internships",
+        `${entry.subtitle}\n${entry.bullets.join(" ")}`
+      )
+    )
+  })
+
+  workEntries.forEach((entry) => {
+    chunks.push(
+      buildChunk(
+        `work-${slugify(entry.title)}`,
+        entry.title,
+        "experience",
+        "Work",
+        `${entry.subtitle}\n${entry.bullets.join(" ")}`
+      )
+    )
+  })
+
+  volunteerEntries.forEach((entry) => {
+    chunks.push(
+      buildChunk(
+        `volunteer-${slugify(entry.title)}`,
+        entry.title,
+        "experience",
+        "Volunteering",
+        `${entry.subtitle}\n${entry.bullets.join(" ")}`
+      )
+    )
+  })
+
+  chunks.push(
+    buildChunk(
+      "education-summary",
+      "Education summary",
+      "education",
+      "Education",
+      [
+        "School: Naperville Central High School (2021-2025).",
+        `Academic stats: ${academicStats.join("; ")}.`,
+        `Coursework: ${coursework.join("; ")}.`,
+        `Activities: ${schoolActivities.join("; ")}.`,
+      ].join("\n")
+    )
+  )
+
+  skillGroups.forEach((group) => {
+    chunks.push(
+      buildChunk(
+        `skills-${slugify(group.title)}`,
+        group.title,
+        "skills",
+        "Skills",
+        `Skill group ${group.title}: ${group.items.join(", ")}.`
+      )
+    )
+  })
+
+  achievements.forEach((achievement, index) => {
+    chunks.push(
+      buildChunk(
+        `achievement-${index}`,
+        `Achievement ${index + 1}`,
+        "achievement",
+        "Achievements",
+        achievement
+      )
+    )
+  })
+
+  passions.forEach((passion) => {
+    chunks.push(
+      buildChunk(
+        `passion-${slugify(passion.title)}`,
+        passion.title,
+        "passion",
+        "Passions",
+        passion.description
+      )
+    )
+  })
+
+  chunks.push(
+    buildChunk(
+      "contact-details",
+      "Contact details",
+      "contact",
+      "Contact",
+      contactLinks.map((link) => `${link.label}: ${link.value}`).join("\n")
+    )
+  )
+
+  return chunks
+}
+
+async function readKnowledgeDocuments() {
+  try {
+    const files = await fs.readdir(KNOWLEDGE_DIR, { withFileTypes: true })
+    const documentChunks: KnowledgeChunk[] = []
+
+    for (const file of files) {
+      if (!file.isFile()) {
+        continue
+      }
+
+      const extension = path.extname(file.name).toLowerCase()
+
+      if (!SUPPORTED_DOCUMENT_EXTENSIONS.has(extension) || file.name.toLowerCase() === "readme.md") {
+        continue
+      }
+
+      const fullPath = path.join(KNOWLEDGE_DIR, file.name)
+      const raw = await fs.readFile(fullPath, "utf8")
+      const content = extension === ".tex" ? stripLatexCommands(raw) : normalizeWhitespace(raw)
+      const lower = content.toLowerCase()
+
+      if (!content || lower.includes("placeholder:") || lower.includes("paste your") || lower.includes("replace this file")) {
+        continue
+      }
+
+      const baseName = path.basename(file.name, extension)
+      const kind: KnowledgeChunkKind =
+        baseName === "resume" ? "resume" : baseName === "transcript" ? "transcript" : "document"
+
+      documentChunks.push(
+        ...chunkLongText(`doc-${slugify(baseName)}`, baseName.replace(/[-_]/g, " "), kind, `Document: ${file.name}`, content)
+      )
+    }
+
+    return documentChunks
+  } catch {
+    return [] as KnowledgeChunk[]
+  }
+}
+
+export async function getKnowledgeChunks() {
+  const portfolioChunks = buildPortfolioChunks()
+  const documentChunks = await readKnowledgeDocuments()
+
+  return [...portfolioChunks, ...documentChunks]
+}
+
+export function retrieveRelevantChunks(question: string, chunks: KnowledgeChunk[], limit = 6) {
+  const normalizedQuestion = normalizeWhitespace(question)
+  const questionTokens = tokenize(normalizedQuestion)
+  const asksAboutTechnologies = questionTokens.some((token) =>
+    ["tech", "stack", "stacks", "technology", "technologies", "framework", "frameworks", "tools", "use", "using"].includes(token)
+  )
+  const asksAboutLearning = questionTokens.some((token) =>
+    ["learning", "learn", "studying", "study", "improving", "growing"].includes(token)
+  )
+  const asksAboutProjects = questionTokens.some((token) =>
+    ["project", "projects", "built", "build", "app", "apps"].includes(token)
+  )
+  const asksAboutExperience = questionTokens.some((token) =>
+    ["internship", "internships", "experience", "work", "volunteer", "volunteering"].includes(token)
+  )
+
+  const scored = chunks
+    .map((chunk) => {
+      const titleTokens = tokenize(chunk.title)
+      const contentTokens = tokenize(chunk.content)
+
+      let score = 0
+
+      for (const token of questionTokens) {
+        if (titleTokens.includes(token)) {
+          score += 6
+        }
+
+        const occurrences = contentTokens.filter((contentToken) => contentToken === token).length
+        score += Math.min(occurrences, 4) * 2
+
+        if (chunk.content.toLowerCase().includes(token)) {
+          score += 0.5
+        }
+      }
+
+      if (normalizedQuestion.length > 8 && chunk.title.toLowerCase().includes(normalizedQuestion.toLowerCase())) {
+        score += 12
+      }
+
+      if (chunk.kind === "project" && asksAboutProjects) {
+        score += 1.5
+      }
+
+      if ((chunk.kind === "skills" || chunk.kind === "project" || chunk.kind === "experience") && asksAboutTechnologies) {
+        score += 4
+      }
+
+      if ((chunk.kind === "experience" || chunk.kind === "resume") && asksAboutExperience) {
+        score += 4
+      }
+
+      if ((chunk.kind === "skills" || chunk.kind === "project" || chunk.kind === "resume") && asksAboutLearning) {
+        score += 2
+      }
+
+      if (chunk.kind === "passion" && (asksAboutTechnologies || asksAboutExperience)) {
+        score -= 3
+      }
+
+      if (chunk.kind === "resume" || chunk.kind === "transcript") {
+        score += 0.5
+      }
+
+      return { chunk, score }
+    })
+    .sort((left, right) => right.score - left.score)
+
+  const positive = scored.filter((entry) => entry.score > 0)
+
+  if (!positive.length) {
+    return chunks.slice(0, limit)
+  }
+
+  return positive.slice(0, limit).map((entry) => entry.chunk)
+}
+
+function buildPrompt(question: string, history: ChatHistoryMessage[], chunks: KnowledgeChunk[]) {
+  const context = chunks
+    .map((chunk) => `[${chunk.source}] ${chunk.title}\n${chunk.content}`)
+    .join("\n\n")
+
+  const historyText = history
+    .slice(-6)
+    .map((message) => `${message.role === "user" ? "User" : "Assistant"}: ${message.content}`)
+    .join("\n")
+
+  return `
+You are an AI assistant embedded inside Connor Furby's portfolio website.
+
+Instructions:
+- Answer as a helpful assistant representing Connor and his work.
+- Use only the provided portfolio context and document context.
+- If information is missing, say you do not see it in the current portfolio knowledge base.
+- Be concise but substantive.
+- Prefer plain language over buzzwords.
+- Do not invent metrics, technologies, schools, or timelines.
+
+Conversation history:
+${historyText || "No prior messages."}
+
+Relevant context:
+${context}
+
+User question:
+${question}
+`.trim()
+}
+
+async function generateWithGemini(prompt: string) {
+  const apiKey = process.env.GEMINI_API_KEY
+
+  if (!apiKey) {
+    return null
+  }
+
+  const model = process.env.PORTFOLIO_CHAT_MODEL || "gemini-2.0-flash"
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.35,
+          maxOutputTokens: 500,
+        },
+      }),
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error(`Gemini request failed with ${response.status}`)
+  }
+
+  const payload = (await response.json()) as {
+    candidates?: Array<{
+      content?: {
+        parts?: Array<{ text?: string }>
+      }
+    }>
+  }
+
+  return payload.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("").trim() || null
+}
+
+async function generateWithOpenAI(prompt: string) {
+  const apiKey = process.env.OPENAI_API_KEY
+
+  if (!apiKey) {
+    return null
+  }
+
+  const model = process.env.PORTFOLIO_CHAT_MODEL || "gpt-4o-mini"
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      temperature: 0.35,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an AI assistant embedded inside Connor Furby's portfolio website. Use only the supplied context, avoid fabrications, and answer clearly.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`OpenAI request failed with ${response.status}`)
+  }
+
+  const payload = (await response.json()) as {
+    choices?: Array<{
+      message?: {
+        content?: string
+      }
+    }>
+  }
+
+  return payload.choices?.[0]?.message?.content?.trim() || null
+}
+
+function buildLocalAnswer(question: string, chunks: KnowledgeChunk[], providerFallbackLabel?: string | null) {
+  const summaries = chunks
+    .slice(0, 3)
+    .map((chunk) => `- ${chunk.title}: ${chunk.content.slice(0, 220)}${chunk.content.length > 220 ? "..." : ""}`)
+    .join("\n")
+
+  return [
+    providerFallbackLabel
+      ? `I couldn't reach the configured ${providerFallbackLabel} model right now, so I searched Connor's local portfolio knowledge base for "${question}".`
+      : `I don't have a live AI model configured yet, but I searched Connor's portfolio knowledge base for "${question}".`,
+    summaries ? `\nMost relevant context:\n${summaries}` : "",
+    providerFallbackLabel
+      ? "\nIf you expected a full AI answer, check your AI provider env vars and model settings. The local fallback is still grounded in your portfolio data and uploaded docs."
+      : "\nAdd `GEMINI_API_KEY` or `OPENAI_API_KEY` in your env file to upgrade this into a full AI answerer.",
+  ]
+    .filter(Boolean)
+    .join("\n")
+}
+
+export async function answerPortfolioQuestion(question: string, history: ChatHistoryMessage[]) {
+  const chunks = await getKnowledgeChunks()
+  const relevantChunks = retrieveRelevantChunks(question, chunks)
+  const prompt = buildPrompt(question, history, relevantChunks)
+  const preferredProvider = process.env.PORTFOLIO_CHAT_PROVIDER?.toLowerCase()
+
+  let answer: string | null = null
+  let mode: "ai" | "local" | "fallback" = "local"
+  let providerFallbackLabel: string | null = null
+
+  try {
+    if (preferredProvider === "openai") {
+      answer = await generateWithOpenAI(prompt)
+    } else if (preferredProvider === "gemini") {
+      answer = await generateWithGemini(prompt)
+    } else {
+      answer = (await generateWithGemini(prompt)) ?? (await generateWithOpenAI(prompt))
+    }
+  } catch (error) {
+    providerFallbackLabel = preferredProvider === "openai" ? "OpenAI" : "Gemini"
+    console.error("Portfolio chat provider failed:", error)
+  }
+
+  if (!answer) {
+    answer = buildLocalAnswer(question, relevantChunks, providerFallbackLabel)
+    mode = providerFallbackLabel ? "fallback" : "local"
+  } else {
+    mode = "ai"
+  }
+
+  return {
+    answer,
+    mode,
+    sources: relevantChunks.map((chunk) => ({
+      id: chunk.id,
+      title: chunk.title,
+      kind: chunk.kind,
+      source: chunk.source,
+    })),
+  }
+}

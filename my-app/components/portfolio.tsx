@@ -15,6 +15,7 @@ import Contact from "@/components/portfolio/Contact"
 import Education from "@/components/portfolio/Education"
 import Experience from "@/components/portfolio/Experience"
 import Footer from "@/components/portfolio/Footer"
+import GitHubDashboard from "@/components/portfolio/GitHubDashboard"
 import Header from "@/components/portfolio/Header"
 import Passions from "@/components/portfolio/Passions"
 import Awards from "@/components/portfolio/Awards"
@@ -225,6 +226,7 @@ export default function Portfolio() {
           <Experience onApiReady={registerCarouselApi} onOpenFullscreen={openProjectFullscreen} />
           <Education />
           <Awards />
+          <GitHubDashboard />
           <Passions />
           <Contact />
         </div>

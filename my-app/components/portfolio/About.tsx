@@ -43,8 +43,8 @@ export default function About() {
           transition={{ delay: 0.05, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
           <motion.div initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1, duration: 0.45 }}>
-            <Badge variant="outline" className="w-fit rounded-full border-foreground/10 bg-background/80 px-4 py-1">
-              <Sparkles data-icon="inline-start" />
+            <Badge variant="outline" className="flex w-fit items-center gap-2 rounded-full px-4 py-1">
+              <Sparkles className="h-3.5 w-3.5 shrink-0" />
               Bright ideas. Clean execution. Real projects.
             </Badge>
           </motion.div>
@@ -124,7 +124,7 @@ export default function About() {
               >
                 <Badge
                   variant="secondary"
-                  className="rounded-full border border-border/70 bg-card/80 px-3 py-1 text-xs font-medium transition-transform duration-300 hover:-translate-y-0.5"
+                  className="rounded-full px-3 py-1 text-xs font-medium transition-transform duration-300 hover:-translate-y-0.5"
                 >
                   {pill.label}
                 </Badge>
@@ -140,7 +140,7 @@ export default function About() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.42, duration: 0.45 }}
               >
-                <Card className="surface-card rounded-[1.5rem] border-border bg-card/90 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_36px_hsl(var(--foreground)/0.09)]">
+                <Card className="liquid-panel liquid-soft rounded-[1.75rem] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_hsl(var(--glass-shadow)/0.14)]">
                   <CardContent className="flex flex-col gap-1.5 p-4">
                     <span className="font-mono text-xs uppercase tracking-[0.24em] text-muted-foreground">Proof</span>
                     <span className="text-2xl font-bold tracking-tight sm:text-3xl">{item.value}</span>
@@ -169,13 +169,13 @@ export default function About() {
             animate={{ y: [0, 10, 0], x: [0, -6, 0] }}
             transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
           />
-          <Card className="surface-card relative overflow-hidden rounded-[2rem] border-border bg-card/95 transition-transform duration-500 hover:-translate-y-1">
+          <Card className="liquid-panel liquid-panel-strong relative overflow-hidden rounded-[2.2rem] transition-transform duration-500 hover:-translate-y-1">
             <motion.div
               className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent"
               animate={{ opacity: [0.35, 0.8, 0.35], x: ["-10%", "10%", "-10%"] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             />
-            <CardHeader className="gap-4 border-b border-border pb-5">
+            <CardHeader className="gap-4 border-b border-border/50 pb-5">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <CardTitle className="text-2xl tracking-tight">Portfolio Snapshot</CardTitle>
@@ -189,14 +189,14 @@ export default function About() {
                   width={88}
                   height={88}
                   priority
-                  className="rounded-2xl border border-border object-cover shadow-sm"
+                  className="rounded-[1.4rem] border border-white/20 object-cover shadow-[0_16px_40px_hsl(var(--glass-shadow)/0.18)]"
                 />
               </div>
             </CardHeader>
             <CardContent className="flex flex-col gap-6 p-6">
               <div className="grid gap-4 sm:grid-cols-2">
                 <motion.div
-                  className="rounded-2xl border border-border bg-muted/40 p-4"
+                  className="liquid-panel liquid-soft rounded-[1.5rem] p-4"
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.22 }}
                 >
@@ -209,7 +209,7 @@ export default function About() {
                   </p>
                 </motion.div>
                 <motion.div
-                  className="rounded-2xl border border-border bg-muted/40 p-4"
+                  className="liquid-panel liquid-soft rounded-[1.5rem] p-4"
                   whileHover={{ y: -4 }}
                   transition={{ duration: 0.22 }}
                 >
@@ -240,7 +240,7 @@ export default function About() {
                   ].map((item) => (
                     <motion.div
                       key={item}
-                      className="rounded-2xl border border-border bg-background px-4 py-3 text-sm leading-7 text-muted-foreground"
+                      className="liquid-panel liquid-soft rounded-[1.4rem] px-4 py-3 text-sm leading-7 text-muted-foreground"
                       whileHover={{ x: 4 }}
                       transition={{ duration: 0.2 }}
                     >

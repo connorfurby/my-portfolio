@@ -32,7 +32,7 @@ export default function SectionHeading({
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.4, delay: 0.05 }}
         >
-          <Badge variant="outline" className="rounded-full border-border bg-background/85 px-4 py-1 font-mono text-[11px] uppercase tracking-[0.22em] backdrop-blur-sm">
+          <Badge variant="outline" className="rounded-full px-4 py-1 font-mono text-[11px] uppercase tracking-[0.22em]">
             {eyebrow}
           </Badge>
         </motion.div>

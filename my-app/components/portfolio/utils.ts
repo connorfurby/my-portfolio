@@ -1,6 +1,6 @@
 import type { SectionId } from "@/components/portfolio/types"
 
-export const sectionIds: SectionId[] = ["about", "experience", "education", "skills", "passions"]
+export const sectionIds: SectionId[] = ["about", "experience", "education", "skills", "integrations", "passions", "contact"]
 
 export function scrollToSection(sectionId: SectionId) {
   const element = document.getElementById(sectionId)

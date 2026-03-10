@@ -20,18 +20,18 @@ export default function Awards() {
           value: "skills",
           label: "Skills",
           content: (
-            <Card className="surface-card rounded-[2rem] border-border bg-card">
+            <Card className="liquid-panel rounded-[2rem]">
               <CardHeader>
                 <CardTitle>Core Skill Areas</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2">
                   {skillGroups.map((group) => (
-                    <div key={group.title} className="rounded-[1.5rem] border border-border bg-muted/35 p-5">
+                    <div key={group.title} className="liquid-panel liquid-soft rounded-[1.5rem] p-5">
                       <h3 className="mb-4 text-base font-semibold">{group.title}</h3>
                       <div className="flex flex-wrap gap-2">
                         {group.items.map((item) => (
-                          <Badge key={item} variant="secondary" className="rounded-full border border-border bg-background px-3 py-1">
+                          <Badge key={item} variant="secondary" className="rounded-full px-3 py-1">
                             {item}
                           </Badge>
                         ))}
@@ -47,7 +47,7 @@ export default function Awards() {
           value: "achievements",
           label: "Achievements",
           content: (
-            <Card className="surface-card rounded-[2rem] border-border bg-card">
+            <Card className="liquid-panel rounded-[2rem]">
               <CardHeader>
                 <CardTitle>Notable Achievements</CardTitle>
               </CardHeader>

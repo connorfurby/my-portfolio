@@ -20,7 +20,7 @@ function ExperienceList({ entries }: { entries: { title: string; subtitle: strin
   return (
     <div className="grid gap-4 xl:max-h-[calc(100vh-12rem)] xl:overflow-y-auto">
       {entries.map((entry) => (
-        <Card key={entry.title} className="surface-card rounded-[1.5rem] border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_hsl(var(--foreground)/0.08)]">
+        <Card key={entry.title} className="liquid-panel rounded-[1.7rem] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_hsl(var(--glass-shadow)/0.14)]">
           <CardHeader>
             <CardTitle>{entry.title}</CardTitle>
             <CardDescription>{entry.subtitle}</CardDescription>

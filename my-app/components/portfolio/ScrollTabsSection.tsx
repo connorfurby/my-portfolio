@@ -95,7 +95,7 @@ export default function ScrollTabsSection({
             </div>
             <TabsList
               className={cn(
-                "mx-auto grid h-auto w-full max-w-5xl gap-2 rounded-[1.4rem] border border-white/10 bg-white/5 p-2 shadow-[0_10px_30px_hsl(var(--foreground)/0.08)] backdrop-blur-xl",
+                "mx-auto grid h-auto w-full max-w-5xl gap-2 rounded-[1.55rem] p-2.5 shadow-none",
                 listClassName
               )}
             >
@@ -112,11 +112,11 @@ export default function ScrollTabsSection({
                   }
                   transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <TabsTrigger value={item.value} className="relative flex-1 overflow-hidden rounded-[1rem] px-3 py-2.5 text-center">
+                  <TabsTrigger value={item.value} className="relative flex-1 overflow-hidden rounded-[1.1rem] px-3 py-2.5 text-center">
                     {item.value === activeTab ? (
                       <motion.span
                         layoutId={`active-tab-pill-${id ?? "section"}`}
-                        className="absolute inset-0 rounded-[1rem] bg-foreground"
+                        className="liquid-chip absolute inset-0 rounded-[1.1rem] border border-foreground/10 bg-background/82"
                         transition={{ type: "spring", stiffness: 360, damping: 28 }}
                       />
                     ) : null}

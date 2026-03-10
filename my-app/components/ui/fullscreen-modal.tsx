@@ -32,13 +32,13 @@ export function FullscreenModal({ isOpen, onClose, images, initialIndex }: Fulls
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] p-4 flex flex-col">
+      <DialogContent className="max-h-[95vh] max-w-[95vw] flex-col p-4">
         <Carousel className="w-full flex-grow" ref={emblaRef}>
           <CarouselContent>
             {images.map((image, index) => (
               <CarouselItem key={index}>
                 <div className="flex flex-col items-center justify-center h-full">
-                  <div className="relative w-full rounded-lg overflow-hidden" style={{ height: "calc(80vh - 100px)" }}>
+                  <div className="liquid-panel liquid-panel-strong relative w-full overflow-hidden rounded-[1.8rem]" style={{ height: "calc(80vh - 100px)" }}>
                     {image.isVideo ? (
                       <video
                         src={image.src}
@@ -46,7 +46,7 @@ export function FullscreenModal({ isOpen, onClose, images, initialIndex }: Fulls
                         loop
                         muted
                         playsInline
-                        className="absolute inset-0 w-full h-full object-contain rounded-lg"
+                        className="absolute inset-0 h-full w-full rounded-[1.8rem] object-contain"
                       />
                     ) : (
                       <Image
@@ -54,11 +54,13 @@ export function FullscreenModal({ isOpen, onClose, images, initialIndex }: Fulls
                         alt={image.alt}
                         layout="fill"
                         objectFit="contain"
-                        className="rounded-lg"
+                        className="rounded-[1.8rem]"
                       />
                     )}
                   </div>
-                  <p className="mt-4 text-center text-sm">{image.description}</p>
+                  <p className="mt-4 rounded-full border border-foreground/10 bg-background/55 px-4 py-2 text-center text-sm text-muted-foreground backdrop-blur-xl">
+                    {image.description}
+                  </p>
                 </div>
               </CarouselItem>
             ))}

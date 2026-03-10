@@ -29,16 +29,16 @@ export default function ExperienceCard({
   onOpenFullscreen,
 }: ExperienceCardProps) {
   return (
-    <Card className="surface-card mb-8 overflow-hidden rounded-[2rem] border-border bg-card pt-0 xl:max-h-[calc(100vh-10rem)]">
+    <Card className="liquid-panel liquid-panel-strong mb-8 overflow-hidden rounded-[2.2rem] pt-0 xl:max-h-[calc(100vh-10rem)]">
       <CardHeader className="gap-3 pb-5 pt-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex max-w-2xl flex-col gap-3">
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="rounded-full border-border bg-background px-3 py-1 font-mono text-[11px] uppercase tracking-[0.22em]">
+              <Badge variant="outline" className="rounded-full px-3 py-1 font-mono text-[11px] uppercase tracking-[0.22em]">
                 Featured Project
               </Badge>
-              {project.stack?.slice(0, 3).map((item) => (
-                <Badge key={item} variant="secondary" className="rounded-full border border-border bg-card px-3 py-1">
+              {project.stack?.slice(0, 4).map((item) => (
+                <Badge key={item} variant="secondary" className="rounded-full px-3 py-1">
                   {item}
                 </Badge>
               ))}
@@ -50,7 +50,7 @@ export default function ExperienceCard({
           </div>
 
           {project.spotlight ? (
-            <div className="max-w-sm rounded-2xl border border-border bg-muted/40 p-3">
+            <div className="liquid-panel liquid-soft max-w-sm rounded-[1.45rem] p-3">
               <div className="mb-2 flex items-center gap-2 text-sm font-medium">
                 <Sparkles className="h-4 w-4 text-primary" />
                 Why it stands out
@@ -62,7 +62,7 @@ export default function ExperienceCard({
       </CardHeader>
 
       <CardContent className="grid gap-6 xl:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] xl:overflow-hidden">
-        <div className="rounded-[1.5rem] border border-border bg-muted/35 p-4 xl:max-h-[calc(100vh-18rem)] xl:overflow-y-auto">
+        <div className="liquid-panel liquid-soft rounded-[1.7rem] p-4 xl:max-h-[calc(100vh-18rem)] xl:overflow-y-auto">
           <div className="mb-4 flex items-center justify-between gap-3">
             <span className="text-sm font-semibold">Key Contributions</span>
             <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -76,7 +76,7 @@ export default function ExperienceCard({
           </ul>
         </div>
 
-        <div className="rounded-[1.5rem] border border-border bg-background p-4 xl:flex xl:max-h-[calc(100vh-18rem)] xl:flex-col">
+        <div className="liquid-panel rounded-[1.7rem] p-4 xl:flex xl:max-h-[calc(100vh-18rem)] xl:flex-col">
           <Carousel
             className="mx-auto w-full xl:flex xl:h-full xl:flex-col"
             opts={{ loop: true }}
@@ -90,7 +90,7 @@ export default function ExperienceCard({
               {project.images.map((image, imageIndex) => (
                 <CarouselItem key={`${project.title}-${imageIndex}`}>
                   <div className="p-1 xl:h-full">
-                    <Card className="overflow-hidden rounded-[1.5rem] border-border bg-muted/25 xl:h-full">
+                    <Card className="liquid-panel liquid-soft overflow-hidden rounded-[1.7rem] xl:h-full">
                       <CardContent className="p-3">
                         <AspectRatio ratio={16 / 9} className="bg-muted">
                           <div className="relative h-full w-full">

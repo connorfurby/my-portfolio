@@ -34,7 +34,7 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="mx-auto w-[min(1320px,calc(100%-1rem))] py-2">
-        <div className="header-glass pointer-events-auto relative flex h-16 items-center gap-3 overflow-hidden rounded-[1.6rem] border border-white/15 px-4 md:px-6">
+        <div className="header-glass pointer-events-auto relative flex h-16 items-center gap-3 overflow-hidden rounded-[1.85rem] border border-white/10 px-4 md:px-6">
           <div className="header-warp pointer-events-none absolute inset-0 overflow-hidden">
             <div className="header-warp-orb header-warp-orb-one" />
             <div className="header-warp-orb header-warp-orb-two" />
@@ -43,7 +43,7 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
 
           <div className="relative flex h-full w-full items-center gap-3">
             <motion.div className="mr-2 flex items-center gap-3" whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
-              <div className="flex size-10 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-transform duration-300 hover:rotate-6 hover:scale-105">
+              <div className="liquid-chip flex size-10 items-center justify-center rounded-[1.15rem] transition-transform duration-300 hover:scale-[1.03]">
                 <Image src="/imgs/logo.png" alt="Logo" width={22} height={22} className="size-[22px]" />
               </div>
               <div className="hidden flex-col sm:flex">
@@ -63,9 +63,9 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
                     <Button
                       variant="ghost"
                       className={cn(
-                        "rounded-full border border-transparent px-4 text-sm font-medium text-muted-foreground transition-all duration-200 hover:border-white/10 hover:bg-white/10 hover:text-foreground",
+                        "rounded-full border border-transparent px-4 text-sm font-medium text-muted-foreground transition-all duration-200",
                         activeSection === sectionId &&
-                          "border-white/15 bg-foreground/90 text-background shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:bg-foreground hover:text-background"
+                          "liquid-chip border-foreground/8 bg-background/24 text-foreground shadow-[0_8px_20px_hsl(var(--glass-shadow)/0.08)] hover:bg-background/24"
                       )}
                       onClick={() => onNavigate(sectionId)}
                     >
@@ -79,11 +79,11 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
             <div className="flex-1 md:hidden">
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="icon" aria-label="Menu" className="rounded-full border-white/15 bg-white/10">
+                  <Button variant="outline" size="icon" aria-label="Menu" className="rounded-full">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="border-border bg-background/95">
+                <SheetContent side="left" className="border-border bg-background/92">
                   <SheetHeader>
                     <SheetTitle>Menu</SheetTitle>
                     <SheetDescription>Navigate through the portfolio sections</SheetDescription>
@@ -113,9 +113,9 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
 
             <div className="ml-auto hidden items-center gap-2 sm:flex">
               <motion.div
-                className="hidden rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-muted-foreground xl:flex xl:items-center xl:gap-2"
-                animate={{ y: [0, -2, 0] }}
-                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+                className="liquid-chip hidden rounded-full px-3 py-1 text-xs text-muted-foreground xl:flex xl:items-center xl:gap-2"
+                animate={{ y: [0, -1, 0] }}
+                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
               >
                 <Sparkles className="h-3.5 w-3.5" />
                 Open to software opportunities
@@ -125,7 +125,7 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
                 size="sm"
                 aria-label="Toggle Theme"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="rounded-full border-white/15 bg-white/10"
+                className="rounded-full"
               >
                 {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                 Theme

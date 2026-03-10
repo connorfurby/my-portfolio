@@ -49,6 +49,12 @@ body {
     --radius: 1rem;
     --spotlight: 229 91% 62%;
     --spotlight-secondary: 171 82% 52%;
+    --glass-surface: 0 0% 100%;
+    --glass-surface-strong: 0 0% 100%;
+    --glass-shadow: 224 45% 20%;
+    --glass-inner: 0 0% 100%;
+    --glass-stroke: 220 28% 86%;
+    --glass-frost: 22px;
   }
   .dark {
     --background: 222 37% 8%;
@@ -77,6 +83,12 @@ body {
     --chart-5: 340 75% 55%;
     --spotlight: 227 91% 66%;
     --spotlight-secondary: 171 82% 60%;
+    --glass-surface: 223 34% 14%;
+    --glass-surface-strong: 224 38% 17%;
+    --glass-shadow: 222 52% 4%;
+    --glass-inner: 210 40% 98%;
+    --glass-stroke: 222 24% 26%;
+    --glass-frost: 24px;
   }
 }
 
@@ -90,11 +102,95 @@ body {
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
-      radial-gradient(circle at top left, hsl(var(--spotlight) / 0.12), transparent 26%),
-      radial-gradient(circle at 80% 10%, hsl(var(--spotlight-secondary) / 0.12), transparent 24%),
-      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 55%, hsl(var(--muted) / 0.3) 100%);
+      radial-gradient(circle at 12% 8%, hsl(var(--spotlight) / 0.1), transparent 28%),
+      radial-gradient(circle at 82% 10%, hsl(var(--spotlight-secondary) / 0.08), transparent 26%),
+      radial-gradient(circle at 50% 100%, hsl(var(--primary) / 0.05), transparent 34%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.98) 52%, hsl(var(--muted) / 0.42) 100%);
     background-attachment: fixed;
+    overflow-x: hidden;
   }
+}
+
+.liquid-panel,
+.surface-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid hsl(var(--glass-stroke) / 0.48);
+  background:
+    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.46), hsl(var(--glass-surface) / 0.16)),
+    linear-gradient(135deg, hsl(var(--glass-inner) / 0.12), transparent 44%);
+  box-shadow:
+    0 1px 0 hsl(var(--glass-inner) / 0.24),
+    0 18px 42px hsl(var(--glass-shadow) / 0.09),
+    inset 0 1px 0 hsl(var(--glass-inner) / 0.38);
+  backdrop-filter: blur(var(--glass-frost)) saturate(132%);
+  -webkit-backdrop-filter: blur(var(--glass-frost)) saturate(132%);
+}
+
+.liquid-panel::before,
+.surface-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, hsl(var(--glass-inner) / 0.16), transparent 22%, transparent 62%, hsl(var(--glass-inner) / 0.1) 100%);
+  opacity: 0.72;
+}
+
+.liquid-panel > *,
+.surface-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.liquid-panel-strong {
+  background:
+    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.54), hsl(var(--glass-surface) / 0.2)),
+    linear-gradient(140deg, hsl(var(--glass-inner) / 0.12), transparent 46%);
+  box-shadow:
+    0 1px 0 hsl(var(--glass-inner) / 0.24),
+    0 22px 54px hsl(var(--glass-shadow) / 0.11),
+    inset 0 1px 0 hsl(var(--glass-inner) / 0.42);
+}
+
+.liquid-soft {
+  background:
+    linear-gradient(180deg, hsl(var(--glass-surface) / 0.36), hsl(var(--glass-surface) / 0.12));
+  border-color: hsl(var(--glass-stroke) / 0.38);
+}
+
+.liquid-chip {
+  border: 1px solid hsl(var(--glass-stroke) / 0.42);
+  background:
+    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.38), hsl(var(--glass-surface) / 0.12)),
+    linear-gradient(135deg, hsl(var(--glass-inner) / 0.12), transparent 50%);
+  box-shadow:
+    0 1px 0 hsl(var(--glass-inner) / 0.24),
+    0 10px 24px hsl(var(--glass-shadow) / 0.08),
+    inset 0 1px 0 hsl(var(--glass-inner) / 0.34);
+  backdrop-filter: blur(16px) saturate(122%);
+  -webkit-backdrop-filter: blur(16px) saturate(122%);
+}
+
+.liquid-divider {
+  background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.18), transparent);
+}
+
+.liquid-glow {
+  position: relative;
+}
+
+.liquid-glow::after {
+  content: "";
+  position: absolute;
+  inset: auto 10% -40% 10%;
+  height: 40%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, hsl(var(--spotlight) / 0.08), transparent 72%);
+  filter: blur(18px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .banner-gradient {
@@ -251,13 +347,15 @@ body {
   position: fixed;
   inset: 0;
   z-index: -2;
-  background-image:
+  background:
     linear-gradient(to right, hsl(var(--foreground) / 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, hsl(var(--foreground) / 0.04) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(circle at center, black 45%, transparent 90%);
+    linear-gradient(to bottom, hsl(var(--foreground) / 0.04) 1px, transparent 1px),
+    radial-gradient(circle at 20% 15%, hsl(var(--spotlight) / 0.04), transparent 24%),
+    radial-gradient(circle at 80% 10%, hsl(var(--spotlight-secondary) / 0.03), transparent 22%);
+  background-size: 56px 56px, 56px 56px, auto, auto;
+  mask-image: radial-gradient(circle at center, black 52%, transparent 94%);
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.58;
 }
 
 .portfolio-shell::after {
@@ -265,35 +363,35 @@ body {
   position: fixed;
   inset: 0;
   z-index: -1;
-  opacity: 0.09;
+  opacity: 0.08;
   background-image:
-    radial-gradient(circle at 18% 16%, hsl(var(--spotlight) / 0.3), transparent 24%),
-    radial-gradient(circle at 85% 8%, hsl(var(--spotlight-secondary) / 0.24), transparent 20%),
-    radial-gradient(circle at 50% 100%, hsl(var(--spotlight) / 0.12), transparent 30%);
-  filter: blur(42px);
+    radial-gradient(circle at 14% 10%, hsl(var(--spotlight) / 0.18), transparent 24%),
+    radial-gradient(circle at 84% 4%, hsl(var(--spotlight-secondary) / 0.14), transparent 20%),
+    radial-gradient(circle at 50% 105%, hsl(var(--primary) / 0.08), transparent 30%);
+  filter: blur(44px);
   pointer-events: none;
 }
 
 .header-glass {
   background:
-    linear-gradient(180deg, hsl(var(--background) / 0.54), hsl(var(--background) / 0.34)),
-    linear-gradient(120deg, hsl(var(--spotlight) / 0.1), transparent 34%, hsl(var(--spotlight-secondary) / 0.1) 100%);
+    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.38), hsl(var(--glass-surface) / 0.12)),
+    linear-gradient(120deg, hsl(var(--glass-inner) / 0.1), transparent 40%);
   box-shadow:
-    0 16px 40px hsl(var(--foreground) / 0.1),
-    inset 0 1px 0 hsl(0 0% 100% / 0.42);
-  backdrop-filter: blur(22px) saturate(165%);
-  -webkit-backdrop-filter: blur(22px) saturate(165%);
+    0 16px 38px hsl(var(--glass-shadow) / 0.12),
+    inset 0 1px 0 hsl(var(--glass-inner) / 0.32);
+  backdrop-filter: blur(24px) saturate(126%);
+  -webkit-backdrop-filter: blur(24px) saturate(126%);
 }
 
 .header-warp {
-  opacity: 0.95;
+  opacity: 0.55;
 }
 
 .header-warp-orb {
   position: absolute;
   border-radius: 9999px;
   filter: blur(24px);
-  opacity: 0.42;
+  opacity: 0.22;
 }
 
 .header-warp-orb-one {
@@ -318,9 +416,9 @@ body {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(120deg, transparent 10%, hsl(0 0% 100% / 0.18) 28%, transparent 54%),
-    linear-gradient(180deg, hsl(0 0% 100% / 0.18), transparent 58%);
-  opacity: 1;
+    linear-gradient(120deg, transparent 10%, hsl(var(--glass-inner) / 0.12) 24%, transparent 56%),
+    linear-gradient(180deg, hsl(var(--glass-inner) / 0.08), transparent 58%);
+  opacity: 0.7;
 }
 
 .section-title {
@@ -328,14 +426,11 @@ body {
   font-family: var(--font-display), var(--font-sans), Arial, Helvetica, sans-serif;
   font-weight: 600;
   letter-spacing: -0.04em;
+  text-shadow: 0 12px 38px hsl(var(--spotlight) / 0.1);
 }
 
 .section-subtitle {
   @apply max-w-2xl text-sm leading-7 text-muted-foreground md:text-base;
-}
-
-.surface-card {
-  @apply border-border/80 bg-card shadow-[0_1px_0_hsl(var(--foreground)/0.02),0_18px_45px_hsl(var(--foreground)/0.06)];
 }
 
 .hero-glow {
@@ -388,12 +483,21 @@ body {
 }
 
 .progress-rail {
-  box-shadow: inset 0 0 0 1px hsl(var(--border) / 0.5);
+  box-shadow:
+    inset 0 1px 0 hsl(var(--glass-inner) / 0.18),
+    inset 0 0 0 1px hsl(var(--glass-stroke) / 0.3);
+  background:
+    linear-gradient(180deg, hsl(var(--glass-surface) / 0.32), hsl(var(--glass-surface) / 0.14));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .progress-fill {
-  background: linear-gradient(90deg, hsl(var(--spotlight)) 0%, hsl(var(--spotlight-secondary)) 100%);
-  box-shadow: 0 0 8px hsl(var(--spotlight) / 0.1);
+  background:
+    linear-gradient(90deg, hsl(var(--foreground) / 0.9) 0%, hsl(var(--foreground) / 0.58) 100%);
+  box-shadow:
+    0 0 10px hsl(var(--foreground) / 0.08),
+    inset 0 1px 0 hsl(var(--glass-inner) / 0.26);
 }
 
 .hero-rings {
@@ -432,6 +536,20 @@ body {
   background-size: 24px 24px;
   mask-image: radial-gradient(circle at center, black 48%, transparent 100%);
   opacity: 0.38;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-dot-float,
+  .ambient-float-slow,
+  .ambient-float-medium,
+  .ambient-float-fast,
+  .particle-float,
+  .career-particle-ring,
+  .header-warp-orb-one,
+  .header-warp-orb-two,
+  .text-gradient {
+    animation: none !important;
+  }
 }
 
 @media (max-width: 1023px) {

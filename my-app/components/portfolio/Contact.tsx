@@ -12,7 +12,7 @@ export default function Contact() {
     <AnimatedSection id="contact" className="mb-12 pt-16" delay={0.05}>
       <div className="grid gap-8 xl:grid-cols-[0.9fr_1.1fr]">
         <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }}>
-          <Card className="surface-card relative overflow-hidden rounded-[2rem] border-border bg-card transition-all duration-300 hover:-translate-y-1">
+          <Card className="liquid-panel liquid-panel-strong relative overflow-hidden rounded-[2.2rem] transition-all duration-300 hover:-translate-y-1">
             <motion.div
               className="absolute -left-10 top-10 size-28 rounded-full bg-primary/12 blur-3xl"
               animate={{ x: [0, 20, 0], y: [0, -12, 0] }}
@@ -29,7 +29,7 @@ export default function Contact() {
                 {contactLinks.map((link) => (
                   <motion.div
                     key={link.href}
-                    className="rounded-[1.5rem] border border-border bg-muted/35 p-4"
+                    className="liquid-panel liquid-soft rounded-[1.6rem] p-4"
                     whileHover={{ x: 4, y: -2 }}
                     transition={{ duration: 0.2 }}
                   >
@@ -66,7 +66,7 @@ export default function Contact() {
                 whileHover={{ y: -6 }}
                 transition={{ duration: 0.22 }}
               >
-                <Card className="surface-card rounded-[1.5rem] border-border bg-card transition-shadow duration-300 hover:shadow-[0_18px_42px_hsl(var(--foreground)/0.08)]">
+                <Card className="liquid-panel rounded-[1.7rem] transition-shadow duration-300 hover:shadow-[0_22px_48px_hsl(var(--glass-shadow)/0.16)]">
                   <CardContent className="p-4">
                     <div className="mb-3 flex items-center gap-2 text-sm font-medium">
                       <Music4 className="h-4 w-4 text-primary" />
