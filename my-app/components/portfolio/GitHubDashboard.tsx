@@ -1,7 +1,23 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-import { Bot, CalendarClock, ExternalLink, FolderGit2, GitBranch, GitCommitHorizontal, GitPullRequest, Linkedin, RefreshCcw, Rss, Sparkles, Star, Users } from "lucide-react"
+import Image from "next/image"
+import { useEffect, useMemo, useRef, useState } from "react"
+import {
+  Bot,
+  CalendarClock,
+  ExternalLink,
+  FolderGit2,
+  GitBranch,
+  GitCommitHorizontal,
+  GitPullRequest,
+  Linkedin,
+  Music4,
+  RefreshCcw,
+  Rss,
+  Sparkles,
+  Star,
+  Users,
+} from "lucide-react"
 import { motion } from "framer-motion"
 
 import AnimatedSection from "@/components/portfolio/AnimatedSection"
@@ -77,6 +93,57 @@ type LinkedInActivityResponse = {
     publishedAt: string
   }[]
   message: string
+}
+
+type SpotifyDashboardResponse = {
+  mode: "configured" | "unconfigured" | "error"
+  updatedAt: string
+  message: string
+  topWindowLabel: string
+  profile: {
+    displayName: string | null
+    profileUrl: string | null
+    imageUrl: string | null
+    product: string | null
+    country: string | null
+  } | null
+  playback: {
+    state: "playing" | "recent" | "idle"
+    label: string
+    title: string | null
+    artist: string | null
+    album: string | null
+    imageUrl: string | null
+    url: string | null
+    progressMs: number | null
+    durationMs: number | null
+    playedAt: string | null
+    deviceName: string | null
+    deviceType: string | null
+    shuffleState: boolean | null
+    repeatState: string | null
+    explicit: boolean | null
+    releaseDate: string | null
+    contextType: string | null
+    contextUrl: string | null
+    message: string
+  } | null
+  topTracks: Array<{
+    id: string
+    title: string
+    artist: string
+    album: string | null
+    imageUrl: string | null
+    url: string | null
+    durationMs: number | null
+  }>
+  topArtists: Array<{
+    id: string
+    name: string
+    imageUrl: string | null
+    url: string | null
+    genres: string[]
+  }>
 }
 
 const statCards = [
@@ -156,14 +223,60 @@ function formatMonthYear(dateString: string) {
   }).format(new Date(dateString))
 }
 
+function formatDuration(durationMs?: number | null) {
+  if (!durationMs) {
+    return "--:--"
+  }
+
+  const totalSeconds = Math.max(0, Math.floor(durationMs / 1000))
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`
+}
+
+function formatSpotifyValue(value?: string | null) {
+  if (!value) {
+    return null
+  }
+
+  return value.replace(/_/g, " ")
+}
+
 export default function GitHubDashboard() {
+  const sectionRef = useRef<HTMLElement | null>(null)
   const [activeTab, setActiveTab] = useState("github")
   const [githubData, setGitHubData] = useState<GitHubDashboardResponse | null>(null)
   const [githubError, setGitHubError] = useState<string | null>(null)
   const [githubLoading, setGitHubLoading] = useState(true)
+  const [spotifyData, setSpotifyData] = useState<SpotifyDashboardResponse | null>(null)
+  const [spotifyError, setSpotifyError] = useState<string | null>(null)
+  const [spotifyLoading, setSpotifyLoading] = useState(true)
+  const [isIntegrationsVisible, setIsIntegrationsVisible] = useState(false)
   const [linkedinData, setLinkedinData] = useState<LinkedInActivityResponse | null>(null)
   const [linkedinError, setLinkedinError] = useState<string | null>(null)
   const [linkedinLoading, setLinkedinLoading] = useState(true)
+
+  useEffect(() => {
+    const element = sectionRef.current
+
+    if (!element) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsIntegrationsVisible(entry.isIntersecting)
+      },
+      {
+        threshold: 0.35,
+      }
+    )
+
+    observer.observe(element)
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     let isCancelled = false
@@ -220,7 +333,36 @@ export default function GitHubDashboard() {
       }
     }
 
+    async function loadSpotifyActivity() {
+      try {
+        setSpotifyLoading(true)
+        setSpotifyError(null)
+
+        const response = await fetch("/api/spotify/now-playing", {
+          cache: "no-store",
+        })
+        const payload = (await response.json()) as SpotifyDashboardResponse | { message?: string }
+
+        if (!response.ok && !("mode" in payload)) {
+          throw new Error("message" in payload ? payload.message : "Unable to load Spotify activity")
+        }
+
+        if (!isCancelled) {
+          setSpotifyData(payload as SpotifyDashboardResponse)
+        }
+      } catch (fetchError) {
+        if (!isCancelled) {
+          setSpotifyError(fetchError instanceof Error ? fetchError.message : "Unable to load Spotify activity")
+        }
+      } finally {
+        if (!isCancelled) {
+          setSpotifyLoading(false)
+        }
+      }
+    }
+
     loadGitHubDashboard()
+    loadSpotifyActivity()
     loadLinkedInActivity()
 
     return () => {
@@ -228,24 +370,68 @@ export default function GitHubDashboard() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!isIntegrationsVisible) {
+      return
+    }
+
+    const spotifyInterval = window.setInterval(() => {
+      void (async () => {
+        try {
+          const response = await fetch("/api/spotify/now-playing", {
+            cache: "no-store",
+          })
+          const payload = (await response.json()) as SpotifyDashboardResponse | { message?: string }
+
+          if (!response.ok && !("mode" in payload)) {
+            throw new Error("message" in payload ? payload.message : "Unable to load Spotify activity")
+          }
+
+          setSpotifyData(payload as SpotifyDashboardResponse)
+          setSpotifyError(null)
+        } catch (fetchError) {
+          setSpotifyError(fetchError instanceof Error ? fetchError.message : "Unable to load Spotify activity")
+        }
+      })()
+    }, 5000)
+
+    return () => window.clearInterval(spotifyInterval)
+  }, [isIntegrationsVisible])
+
   const maxPulse = useMemo(
     () => Math.max(...(githubData?.activityPulse.map((point) => point.total) ?? [0]), 1),
     [githubData?.activityPulse]
   )
+  const spotifyPlaybackProgress = useMemo(() => {
+    const playback = spotifyData?.playback
+
+    if (!playback?.progressMs || !playback.durationMs) {
+      return 0
+    }
+
+    return Math.min(100, Math.max(0, (playback.progressMs / playback.durationMs) * 100))
+  }, [spotifyData?.playback])
 
   return (
-    <AnimatedSection id="integrations" className="mb-16 pt-16" delay={0.04}>
-      <SectionHeading
-        eyebrow="Integrations"
-        title="Live signals from the platforms tied to my work"
-        description="A shared hub for external profiles and activity. GitHub is fully live, and LinkedIn is wired through a feed adapter so it can slot into the portfolio cleanly."
-      />
+    <AnimatedSection id="integrations" className="mb-16 pt-6" delay={0.04}>
+      <section ref={sectionRef}>
+      <div className="mb-3">
+        <SectionHeading
+          eyebrow="Integrations"
+          title="Live signals from the platforms tied to my work"
+          description="A shared hub for external profiles and activity. GitHub is fully live, Spotify can surface personal listening data from my own account, and LinkedIn is wired through a feed adapter so it can slot into the portfolio cleanly."
+        />
+      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-6 grid h-auto w-full max-w-2xl grid-cols-1 gap-2 sm:grid-cols-3">
+        <TabsList className="mb-3 grid h-auto w-full max-w-3xl grid-cols-1 gap-2 sm:grid-cols-4">
           <TabsTrigger value="github" className="gap-2">
             <FolderGit2 className="h-4 w-4" />
             GitHub
+          </TabsTrigger>
+          <TabsTrigger value="spotify" className="gap-2">
+            <Music4 className="h-4 w-4" />
+            Spotify
           </TabsTrigger>
           <TabsTrigger value="linkedin" className="gap-2">
             <Linkedin className="h-4 w-4" />
@@ -598,6 +784,232 @@ export default function GitHubDashboard() {
           </div>
         </TabsContent>
 
+        <TabsContent value="spotify" className="!mt-0">
+          {spotifyLoading ? (
+            <div className="grid gap-3 xl:grid-cols-[minmax(0,1.15fr)_minmax(24rem,0.95fr)]">
+              <div className="h-[22rem] rounded-[1.3rem] bg-foreground/6 animate-pulse" />
+              <div className="h-[22rem] rounded-[1.3rem] bg-foreground/6 animate-pulse" />
+            </div>
+          ) : spotifyError || !spotifyData ? (
+            <Card className="surface-card rounded-[1.3rem] border-border bg-card">
+              <div className="p-4 text-sm leading-7 text-muted-foreground">
+                {spotifyError ?? "Spotify activity is temporarily unavailable."}
+              </div>
+            </Card>
+          ) : spotifyData.mode !== "configured" ? (
+            <Card className="surface-card rounded-[1.3rem] border-border bg-card">
+              <div className="p-4 text-sm leading-7 text-muted-foreground">{spotifyData.message}</div>
+            </Card>
+          ) : (
+            <div className="grid gap-3 xl:grid-cols-[minmax(0,1.15fr)_minmax(24rem,0.95fr)]">
+              <Card className="surface-card relative overflow-hidden rounded-[1.3rem] border-border bg-card">
+                <motion.div
+                  className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.22),transparent_70%)] blur-3xl"
+                  animate={{ x: [0, 16, 0], y: [0, -10, 0] }}
+                  transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <div className="relative grid gap-0 md:grid-cols-[minmax(13rem,14rem)_1fr]">
+                  <div className="relative aspect-square w-full bg-background/60">
+                    {spotifyData.playback?.imageUrl ? (
+                      <Image
+                        src={spotifyData.playback.imageUrl}
+                        alt={spotifyData.playback.title ?? "Spotify artwork"}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.18),transparent_70%)]">
+                        <Music4 className="h-12 w-12 text-foreground/70" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-3 p-3.5 sm:p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                          Personal Spotify
+                        </Badge>
+                        {isIntegrationsVisible ? (
+                          <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                            5s in view
+                          </Badge>
+                        ) : null}
+                      </div>
+                      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                        Updated {formatRelative(spotifyData.updatedAt)}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                        {spotifyData.playback?.label ?? "Spotify"}
+                      </Badge>
+                      {spotifyData.playback?.explicit ? (
+                        <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                          Explicit
+                        </Badge>
+                      ) : null}
+                      {spotifyData.profile?.product ? (
+                        <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                          {spotifyData.profile.product}
+                        </Badge>
+                      ) : null}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
+                        {spotifyData.profile?.displayName ?? "Spotify account"}
+                      </div>
+                      <div className="font-display text-2xl font-semibold tracking-[-0.05em] text-foreground sm:text-[2rem]">
+                        {spotifyData.playback?.title ?? "Nothing is playing"}
+                      </div>
+                      <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                        {spotifyData.playback?.artist ?? "Unknown artist"}
+                      </div>
+                      {spotifyData.playback?.album ? (
+                        <p className="text-sm leading-6 text-muted-foreground">
+                          {spotifyData.playback.state === "recent" ? "Last played from" : "From"} {spotifyData.playback.album}
+                        </p>
+                      ) : null}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="h-1.5 rounded-full bg-foreground/8">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-primary via-[hsl(var(--spotlight))] to-[hsl(var(--spotlight-secondary))]"
+                          style={{ width: `${spotifyPlaybackProgress}%` }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{formatDuration(spotifyData.playback?.progressMs)}</span>
+                        <span>{formatDuration(spotifyData.playback?.durationMs)}</span>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-2.5 sm:grid-cols-2">
+                      <div className="rounded-[1rem] border border-foreground/10 bg-background/45 p-2.5">
+                        <div className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Device</div>
+                        <div className="text-sm text-foreground">
+                          {spotifyData.playback?.deviceName ?? "Recent history"}
+                        </div>
+                      </div>
+                      <div className="rounded-[1rem] border border-foreground/10 bg-background/45 p-2.5">
+                        <div className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Context</div>
+                        <div className="text-sm text-foreground">
+                          {formatSpotifyValue(spotifyData.playback?.contextType) ?? "Direct play"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2.5">
+                      {spotifyData.playback?.url ? (
+                        <Button asChild className="rounded-full px-4">
+                          <a href={spotifyData.playback.url} target="_blank" rel="noreferrer">
+                            Open in Spotify
+                          </a>
+                        </Button>
+                      ) : null}
+                      {spotifyData.profile?.profileUrl ? (
+                        <Button asChild variant="outline" className="rounded-full px-4">
+                          <a href={spotifyData.profile.profileUrl} target="_blank" rel="noreferrer">
+                            Open Profile
+                          </a>
+                        </Button>
+                      ) : null}
+                      <div className="rounded-full border border-foreground/10 bg-background/60 px-3 py-1.5 text-sm text-muted-foreground">
+                        {spotifyData.playback?.playedAt
+                          ? `Played ${formatRelative(spotifyData.playback.playedAt)}`
+                          : spotifyData.playback?.message ?? spotifyData.message}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="surface-card rounded-[1.3rem] border-border bg-card">
+                <div className="p-3.5 sm:p-4">
+                  <div className="mb-3 flex items-center gap-2 text-xl font-display font-semibold tracking-tight">
+                    <Users className="h-5 w-5 text-primary" />
+                    Top listening
+                  </div>
+
+                  <div className="grid gap-4 lg:grid-cols-2">
+                    <div>
+                      <div className="mb-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                        Top tracks {spotifyData.topWindowLabel}
+                      </div>
+                      <div className="grid gap-2">
+                        {spotifyData.topTracks.length ? (
+                          spotifyData.topTracks.map((track, index) => (
+                            <div key={track.id} className="flex items-center gap-3 rounded-[1.05rem] border border-foreground/10 bg-background/45 p-2.5">
+                              <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
+                                {track.imageUrl ? (
+                                  <Image src={track.imageUrl} alt={track.title} fill className="object-cover" unoptimized />
+                                ) : (
+                                  <div className="flex h-full items-center justify-center">
+                                    <Music4 className="h-5 w-5 text-muted-foreground" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="truncate text-sm font-semibold text-foreground">
+                                  #{index + 1} {track.title}
+                                </div>
+                                <div className="truncate text-xs uppercase tracking-[0.18em] text-muted-foreground">{track.artist}</div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="rounded-[1.3rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
+                            Top tracks will appear after Spotify returns affinity data.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="mb-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                        Top artists {spotifyData.topWindowLabel}
+                      </div>
+                      <div className="grid gap-2">
+                        {spotifyData.topArtists.length ? (
+                          spotifyData.topArtists.map((artist, index) => (
+                            <div key={artist.id} className="flex items-center gap-3 rounded-[1.05rem] border border-foreground/10 bg-background/45 p-2.5">
+                              <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
+                                {artist.imageUrl ? (
+                                  <Image src={artist.imageUrl} alt={artist.name} fill className="object-cover" unoptimized />
+                                ) : (
+                                  <div className="flex h-full items-center justify-center">
+                                    <Users className="h-5 w-5 text-muted-foreground" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="truncate text-sm font-semibold text-foreground">
+                                  #{index + 1} {artist.name}
+                                </div>
+                                <div className="truncate text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                                  {artist.genres.join(" • ") || "Top artist"}
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="rounded-[1.3rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
+                            Top artists will appear after Spotify returns affinity data.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
+        </TabsContent>
+
         <TabsContent value="linkedin" className="mt-0">
           <div className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
             <Card className="surface-card rounded-[2rem] border-border bg-card">
@@ -718,6 +1130,7 @@ export default function GitHubDashboard() {
           <PortfolioChat />
         </TabsContent>
       </Tabs>
+      </section>
     </AnimatedSection>
   )
 }

@@ -1,8 +1,7 @@
-import { Buffer } from "buffer"
-
 import { NextResponse } from "next/server"
 
 import type { NowApiResponse, NowEvent, NowEventGroup, NowSignal } from "@/lib/now"
+import { fetchSpotifyNowSignal } from "@/lib/spotify"
 
 const REVALIDATE_SECONDS = 1800
 const GITHUB_USERNAME = "connorfurby"
@@ -18,27 +17,6 @@ type GitHubRepository = {
   stargazers_count: number
   archived: boolean
   fork: boolean
-}
-
-type SpotifyTokenResponse = {
-  access_token: string
-}
-
-type SpotifyCurrentTrackResponse = {
-  is_playing?: boolean
-  item?: {
-    name?: string
-    external_urls?: {
-      spotify?: string
-    }
-    album?: {
-      name?: string
-      images?: Array<{ url?: string }>
-    }
-    artists?: Array<{
-      name?: string
-    }>
-  }
 }
 
 type NotionRichText = {
@@ -186,90 +164,6 @@ function getNotionDate(page: NotionPage, propertyName: string) {
 function getNotionCheckbox(page: NotionPage, propertyName: string) {
   const property = getNotionProperty(page, propertyName)
   return property?.type === "checkbox" ? property.checkbox : false
-}
-
-function defaultSpotifySignal(): NowSignal {
-  return {
-    source: "Spotify",
-    state: "unconfigured",
-    label: "Currently playing",
-    title: "Spotify not connected yet",
-    description: "Add Spotify credentials and a refresh token to show the track currently in rotation.",
-  }
-}
-
-async function fetchSpotifyCurrentTrack() {
-  const clientId = process.env.SPOTIFY_CLIENT_ID
-  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
-  const refreshToken = process.env.SPOTIFY_REFRESH_TOKEN
-
-  if (!clientId || !clientSecret || !refreshToken) {
-    return defaultSpotifySignal()
-  }
-
-  try {
-    const basicToken = Buffer.from(`${clientId}:${clientSecret}`).toString("base64")
-    const tokenResponse = await fetch("https://accounts.spotify.com/api/token", {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${basicToken}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        grant_type: "refresh_token",
-        refresh_token: refreshToken,
-      }),
-      next: { revalidate: REVALIDATE_SECONDS },
-    })
-
-    if (!tokenResponse.ok) {
-      throw new Error(`Spotify token refresh failed with ${tokenResponse.status}`)
-    }
-
-    const tokenPayload = (await tokenResponse.json()) as SpotifyTokenResponse
-    const currentTrackResponse = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
-      headers: {
-        Authorization: `Bearer ${tokenPayload.access_token}`,
-      },
-      next: { revalidate: 60 },
-    })
-
-    if (currentTrackResponse.status === 204) {
-      return {
-        source: "Spotify",
-        state: "idle",
-        label: "Currently playing",
-        title: "Nothing is playing right now",
-        description: "Spotify is connected. This card updates automatically when a new track starts.",
-      } satisfies NowSignal
-    }
-
-    if (!currentTrackResponse.ok) {
-      throw new Error(`Spotify current track failed with ${currentTrackResponse.status}`)
-    }
-
-    const payload = (await currentTrackResponse.json()) as SpotifyCurrentTrackResponse
-    const artists = payload.item?.artists?.map((artist) => artist.name).filter(Boolean).join(", ") ?? "Unknown artist"
-
-    return {
-      source: "Spotify",
-      state: payload.is_playing ? "active" : "idle",
-      label: "Currently playing",
-      title: payload.item?.name ?? "Unknown track",
-      subtitle: artists,
-      description: payload.item?.album?.name ? `From ${payload.item.album.name}` : "Live from Spotify.",
-      url: payload.item?.external_urls?.spotify,
-      imageUrl: payload.item?.album?.images?.[0]?.url,
-    } satisfies NowSignal
-  } catch {
-    return {
-      source: "Spotify",
-      state: "error",
-      label: "Currently playing",
-      title: "Spotify is temporarily unavailable",
-      description: "The track card will recover automatically when Spotify responds again.",
-    } satisfies NowSignal
-  }
 }
 
 function parseGoodreadsFeed(xml: string) {
@@ -519,7 +413,7 @@ async function fetchNotionNowContent() {
 
 export async function GET() {
   const [currentTrack, currentBook, latestProject, notionContent] = await Promise.all([
-    fetchSpotifyCurrentTrack(),
+    fetchSpotifyNowSignal(),
     fetchCurrentBook(),
     fetchLatestProject(),
     fetchNotionNowContent(),

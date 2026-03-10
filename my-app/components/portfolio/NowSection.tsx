@@ -150,7 +150,7 @@ function SignalCard({
                 <div>
                   <Button asChild variant="outline" className="rounded-full px-4">
                     <a href={signal.url} target="_blank" rel="noreferrer">
-                      Open source
+                      {signal.source === "Spotify" ? "Open in Spotify" : "Open source"}
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </a>
                   </Button>

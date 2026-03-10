@@ -17,7 +17,6 @@ import Experience from "@/components/portfolio/Experience"
 import Footer from "@/components/portfolio/Footer"
 import GitHubDashboard from "@/components/portfolio/GitHubDashboard"
 import Header from "@/components/portfolio/Header"
-import NowSection from "@/components/portfolio/NowSection"
 import Passions from "@/components/portfolio/Passions"
 import Awards from "@/components/portfolio/Awards"
 import { navItems, projects } from "@/components/portfolio/data"
@@ -228,7 +227,6 @@ export default function Portfolio() {
           <Education />
           <Awards />
           <GitHubDashboard />
-          <NowSection />
           <Passions />
           <Contact />
         </div>
