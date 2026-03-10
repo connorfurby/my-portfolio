@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react"
 
-export type SectionId = "about" | "experience" | "education" | "skills" | "integrations" | "passions" | "contact"
+export type SectionId = "about" | "experience" | "education" | "skills" | "integrations" | "now" | "passions" | "contact"
 
 export type PortfolioMedia = {
   src: string

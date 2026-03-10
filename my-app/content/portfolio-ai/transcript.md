@@ -1,9 +1,6 @@
-# Undergraduate Unofficial Transcript
+# Undergraduate Transcript
 
-**Name:** Connor Allen Furby  
-**SIS ID:** 0006717771  
-**Campus ID:** 9088063368  
-**Birthdate:** 02/27/2007  
+**Name:** Connor Furby  
 **Institution:** University of Wisconsin–Madison  
 **Print Date:** 12/21/2025  
 
@@ -22,7 +19,7 @@
 
 ## Program
 **General Course – BA Degree**  
-Major: No Major Code BA  
+Major: Computer Science BS
 
 ---
 

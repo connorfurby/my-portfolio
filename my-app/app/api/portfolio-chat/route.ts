@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-import { answerPortfolioQuestion } from "@/lib/portfolio-chat"
+import { PortfolioChatError, answerPortfolioQuestion } from "@/lib/portfolio-chat"
 
 type ChatRequest = {
   question?: string
@@ -29,7 +29,17 @@ export async function POST(request: Request) {
     const result = await answerPortfolioQuestion(question, history)
 
     return NextResponse.json(result)
-  } catch {
+  } catch (error) {
+    if (error instanceof PortfolioChatError) {
+      return NextResponse.json(
+        {
+          message: error.message,
+        },
+        { status: error.status }
+      )
+    }
+
+    console.error("Portfolio chat route failed:", error)
     return NextResponse.json(
       {
         message: "The portfolio assistant is temporarily unavailable.",

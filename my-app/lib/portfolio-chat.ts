@@ -43,6 +43,16 @@ type ChatHistoryMessage = {
   content: string
 }
 
+export class PortfolioChatError extends Error {
+  status: number
+
+  constructor(message: string, status = 500) {
+    super(message)
+    this.name = "PortfolioChatError"
+    this.status = status
+  }
+}
+
 const KNOWLEDGE_DIR = path.join(process.cwd(), "content", "portfolio-ai")
 const SUPPORTED_DOCUMENT_EXTENSIONS = new Set([".md", ".txt", ".json", ".tex"])
 const STOPWORDS = new Set([
@@ -435,14 +445,61 @@ ${question}
 `.trim()
 }
 
+async function safeParseJson<T>(response: Response) {
+  try {
+    return (await response.json()) as T
+  } catch {
+    return null
+  }
+}
+
+function buildGeminiErrorMessage(status: number) {
+  if (status === 401 || status === 403) {
+    return "The portfolio assistant could not authenticate with Gemini."
+  }
+
+  if (status === 404) {
+    return "The portfolio assistant is pointed at a Gemini model that is unavailable right now."
+  }
+
+  if (status === 429) {
+    return "The portfolio assistant is temporarily rate-limited by Gemini. Please try again in a moment."
+  }
+
+  if (status >= 500) {
+    return "Gemini is temporarily unavailable right now. Please try again shortly."
+  }
+
+  return "The portfolio assistant could not get a valid response from Gemini."
+}
+
+function resolveGeminiModel() {
+  const configuredModel = process.env.PORTFOLIO_CHAT_MODEL?.trim()
+
+  if (!configuredModel) {
+    return "gemini-2.5-flash"
+  }
+
+  if (configuredModel === "gemini-2.0-flash" || configuredModel === "gemini-2.0-flash-lite") {
+    return "gemini-2.5-flash"
+  }
+
+  return configuredModel
+}
+
+function resolveOpenAIModel() {
+  const configuredModel = process.env.PORTFOLIO_CHAT_MODEL?.trim()
+  return configuredModel?.startsWith("gpt-") ? configuredModel : "gpt-4o-mini"
+}
+
 async function generateWithGemini(prompt: string) {
   const apiKey = process.env.GEMINI_API_KEY
 
   if (!apiKey) {
-    return null
+    throw new PortfolioChatError("The portfolio assistant is not configured with a Gemini API key.", 500)
   }
 
-  const model = process.env.PORTFOLIO_CHAT_MODEL || "gemini-2.0-flash"
+  const model = resolveGeminiModel()
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
     {
@@ -452,35 +509,64 @@ async function generateWithGemini(prompt: string) {
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.35,
-          maxOutputTokens: 500,
+          maxOutputTokens: 1200,
+          thinkingConfig: {
+            thinkingBudget: 0,
+          },
         },
       }),
     }
   )
 
   if (!response.ok) {
-    throw new Error(`Gemini request failed with ${response.status}`)
+    const errorPayload = await safeParseJson<{
+      error?: {
+        message?: string
+        status?: string
+      }
+    }>(response)
+
+    console.error("Gemini API request failed.", {
+      status: response.status,
+      model,
+      providerStatus: errorPayload?.error?.status,
+      providerMessage: errorPayload?.error?.message,
+    })
+
+    throw new PortfolioChatError(buildGeminiErrorMessage(response.status), response.status === 429 ? 503 : response.status)
   }
 
   const payload = (await response.json()) as {
     candidates?: Array<{
+      finishReason?: string
       content?: {
         parts?: Array<{ text?: string }>
       }
     }>
   }
 
-  return payload.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("").trim() || null
+  const candidate = payload.candidates?.[0]
+  const answer = candidate?.content?.parts?.map((part) => part.text ?? "").join("").trim() || null
+
+  if (!answer) {
+    throw new PortfolioChatError("Gemini returned an empty answer.", 502)
+  }
+
+  if (candidate?.finishReason === "MAX_TOKENS") {
+    console.warn("Gemini response hit max output tokens.", { model, maxOutputTokens: 1200 })
+  }
+
+  return answer
 }
 
 async function generateWithOpenAI(prompt: string) {
   const apiKey = process.env.OPENAI_API_KEY
 
   if (!apiKey) {
-    return null
+    throw new PortfolioChatError("The portfolio assistant is not configured with an OpenAI API key.", 500)
   }
 
-  const model = process.env.PORTFOLIO_CHAT_MODEL || "gpt-4o-mini"
+  const model = resolveOpenAIModel()
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -505,7 +591,19 @@ async function generateWithOpenAI(prompt: string) {
   })
 
   if (!response.ok) {
-    throw new Error(`OpenAI request failed with ${response.status}`)
+    const errorPayload = await safeParseJson<{
+      error?: {
+        message?: string
+      }
+    }>(response)
+
+    console.error("OpenAI API request failed.", {
+      status: response.status,
+      model,
+      providerMessage: errorPayload?.error?.message,
+    })
+
+    throw new PortfolioChatError("The portfolio assistant could not get a valid response from OpenAI.", response.status)
   }
 
   const payload = (await response.json()) as {
@@ -516,26 +614,13 @@ async function generateWithOpenAI(prompt: string) {
     }>
   }
 
-  return payload.choices?.[0]?.message?.content?.trim() || null
-}
+  const answer = payload.choices?.[0]?.message?.content?.trim() || null
 
-function buildLocalAnswer(question: string, chunks: KnowledgeChunk[], providerFallbackLabel?: string | null) {
-  const summaries = chunks
-    .slice(0, 3)
-    .map((chunk) => `- ${chunk.title}: ${chunk.content.slice(0, 220)}${chunk.content.length > 220 ? "..." : ""}`)
-    .join("\n")
+  if (!answer) {
+    throw new PortfolioChatError("OpenAI returned an empty answer.", 502)
+  }
 
-  return [
-    providerFallbackLabel
-      ? `I couldn't reach the configured ${providerFallbackLabel} model right now, so I searched Connor's local portfolio knowledge base for "${question}".`
-      : `I don't have a live AI model configured yet, but I searched Connor's portfolio knowledge base for "${question}".`,
-    summaries ? `\nMost relevant context:\n${summaries}` : "",
-    providerFallbackLabel
-      ? "\nIf you expected a full AI answer, check your AI provider env vars and model settings. The local fallback is still grounded in your portfolio data and uploaded docs."
-      : "\nAdd `GEMINI_API_KEY` or `OPENAI_API_KEY` in your env file to upgrade this into a full AI answerer.",
-  ]
-    .filter(Boolean)
-    .join("\n")
+  return answer
 }
 
 export async function answerPortfolioQuestion(question: string, history: ChatHistoryMessage[]) {
@@ -543,34 +628,12 @@ export async function answerPortfolioQuestion(question: string, history: ChatHis
   const relevantChunks = retrieveRelevantChunks(question, chunks)
   const prompt = buildPrompt(question, history, relevantChunks)
   const preferredProvider = process.env.PORTFOLIO_CHAT_PROVIDER?.toLowerCase()
-
-  let answer: string | null = null
-  let mode: "ai" | "local" | "fallback" = "local"
-  let providerFallbackLabel: string | null = null
-
-  try {
-    if (preferredProvider === "openai") {
-      answer = await generateWithOpenAI(prompt)
-    } else if (preferredProvider === "gemini") {
-      answer = await generateWithGemini(prompt)
-    } else {
-      answer = (await generateWithGemini(prompt)) ?? (await generateWithOpenAI(prompt))
-    }
-  } catch (error) {
-    providerFallbackLabel = preferredProvider === "openai" ? "OpenAI" : "Gemini"
-    console.error("Portfolio chat provider failed:", error)
-  }
-
-  if (!answer) {
-    answer = buildLocalAnswer(question, relevantChunks, providerFallbackLabel)
-    mode = providerFallbackLabel ? "fallback" : "local"
-  } else {
-    mode = "ai"
-  }
+  const provider = preferredProvider === "openai" ? "openai" : "gemini"
+  const answer = provider === "openai" ? await generateWithOpenAI(prompt) : await generateWithGemini(prompt)
 
   return {
     answer,
-    mode,
+    mode: "ai" as const,
     sources: relevantChunks.map((chunk) => ({
       id: chunk.id,
       title: chunk.title,

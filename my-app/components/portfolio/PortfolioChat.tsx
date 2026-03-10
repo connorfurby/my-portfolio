@@ -1,12 +1,15 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import { Bot, FileText, GraduationCap, Loader2, MessagesSquare, SendHorizonal, Sparkles } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { Bot, CheckCircle2, Compass, MessageSquareText, SendHorizonal, Sparkles, WandSparkles } from "lucide-react"
 import { motion } from "framer-motion"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 
 type ChatMessage = {
   id: string
@@ -28,23 +31,75 @@ const suggestedQuestions = [
   "What experience do you have with internships?",
 ] as const
 
+function toTitleCase(value: string) {
+  return value
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase())
+}
+
+function formatSourceLabel(source: ChatSource) {
+  if (source.kind === "resume") {
+    return "Resume"
+  }
+
+  if (source.kind === "transcript") {
+    return "Transcript"
+  }
+
+  if (source.kind === "document") {
+    return toTitleCase(source.title)
+  }
+
+  return source.title
+}
+
 export default function PortfolioChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "intro",
       role: "assistant",
       content:
-        "Ask about projects, skills, internships, awards, or anything from the portfolio. If you add resume/transcript docs in `content/portfolio-ai/`, I can answer from those too.",
+        "Ask anything about Connor's projects, experience, technical strengths, leadership, or current learning focus.",
     },
   ])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [sources, setSources] = useState<ChatSource[]>([])
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null)
 
   const history = useMemo(
     () => messages.filter((message) => message.id !== "intro").map(({ role, content }) => ({ role, content })),
     [messages]
   )
+  const uniqueSources = useMemo(() => {
+    const seen = new Set<string>()
+
+    return sources.filter((source) => {
+      const label = formatSourceLabel(source)
+      const key = `${source.kind}:${label.toLowerCase()}`
+
+      if (seen.has(key)) {
+        return false
+      }
+
+      seen.add(key)
+      return true
+    })
+  }, [sources])
+
+  useEffect(() => {
+    const container = messagesContainerRef.current
+
+    if (!container) {
+      return
+    }
+
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: "smooth",
+    })
+  }, [messages, isLoading])
 
   async function submitQuestion(question: string) {
     const trimmed = question.trim()
@@ -62,6 +117,8 @@ export default function PortfolioChat() {
     setMessages((prev) => [...prev, userMessage])
     setInput("")
     setIsLoading(true)
+    setErrorMessage(null)
+    setSources([])
 
     try {
       const response = await fetch("/api/portfolio-chat", {
@@ -94,12 +151,15 @@ export default function PortfolioChat() {
       ])
       setSources(payload.sources)
     } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to load portfolio chat."
+      setErrorMessage(message)
+      setSources([])
       setMessages((prev) => [
         ...prev,
         {
           id: `assistant-error-${Date.now()}`,
           role: "assistant",
-          content: error instanceof Error ? error.message : "Unable to load portfolio chat.",
+          content: message,
         },
       ])
     } finally {
@@ -108,79 +168,95 @@ export default function PortfolioChat() {
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[0.84fr_1.16fr]">
-      <Card className="surface-card rounded-[2rem] border-border bg-card">
+    <div className="grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
+      <Card className="surface-card liquid-glow rounded-[2rem] border-border bg-card">
         <CardContent className="flex h-full flex-col gap-6 p-8">
           <div className="flex flex-wrap items-center gap-3">
             <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/75 px-4 py-1 font-mono text-[11px] uppercase tracking-[0.24em]">
               <Bot className="mr-2 h-3.5 w-3.5" />
-              AI portfolio chat
+              Portfolio assistant
             </Badge>
             <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/75 px-4 py-1 font-mono text-[11px] uppercase tracking-[0.24em]">
-              Retrieval grounded
+              Live with Gemini
             </Badge>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">
-              Ask about Connor
+              Interactive Q&amp;A
             </div>
             <h3 className="font-display text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">
-              A small assistant trained on the portfolio, resume, and transcript
+              Explore the portfolio through conversation
             </h3>
-            <p className="text-sm leading-7 text-muted-foreground sm:text-base">
-              This chat uses retrieval over the portfolio data plus the docs you place in `content/portfolio-ai/`. Add an AI API key and it upgrades into a fuller RAG experience automatically.
+            <p className="max-w-xl text-sm leading-7 text-muted-foreground sm:text-base">
+              Visitors can ask about projects, technical depth, leadership, internships, awards, and what Connor is focused on next.
             </p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[1.4rem] border border-foreground/10 bg-background/45 p-4">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.35 }}
+              className="rounded-[1.5rem] border border-foreground/10 bg-background/45 p-4"
+            >
               <div className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
-                <FileText className="h-4 w-4 text-primary" />
-                Resume ready
+                <Compass className="h-4 w-4 text-primary" />
+                Guided discovery
               </div>
               <p className="text-sm leading-7 text-muted-foreground">
-                Drop your resume into `content/portfolio-ai/resume.md` and the assistant will cite it naturally.
+                Turn a static portfolio into an interactive conversation about impact, choices, and depth.
               </p>
-            </div>
-            <div className="rounded-[1.4rem] border border-foreground/10 bg-background/45 p-4">
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.35, delay: 0.05 }}
+              className="rounded-[1.5rem] border border-foreground/10 bg-background/45 p-4"
+            >
               <div className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
-                <GraduationCap className="h-4 w-4 text-primary" />
-                Transcript ready
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                Grounded answers
               </div>
               <p className="text-sm leading-7 text-muted-foreground">
-                Add coursework, GPA, awards, or transcript details in `content/portfolio-ai/transcript.md`.
+                Responses stay anchored to the portfolio content and supporting documents instead of generic filler.
               </p>
-            </div>
+            </motion.div>
           </div>
 
           <div className="space-y-3">
             <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-              Suggested prompts
+              Try asking
             </div>
             <div className="flex flex-wrap gap-2">
-              {suggestedQuestions.map((question) => (
-                <button
+              {suggestedQuestions.map((question, index) => (
+                <motion.button
                   key={question}
                   type="button"
+                  initial={{ opacity: 0, y: 6 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.24, delay: index * 0.05 }}
                   onClick={() => submitQuestion(question)}
-                  className="rounded-full border border-foreground/10 bg-background/55 px-3 py-1.5 text-left text-xs text-muted-foreground transition-colors duration-200 hover:bg-background/75 hover:text-foreground"
+                  className="rounded-full border border-foreground/10 bg-background/55 px-3 py-1.5 text-left text-xs text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:bg-background/75 hover:text-foreground"
                 >
                   {question}
-                </button>
+                </motion.button>
               ))}
             </div>
           </div>
 
-          {sources.length ? (
+          {uniqueSources.length ? (
             <div className="space-y-3">
               <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                Current sources
+                Referenced context
               </div>
               <div className="flex flex-wrap gap-2">
-                {sources.slice(0, 6).map((source) => (
+                {uniqueSources.slice(0, 6).map((source) => (
                   <Badge key={source.id} variant="outline" className="rounded-full border-foreground/10 bg-background/65 px-3 py-1 text-[10px] uppercase tracking-[0.18em]">
-                    {source.title}
+                    {formatSourceLabel(source)}
                   </Badge>
                 ))}
               </div>
@@ -191,36 +267,145 @@ export default function PortfolioChat() {
 
       <Card className="surface-card rounded-[2rem] border-border bg-card">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <MessagesSquare className="h-5 w-5 text-primary" />
-            Portfolio assistant
+          <CardTitle className="flex items-center gap-3 text-xl">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-foreground/10 bg-background/60">
+              <motion.div
+                className="absolute inset-0 rounded-full bg-primary/10"
+                animate={{ scale: [1, 1.16, 1], opacity: [0.22, 0.1, 0.22] }}
+                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <WandSparkles className="relative h-4.5 w-4.5 text-primary" />
+            </div>
+            <div className="space-y-1">
+              <div>Ask the portfolio assistant</div>
+              <div className="text-xs font-normal text-muted-foreground">
+                Press `Enter` to send. Use `Shift+Enter` for a new line.
+              </div>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="max-h-[28rem] min-h-[24rem] space-y-3 overflow-y-auto rounded-[1.5rem] border border-foreground/10 bg-background/40 p-4">
-            {messages.map((message) => (
+          <div
+            ref={messagesContainerRef}
+            className="max-h-[30rem] min-h-[24rem] space-y-4 overflow-y-auto rounded-[1.7rem] border border-foreground/10 bg-background/35 p-4"
+          >
+            {messages.map((message, index) => (
               <motion.div
                 key={message.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className={`max-w-[90%] rounded-[1.25rem] px-4 py-3 text-sm leading-7 ${
-                  message.role === "user"
-                    ? "ml-auto bg-foreground text-background"
-                    : "border border-foreground/10 bg-background/70 text-foreground"
-                }`}
+                initial={{ opacity: 0, y: 10, scale: 0.985 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.24, delay: index === messages.length - 1 ? 0.02 : 0 }}
+                className={cn("flex", message.role === "user" ? "justify-end" : "justify-start")}
               >
-                <div className="mb-1 text-[10px] uppercase tracking-[0.2em] opacity-70">
-                  {message.role === "user" ? "You" : "Portfolio AI"}
+                <div
+                  className={cn(
+                    "max-w-[92%] rounded-[1.35rem] px-4 py-3 text-sm leading-7 shadow-[0_14px_36px_hsl(var(--glass-shadow)/0.06)]",
+                    message.role === "user"
+                      ? "bg-foreground text-background"
+                      : "border border-foreground/10 bg-background/78 text-foreground"
+                  )}
+                >
+                  <div className="mb-1.5 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] opacity-70">
+                    {message.role === "user" ? (
+                      <>
+                        <MessageSquareText className="h-3 w-3" />
+                        Visitor
+                      </>
+                    ) : (
+                      <>
+                        <Bot className="h-3 w-3" />
+                        Assistant
+                      </>
+                    )}
+                  </div>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      p: (props) => <p className="mb-3 break-words leading-7 last:mb-0" {...props} />,
+                      ul: (props) => <ul className="mb-3 list-disc space-y-2 pl-5 last:mb-0" {...props} />,
+                      ol: (props) => <ol className="mb-3 list-decimal space-y-2 pl-5 last:mb-0" {...props} />,
+                      li: (props) => <li className="break-words" {...props} />,
+                      strong: (props) => <strong className="font-semibold text-foreground" {...props} />,
+                      em: (props) => <em className="italic" {...props} />,
+                      a: (props) => (
+                        <a
+                          className="text-primary underline decoration-primary/50 underline-offset-4 transition-colors hover:text-foreground"
+                          target="_blank"
+                          rel="noreferrer"
+                          {...props}
+                        />
+                      ),
+                      code: ({ inline, className, children, ...props }: { inline?: boolean; className?: string; children?: React.ReactNode }) =>
+                        inline ? (
+                          <code
+                            className={cn("rounded bg-foreground/8 px-1.5 py-0.5 font-mono text-[0.9em] text-foreground", className)}
+                            {...props}
+                          >
+                            {children}
+                          </code>
+                        ) : (
+                          <code className={cn("font-mono text-[0.92em] text-foreground", className)} {...props}>
+                            {children}
+                          </code>
+                        ),
+                      pre: (props) => (
+                        <pre
+                          className="mb-3 overflow-x-auto rounded-2xl border border-foreground/10 bg-background/70 p-4 font-mono text-[0.92em] leading-6 last:mb-0"
+                          {...props}
+                        />
+                      ),
+                      blockquote: (props) => (
+                        <blockquote className="mb-3 border-l-2 border-primary/40 pl-4 text-muted-foreground last:mb-0" {...props} />
+                      ),
+                      h1: (props) => <h1 className="mb-3 text-lg font-semibold tracking-[-0.03em] last:mb-0" {...props} />,
+                      h2: (props) => <h2 className="mb-3 text-base font-semibold tracking-[-0.03em] last:mb-0" {...props} />,
+                      h3: (props) => <h3 className="mb-2 text-sm font-semibold uppercase tracking-[0.16em] last:mb-0" {...props} />,
+                      hr: (props) => <hr className="my-4 border-foreground/10" {...props} />,
+                    }}
+                  >
+                    {message.content}
+                  </ReactMarkdown>
                 </div>
-                <div className="whitespace-pre-wrap">{message.content}</div>
               </motion.div>
             ))}
+
             {isLoading ? (
-              <div className="inline-flex items-center gap-2 rounded-[1.25rem] border border-foreground/10 bg-background/70 px-4 py-3 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Thinking through the portfolio...
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-start"
+              >
+                <div className="max-w-[92%] rounded-[1.35rem] border border-foreground/10 bg-background/78 px-4 py-3 text-sm text-muted-foreground shadow-[0_14px_36px_hsl(var(--glass-shadow)/0.06)]">
+                  <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] opacity-70">
+                    <Bot className="h-3 w-3" />
+                    Assistant
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5">
+                      {[0, 1, 2].map((dot) => (
+                        <motion.span
+                          key={dot}
+                          className="h-2 w-2 rounded-full bg-primary/70"
+                          animate={{ y: [0, -4, 0], opacity: [0.35, 1, 0.35] }}
+                          transition={{
+                            duration: 0.9,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: dot * 0.12,
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <motion.span
+                      className="text-sm"
+                      animate={{ opacity: [0.55, 1, 0.55] }}
+                      transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      Thinking through the portfolio...
+                    </motion.span>
+                  </div>
+                </div>
+              </motion.div>
             ) : null}
           </div>
 
@@ -231,21 +416,38 @@ export default function PortfolioChat() {
               submitQuestion(input)
             }}
           >
-            <textarea
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Ask about projects, internships, technologies, awards, or what Connor is learning..."
-              className="min-h-[7rem] rounded-[1.5rem] border border-foreground/10 bg-background/45 px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-foreground/20"
-            />
-            <div className="flex items-center justify-between gap-3">
+            <div className="relative overflow-hidden rounded-[1.7rem] border border-foreground/10 bg-background/45">
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+              <textarea
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault()
+                    submitQuestion(input)
+                  }
+                }}
+                placeholder="Ask about projects, technologies, leadership, internships, impact, or what Connor is learning next..."
+                className="min-h-[8rem] w-full resize-none bg-transparent px-4 py-4 pr-24 text-sm text-foreground outline-none placeholder:text-muted-foreground/80"
+              />
+              <div className="absolute bottom-3 right-3">
+                <Button
+                  type="submit"
+                  disabled={isLoading || !input.trim()}
+                  className="h-11 rounded-full px-5 text-sm shadow-[0_14px_32px_hsl(var(--glass-shadow)/0.16)]"
+                >
+                  Send
+                  <SendHorizonal className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
                 <Sparkles className="h-3.5 w-3.5" />
-                Grounded in portfolio data and local docs
+                Real-time answers grounded in portfolio context
               </div>
-              <Button type="submit" disabled={isLoading || !input.trim()} className="rounded-full px-5">
-                Ask
-                <SendHorizonal className="ml-2 h-4 w-4" />
-              </Button>
+              {errorMessage ? <div className="text-xs text-destructive">{errorMessage}</div> : null}
             </div>
           </form>
         </CardContent>
