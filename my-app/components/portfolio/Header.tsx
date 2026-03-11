@@ -1,7 +1,8 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Image from "next/image"
-import { Menu, Moon, Sparkles, Sun } from "lucide-react"
+import { Menu, Moon, Sparkles, Sun, SunMoon } from "lucide-react"
 import { motion } from "framer-motion"
 import { useTheme } from "next-themes"
 
@@ -24,7 +25,12 @@ type HeaderProps = {
 }
 
 export default function Header({ navItems, activeSection, onNavigate }: HeaderProps) {
-  const { theme, setTheme } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme()
+  const [themeReady, setThemeReady] = useState(false)
+
+  useEffect(() => {
+    setThemeReady(true)
+  }, [])
 
   return (
     <motion.header
@@ -33,7 +39,7 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="mx-auto w-[min(1320px,calc(100%-1rem))] py-2">
+      <div className="portfolio-container-wide py-2">
         <div className="header-glass pointer-events-auto relative flex h-16 items-center gap-3 overflow-hidden rounded-[1.85rem] border border-white/10 px-4 md:px-6">
           <div className="header-warp pointer-events-none absolute inset-0 overflow-hidden">
             <div className="header-warp-orb header-warp-orb-one" />
@@ -49,7 +55,7 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
               <div className="hidden flex-col sm:flex">
                 <span className="font-display text-base font-semibold tracking-[-0.03em]">Connor Furby</span>
                 <span className="font-accent text-sm italic leading-none text-muted-foreground">
-                  Portfolio 2026
+                  Portfolio
                 </span>
               </div>
             </motion.div>
@@ -124,10 +130,16 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
                 variant="outline"
                 size="sm"
                 aria-label="Toggle Theme"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
                 className="rounded-full"
               >
-                {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {!themeReady ? (
+                  <SunMoon className="h-5 w-5" />
+                ) : resolvedTheme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
                 Theme
               </Button>
             </div>

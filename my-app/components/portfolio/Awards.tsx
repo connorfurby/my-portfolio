@@ -2,12 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
-import { ArrowUpRight, Pause, Play, Sparkles, Zap } from "lucide-react"
+import { Pause, Play, Sparkles } from "lucide-react"
 
-import SectionHeading from "@/components/portfolio/SectionHeading"
-import { achievements, signatureStacks, techClusters } from "@/components/portfolio/data"
+import { techClusters } from "@/components/portfolio/data"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 const AUTO_ROTATE_MS = 4800
@@ -44,7 +43,6 @@ export default function Awards() {
     0
   )
   const activeCluster = techClusters[activeClusterIndex] ?? techClusters[0]
-  const ActiveClusterIcon = activeCluster.icon
 
   const totalNodeCount = useMemo(
     () => techClusters.reduce((total, cluster) => total + cluster.technologies.length, 0),
@@ -109,79 +107,51 @@ export default function Awards() {
   }, [autoRotate, reduceMotion])
 
   return (
-    <section id="skills" className="relative mb-16 pt-16">
-      <div className="mx-auto w-full max-w-6xl">
-        <SectionHeading
-          eyebrow="Tech Constellation"
-          title="A live map of my stack, strengths, and creative range"
-          description="Instead of a static skills list, this section visualizes the systems I actually use. It clusters the tools, workflows, and technical habits that show up across my projects, internships, and experiments."
-        />
+    <section id="skills" className="relative mb-14 pt-12">
+      <div className="portfolio-container w-full">
+        <div className="mb-5 flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-3xl">
+            <Badge variant="outline" className="rounded-full px-4 py-1 font-mono text-[11px] uppercase tracking-[0.22em]">
+              Tech Constellation
+            </Badge>
+            <h2 className="mt-3 text-[1.9rem] font-semibold tracking-[-0.04em] md:text-[2.3rem]">
+              The stack map, in a tighter view
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-5 text-muted-foreground">
+              Minimal chrome, smaller surrounding UI, and more room for the live map itself.
+            </p>
+          </div>
 
-        <Card className="liquid-panel liquid-panel-strong overflow-hidden rounded-[2.4rem]">
+          <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+            {techClusters.length} live clusters
+          </div>
+        </div>
+
+        <Card className="liquid-panel liquid-panel-strong overflow-hidden rounded-[2.05rem]">
           <CardContent className="p-0">
-            <div className="grid xl:grid-cols-[0.9fr_1.1fr]">
-              <div className="border-b border-border/40 p-6 xl:border-b-0 xl:border-r">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {[
-                    {
-                      label: "Clusters",
-                      value: techClusters.length.toString(),
-                      description: "Distinct skill systems powering different kinds of work.",
-                    },
-                    {
-                      label: "Tech Nodes",
-                      value: `${totalNodeCount}+`,
-                      description: "Languages, frameworks, patterns, and strengths in the map.",
-                    },
-                    {
-                      label: "Active Focus",
-                      value: activeCluster.shortLabel,
-                      description: "Currently highlighted cluster in the live chart.",
-                    },
-                    {
-                      label: "Auto Scan",
-                      value: autoRotate && !reduceMotion ? "On" : "Paused",
-                      description: "Cycles through clusters automatically for a live dashboard feel.",
-                    },
-                  ].map((stat) => (
-                    <motion.div
-                      key={stat.label}
-                      className="liquid-panel liquid-soft rounded-[1.4rem] p-4"
-                      initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-                      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.35 }}
-                      transition={{ duration: 0.4 }}
-                    >
-                      <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                        {stat.label}
-                      </p>
-                      <p className="mt-3 text-2xl font-semibold tracking-tight md:text-3xl">{stat.value}</p>
-                      <p className="mt-2 text-sm leading-6 text-muted-foreground">{stat.description}</p>
-                    </motion.div>
-                  ))}
-                </div>
-
-                <div className="mt-6 flex items-center justify-between gap-3">
+            <div className="grid xl:h-[calc(100vh-15rem)] xl:grid-cols-[minmax(205px,0.5fr)_minmax(0,1.5fr)]">
+              <div className="border-b border-border/40 p-3.5 xl:border-b-0 xl:border-r">
+                <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
                       Cluster Navigator
                     </p>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      Select a cluster to drive the visualization, or let it auto-rotate.
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      Pick a cluster or let the map rotate.
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setAutoRotate((current) => !current)}
-                    className="liquid-chip inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-medium"
+                    className="liquid-chip inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-medium"
                     aria-pressed={autoRotate}
                   >
-                    {autoRotate && !reduceMotion ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                    {autoRotate && !reduceMotion ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
                     {autoRotate && !reduceMotion ? "Pause" : "Play"}
                   </button>
                 </div>
 
-                <div className="mt-5 space-y-3">
+                <div className="mt-2.5 grid gap-1.5">
                   {techClusters.map((cluster, index) => {
                     const Icon = cluster.icon
                     const isActive = cluster.id === activeCluster.id
@@ -192,7 +162,7 @@ export default function Awards() {
                         type="button"
                         onClick={() => setActiveClusterId(cluster.id)}
                         className={cn(
-                          "group relative w-full overflow-hidden rounded-[1.65rem] border px-4 py-4 text-left transition-all duration-300",
+                          "group relative w-full overflow-hidden rounded-[1.1rem] border px-2.5 py-2 text-left transition-all duration-300",
                           isActive
                             ? "border-transparent bg-background/65 shadow-[0_20px_44px_hsl(var(--glass-shadow)/0.14)]"
                             : "border-border/45 bg-background/25 hover:-translate-y-0.5 hover:bg-background/40"
@@ -211,32 +181,21 @@ export default function Awards() {
                         viewport={{ once: true, amount: 0.2 }}
                         transition={{ duration: 0.35, delay: index * 0.04 }}
                       >
-                        <div className="flex items-start gap-4">
+                        <div className="flex items-center gap-2.5">
                           <div
-                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.15rem] border border-white/10 shadow-[0_10px_24px_hsl(var(--glass-shadow)/0.12)]"
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.8rem] border border-white/10 shadow-[0_10px_24px_hsl(var(--glass-shadow)/0.12)]"
                             style={{
                               background: `linear-gradient(135deg, hsl(${cluster.accent} / 0.34), hsl(${cluster.accentSecondary} / 0.16))`,
                             }}
                           >
-                            <Icon className="h-5 w-5" />
+                            <Icon className="h-4 w-4" />
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between gap-3">
-                              <h3 className="text-base font-semibold tracking-tight">{cluster.title}</h3>
+                              <h3 className="text-[13px] font-semibold tracking-tight">{cluster.shortLabel}</h3>
                               <Badge variant={isActive ? "default" : "outline"} className="shrink-0 text-[10px] uppercase tracking-[0.18em]">
                                 {cluster.technologies.length} nodes
                               </Badge>
-                            </div>
-                            <p className="mt-2 text-sm leading-6 text-muted-foreground">{cluster.summary}</p>
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {cluster.focus.slice(0, 3).map((item) => (
-                                <span
-                                  key={item}
-                                  className="rounded-full border border-border/45 bg-background/45 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground"
-                                >
-                                  {item}
-                                </span>
-                              ))}
                             </div>
                           </div>
                         </div>
@@ -246,57 +205,33 @@ export default function Awards() {
                 </div>
               </div>
 
-              <div className="p-6 lg:p-8">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div className="flex flex-col p-3.5 lg:p-4">
+                <div className="flex flex-col gap-2.5 lg:flex-row lg:items-end lg:justify-between">
                   <div className="max-w-2xl">
-                    <div className="mb-3 flex flex-wrap items-center gap-2">
-                      <Badge variant="outline" className="rounded-full px-4 py-1 font-mono text-[11px] uppercase tracking-[0.2em]">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className="rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em]">
                         Live Cluster View
                       </Badge>
                       <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                        {activeCluster.projects.length} linked projects
+                        {totalNodeCount}+ total nodes
                       </span>
                     </div>
-                    <h3 className="text-2xl font-semibold tracking-tight md:text-3xl">{activeCluster.title}</h3>
-                    <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground md:text-base">
+                    <h3 className="text-lg font-semibold tracking-tight md:text-[1.45rem]">{activeCluster.title}</h3>
+                    <p className="mt-1 max-w-2xl text-sm leading-5 text-muted-foreground">
                       {activeCluster.summary}
                     </p>
                   </div>
 
-                  <div className="liquid-panel liquid-soft w-full max-w-xs rounded-[1.45rem] p-4">
-                    <div className="flex items-center justify-between gap-3 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                      <span>Signal Strength</span>
-                      <span>{autoRotate && !reduceMotion ? "Scanning" : "Manual"}</span>
-                    </div>
-                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-background/65">
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{
-                          background: `linear-gradient(90deg, hsl(${activeCluster.accent}), hsl(${activeCluster.accentSecondary}))`,
-                        }}
-                        animate={
-                          reduceMotion
-                            ? { width: "72%" }
-                            : autoRotate
-                              ? { width: ["18%", "96%", "48%"] }
-                              : { width: "44%" }
-                        }
-                        transition={
-                          reduceMotion
-                            ? undefined
-                            : autoRotate
-                              ? { duration: 4.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }
-                              : { duration: 0.4 }
-                        }
-                      />
-                    </div>
-                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                      Hover a node to spotlight it, or click any cluster on the left to redraw the map instantly.
-                    </p>
+                  <div className="flex w-full max-w-sm flex-wrap gap-1.5 rounded-[1rem] border border-border/45 bg-background/20 px-2.5 py-2">
+                    {activeCluster.focus.slice(0, 3).map((item) => (
+                      <Badge key={item} variant="secondary" className="rounded-full px-2.5 py-1 text-[10px] uppercase tracking-[0.16em]">
+                        {item}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
 
-                <div className="relative mt-6 min-h-[30rem] overflow-hidden rounded-[2rem] border border-border/45 bg-background/20 p-4 sm:p-6">
+                <div className="relative mt-3 min-h-[17rem] flex-1 overflow-hidden rounded-[1.4rem] border border-border/45 bg-background/20 p-2.5 sm:p-3 lg:min-h-[18.75rem]">
                   <div
                     className="absolute inset-0 opacity-70"
                     style={{
@@ -325,9 +260,9 @@ export default function Awards() {
                   ) : null}
 
                   {[
-                    "h-[12rem] w-[12rem] sm:h-[14rem] sm:w-[14rem]",
-                    "h-[18rem] w-[18rem] sm:h-[20rem] sm:w-[20rem]",
-                    "h-[24rem] w-[24rem] sm:h-[26rem] sm:w-[26rem]",
+                    "h-[7.75rem] w-[7.75rem] sm:h-[9.5rem] sm:w-[9.5rem]",
+                    "h-[11.5rem] w-[11.5rem] sm:h-[13.5rem] sm:w-[13.5rem]",
+                    "h-[15rem] w-[15rem] sm:h-[17rem] sm:w-[17rem]",
                   ].map((sizeClassName, index) => (
                     <motion.div
                       key={sizeClassName}
@@ -373,15 +308,23 @@ export default function Awards() {
                         transition={{ duration: 0.65, delay: tech.delay }}
                       />
                     ))}
-                    <motion.circle
+                    <circle
                       cx="50"
                       cy="50"
                       r="1.8"
                       fill={`hsl(${activeCluster.accent})`}
-                      animate={reduceMotion ? undefined : { r: [1.8, 2.2, 1.8], opacity: [0.7, 1, 0.7] }}
-                      transition={{ duration: 2.8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                      opacity="0.9"
                     />
                   </svg>
+
+                  {!reduceMotion ? (
+                    <motion.div
+                      className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                      style={{ backgroundColor: `hsl(${activeCluster.accent})` }}
+                      animate={{ opacity: [0.7, 1, 0.7], scale: [1, 1.22, 1] }}
+                      transition={{ duration: 2.8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                    />
+                  ) : null}
 
                   <AnimatePresence mode="wait">
                     <motion.div
@@ -400,7 +343,7 @@ export default function Awards() {
                           onFocus={() => setSpotlightTechName(tech.name)}
                           onClick={() => setSpotlightTechName(tech.name)}
                           className={cn(
-                            "absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border px-3 py-2 text-xs font-medium shadow-[0_14px_30px_hsl(var(--glass-shadow)/0.12)] backdrop-blur-xl transition-all duration-300",
+                            "absolute z-20 -translate-x-1/2 -translate-y-1/2 rounded-full border px-2 py-1 text-[10px] font-medium shadow-[0_14px_30px_hsl(var(--glass-shadow)/0.12)] backdrop-blur-xl transition-all duration-300",
                             spotlightTech?.name === tech.name
                               ? "scale-[1.04] border-transparent text-foreground shadow-[0_18px_34px_hsl(var(--glass-shadow)/0.18)]"
                               : "border-white/10 text-foreground/90"
@@ -448,53 +391,13 @@ export default function Awards() {
                     </motion.div>
                   </AnimatePresence>
 
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={activeCluster.id}
-                      className="absolute left-1/2 top-1/2 z-10 w-[min(78%,22rem)] -translate-x-1/2 -translate-y-1/2"
-                      initial={reduceMotion ? false : { opacity: 0, scale: 0.92, y: 10 }}
-                      animate={reduceMotion ? undefined : { opacity: 1, scale: 1, y: 0 }}
-                      exit={reduceMotion ? undefined : { opacity: 0, scale: 0.96, y: -6 }}
-                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      <div
-                        className="liquid-panel liquid-panel-strong relative rounded-[1.9rem] border border-white/10 p-5 text-center shadow-[0_28px_56px_hsl(var(--glass-shadow)/0.16)]"
-                        style={{
-                          background: `linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.72), hsl(var(--glass-surface) / 0.28)), linear-gradient(135deg, hsl(${activeCluster.accent} / 0.16), hsl(${activeCluster.accentSecondary} / 0.08))`,
-                        }}
-                      >
-                        <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
-                        <div
-                          className="mx-auto flex h-16 w-16 items-center justify-center rounded-[1.35rem] border border-white/10 shadow-[0_18px_34px_hsl(var(--glass-shadow)/0.15)]"
-                          style={{
-                            background: `linear-gradient(135deg, hsl(${activeCluster.accent} / 0.34), hsl(${activeCluster.accentSecondary} / 0.18))`,
-                          }}
-                        >
-                          <ActiveClusterIcon className="h-7 w-7" />
-                        </div>
-                        <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
-                          Active cluster
-                        </p>
-                        <h4 className="mt-3 text-2xl font-semibold tracking-tight">{activeCluster.title}</h4>
-                        <p className="mt-3 text-sm leading-7 text-muted-foreground">{activeCluster.summary}</p>
-                        <div className="mt-4 flex flex-wrap justify-center gap-2">
-                          {activeCluster.focus.map((item) => (
-                            <Badge key={item} variant="secondary" className="rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.16em]">
-                              {item}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-
-                  <div className="absolute left-4 top-4 z-20 flex flex-wrap gap-2">
+                  <div className="absolute left-2.5 top-2.5 z-20 flex flex-wrap gap-1.5">
                     {(["core", "strong", "exploring"] as const).map((tier) => (
                       <Badge
                         key={tier}
                         variant="outline"
                         className={cn(
-                          "rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em]",
+                          "rounded-full px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.18em]",
                           tierMeta[tier].chipClassName
                         )}
                       >
@@ -504,184 +407,76 @@ export default function Awards() {
                   </div>
                 </div>
 
-                <div className="mt-5 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-                  <Card className="liquid-panel liquid-soft rounded-[1.8rem]">
-                    <CardContent className="p-5">
+                <div className="mt-2.5 rounded-[1.05rem] border border-border/45 bg-background/20 px-3 py-2.5">
+                  <div className="grid gap-2.5 lg:grid-cols-[0.82fr_1.18fr]">
+                    <div>
                       <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
                         <Sparkles className="h-4 w-4" />
-                        Node Spotlight
+                        Spotlight
                       </div>
-                      <div className="mt-4 flex items-start justify-between gap-3">
-                        <div>
-                          <CardTitle className="text-xl">{spotlightTech.name}</CardTitle>
-                          <CardDescription className="mt-2 leading-6">
-                            {tierMeta[spotlightTech.tier].description}
-                          </CardDescription>
-                        </div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <div className="text-sm font-semibold tracking-tight">{spotlightTech.name}</div>
                         <Badge
                           variant="outline"
                           className={cn(
-                            "rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em]",
+                            "rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em]",
                             tierMeta[spotlightTech.tier].chipClassName
                           )}
                         >
                           {tierMeta[spotlightTech.tier].label}
                         </Badge>
                       </div>
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {activeCluster.projects.map((project) => (
-                          <Badge key={project} variant="secondary" className="rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.14em]">
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {activeCluster.projects.slice(0, 2).map((project) => (
+                          <Badge key={project} variant="secondary" className="rounded-full px-2.5 py-1 text-[10px] uppercase tracking-[0.14em]">
                             {project}
                           </Badge>
                         ))}
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
 
-                  <Card className="liquid-panel liquid-soft rounded-[1.8rem]">
-                    <CardContent className="p-5">
-                      <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                        <Zap className="h-4 w-4" />
-                        Cluster Breakdown
-                      </div>
-                      <div className="mt-4 space-y-4">
-                        {(["core", "strong", "exploring"] as const).map((tier) => {
-                          const percentage = (tierCounts[tier] / activeCluster.technologies.length) * 100
+                    <div className="grid gap-2">
+                      {(["core", "strong", "exploring"] as const).map((tier) => {
+                        const percentage = (tierCounts[tier] / activeCluster.technologies.length) * 100
 
-                          return (
-                            <div key={tier}>
-                              <div className="mb-2 flex items-center justify-between gap-3">
-                                <div>
-                                  <p className="text-sm font-medium">{tierMeta[tier].label}</p>
-                                  <p className="text-xs text-muted-foreground">{tierMeta[tier].description}</p>
-                                </div>
-                                <span className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                                  {tierCounts[tier]}
-                                </span>
-                              </div>
-                              <div className="h-2 overflow-hidden rounded-full bg-background/65">
-                                <motion.div
-                                  className="h-full rounded-full"
-                                  style={{
-                                    background:
-                                      tier === "core"
-                                        ? "linear-gradient(90deg, hsl(var(--spotlight)), hsl(var(--primary)))"
-                                        : tier === "strong"
-                                          ? "linear-gradient(90deg, hsl(var(--spotlight-secondary)), hsl(var(--chart-2)))"
-                                          : "linear-gradient(90deg, hsl(var(--chart-5)), hsl(var(--chart-4)))",
-                                  }}
-                                  initial={{ width: 0 }}
-                                  whileInView={{ width: `${Math.max(percentage, 8)}%` }}
-                                  viewport={{ once: true, amount: 0.6 }}
-                                  transition={{ duration: 0.5, delay: 0.08 }}
-                                />
-                              </div>
+                        return (
+                          <div key={tier}>
+                            <div className="mb-1.5 flex items-center justify-between gap-3">
+                              <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                                {tierMeta[tier].label}
+                              </p>
+                              <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                                {tierCounts[tier]}
+                              </span>
                             </div>
-                          )
-                        })}
-                      </div>
-                    </CardContent>
-                  </Card>
+                            <div className="h-1.5 overflow-hidden rounded-full bg-background/65">
+                              <motion.div
+                                className="h-full rounded-full"
+                                style={{
+                                  background:
+                                    tier === "core"
+                                      ? "linear-gradient(90deg, hsl(var(--spotlight)), hsl(var(--primary)))"
+                                      : tier === "strong"
+                                        ? "linear-gradient(90deg, hsl(var(--spotlight-secondary)), hsl(var(--chart-2)))"
+                                        : "linear-gradient(90deg, hsl(var(--chart-5)), hsl(var(--chart-4)))",
+                                }}
+                                initial={{ width: 0 }}
+                                whileInView={{ width: `${Math.max(percentage, 8)}%` }}
+                                viewport={{ once: true, amount: 0.6 }}
+                                transition={{ duration: 0.45, delay: 0.05 }}
+                              />
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <div className="mt-6 grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-          <Card className="liquid-panel rounded-[2rem]">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                <ArrowUpRight className="h-4 w-4" />
-                Why This Cluster Matters
-              </div>
-              <CardTitle className="mt-4 text-2xl">{activeCluster.title}</CardTitle>
-              <CardDescription className="mt-2 max-w-2xl leading-7">
-                These proof points connect the active cluster back to real work, not just keywords.
-              </CardDescription>
-              <ul className="mt-5 grid gap-3">
-                {activeCluster.proofs.map((proof, index) => (
-                  <motion.li
-                    key={proof}
-                    className="liquid-panel liquid-soft rounded-[1.45rem] px-4 py-4 text-sm leading-7 text-muted-foreground"
-                    initial={reduceMotion ? false : { opacity: 0, x: -12 }}
-                    whileInView={reduceMotion ? undefined : { opacity: 1, x: 0 }}
-                    viewport={{ once: true, amount: 0.35 }}
-                    transition={{ duration: 0.35, delay: index * 0.05 }}
-                  >
-                    {proof}
-                  </motion.li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="liquid-panel rounded-[2rem]">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                <Sparkles className="h-4 w-4" />
-                Signature Stacks
-              </div>
-              <div className="mt-5 grid gap-4">
-                {signatureStacks.map((stack, index) => (
-                  <motion.div
-                    key={stack.title}
-                    className="liquid-panel liquid-soft rounded-[1.55rem] p-4"
-                    initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-                    whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.25 }}
-                    transition={{ duration: 0.35, delay: index * 0.06 }}
-                  >
-                    <h3 className="text-lg font-semibold tracking-tight">{stack.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{stack.description}</p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {stack.stack.map((item) => (
-                        <Badge key={item} variant="secondary" className="rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.14em]">
-                          {item}
-                        </Badge>
-                      ))}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="liquid-panel mt-6 rounded-[2rem]">
-          <CardContent className="p-6">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                  Achievement Overlay
-                </p>
-                <h3 className="mt-3 text-2xl font-semibold tracking-tight">Proof layered over the tech</h3>
-              </div>
-              <Badge variant="outline" className="rounded-full px-4 py-1 font-mono text-[11px] uppercase tracking-[0.2em]">
-                {achievements.length} highlights
-              </Badge>
-            </div>
-
-            <div className="mt-5 flex flex-wrap gap-3">
-              {achievements.map((item, index) => (
-                <motion.div
-                  key={item}
-                  className="liquid-chip rounded-full px-4 py-2 text-sm leading-6 text-foreground/90"
-                  initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-                  whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  animate={reduceMotion ? undefined : { y: [0, -4, 0] }}
-                  transition={{
-                    opacity: { duration: 0.25, delay: index * 0.03 },
-                    y: { duration: 4.2 + (index % 3), repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: index * 0.08 },
-                  }}
-                >
-                  {item}
-                </motion.div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </section>
   )

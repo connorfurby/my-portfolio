@@ -1,5 +1,6 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { useCallback, useEffect, useState } from "react"
 import {
   BriefcaseBusiness,
@@ -11,19 +12,20 @@ import {
 } from "lucide-react"
 
 import About from "@/components/portfolio/About"
-import Contact from "@/components/portfolio/Contact"
-import Education from "@/components/portfolio/Education"
 import Experience from "@/components/portfolio/Experience"
-import Footer from "@/components/portfolio/Footer"
-import GitHubDashboard from "@/components/portfolio/GitHubDashboard"
 import Header from "@/components/portfolio/Header"
-import Passions from "@/components/portfolio/Passions"
-import Awards from "@/components/portfolio/Awards"
 import { navItems, projects } from "@/components/portfolio/data"
 import type { Project, SectionId } from "@/components/portfolio/types"
 import { scrollToSection, sectionIds } from "@/components/portfolio/utils"
 import { FullscreenModal } from "@/components/ui/fullscreen-modal"
 import type { CarouselApi } from "@/components/ui/carousel"
+
+const Education = dynamic(() => import("@/components/portfolio/Education"))
+const Awards = dynamic(() => import("@/components/portfolio/Awards"))
+const GitHubDashboard = dynamic(() => import("@/components/portfolio/GitHubDashboard"))
+const Passions = dynamic(() => import("@/components/portfolio/Passions"))
+const Contact = dynamic(() => import("@/components/portfolio/Contact"))
+const Footer = dynamic(() => import("@/components/portfolio/Footer"))
 
 const careerParticles = [
   {
@@ -82,7 +84,6 @@ const ambientDots = [
 ] as const
 
 export default function Portfolio() {
-  const [mounted, setMounted] = useState(false)
   const [activeSection, setActiveSection] = useState<SectionId>("about")
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false)
   const [currentProjectImages, setCurrentProjectImages] = useState<Project["images"]>(projects[0]?.images ?? [])
@@ -149,34 +150,34 @@ export default function Portfolio() {
   }, [carouselApis, scrollNext])
 
   useEffect(() => {
-    setMounted(true)
+    const sections = sectionIds
+      .map((sectionId) => document.getElementById(sectionId))
+      .filter((element): element is HTMLElement => Boolean(element))
 
-    const handleScroll = () => {
-      for (const sectionId of sectionIds) {
-        const element = document.getElementById(sectionId)
-
-        if (!element) {
-          continue
-        }
-
-        const { top, bottom } = element.getBoundingClientRect()
-
-        if (top <= 100 && bottom > 100) {
-          setActiveSection(sectionId)
-          break
-        }
-      }
+    if (!sections.length) {
+      return
     }
 
-    window.addEventListener("scroll", handleScroll)
-    handleScroll()
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const activeEntry = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((left, right) => left.boundingClientRect.top - right.boundingClientRect.top)[0]
 
-    return () => window.removeEventListener("scroll", handleScroll)
+        if (activeEntry?.target.id) {
+          setActiveSection(activeEntry.target.id as SectionId)
+        }
+      },
+      {
+        rootMargin: "-96px 0px -50% 0px",
+        threshold: [0.15, 0.35, 0.6],
+      }
+    )
+
+    sections.forEach((section) => observer.observe(section))
+
+    return () => observer.disconnect()
   }, [])
-
-  if (!mounted) {
-    return null
-  }
 
   return (
     <div className="portfolio-shell min-h-screen bg-background text-foreground">
@@ -222,7 +223,7 @@ export default function Portfolio() {
       <main className="w-full">
         <About />
 
-        <div className="container mx-auto bg-background/20 px-4 py-8">
+        <div className="portfolio-container-wide bg-background/20 py-8">
           <Experience onApiReady={registerCarouselApi} onOpenFullscreen={openProjectFullscreen} />
           <Education />
           <Awards />

@@ -2,11 +2,11 @@ import Image from "next/image"
 import { ArrowDownRight, BriefcaseBusiness, GraduationCap, Sparkles } from "lucide-react"
 import { motion } from "framer-motion"
 
-import { heroPills, proofHighlights } from "@/components/portfolio/data"
+import { educationProfile, heroPills, proofHighlights } from "@/components/portfolio/data"
+import { scrollToSection } from "@/components/portfolio/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 
 export default function About() {
   return (
@@ -15,7 +15,7 @@ export default function About() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="section-wash relative flex min-h-dvh w-full flex-col justify-center overflow-hidden px-0 pb-6 pt-24 md:pb-8 md:pt-24"
+      className="section-wash relative flex min-h-[calc(100dvh-1.5rem)] w-full flex-col justify-center overflow-hidden px-0 pb-4 pt-24 md:pb-6 md:pt-24"
     >
       <div className="hero-rings absolute inset-0 z-0">
         <div className="hero-ring hero-ring-one" />
@@ -35,9 +35,9 @@ export default function About() {
         <div className="banner-gradient absolute inset-0 bg-gradient-to-b from-transparent to-background" />
       </div>
 
-      <div className="container relative z-10 grid items-center gap-8 px-4 lg:grid-cols-[1.08fr_0.92fr]">
+      <div className="portfolio-container portfolio-grid-gap relative z-10 grid items-center lg:grid-cols-[minmax(0,0.96fr)_minmax(320px,0.78fr)] 2xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.8fr)]">
         <motion.div
-          className="flex flex-col gap-5 text-left"
+          className="flex flex-col gap-6 text-left"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
@@ -45,44 +45,32 @@ export default function About() {
           <motion.div initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1, duration: 0.45 }}>
             <Badge variant="outline" className="flex w-fit items-center gap-2 rounded-full px-4 py-1">
               <Sparkles className="h-3.5 w-3.5 shrink-0" />
-              Bright ideas. Clean execution. Real projects.
+              Product-minded engineering with strong UI instincts.
             </Badge>
           </motion.div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <div className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">
-              Student software engineer
+              Software engineer and UW-Madison student
             </div>
             <motion.h1
-              className="max-w-4xl font-display text-4xl font-semibold tracking-[-0.05em] sm:text-5xl md:text-6xl xl:text-[4.35rem]"
+              className="max-w-4xl font-display text-4xl font-semibold tracking-[-0.05em] sm:text-5xl md:text-6xl xl:text-[4rem] 2xl:text-[4.45rem]"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.16, duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
             >
-              I build{" "}
-              <span className="text-gradient">fast, polished, memorable</span>{" "}
-              software experiences.
+              I build <span className="text-gradient">polished software</span> with real product sense.
             </motion.h1>
             <motion.p
-              className="max-w-2xl text-[15px] leading-7 text-muted-foreground sm:text-base"
+              className="max-w-2xl text-[15px] leading-7 text-muted-foreground sm:text-base xl:text-[1.02rem] xl:leading-8"
               initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.24, duration: 0.55 }}
             >
-              I&apos;m Connor Furby, a software engineer who cares about product feel just as much as technical depth.
-              I like turning ambitious ideas into interfaces that feel sharp, smooth, and alive.
+              I&apos;m Connor Furby, a computer science student at UW-Madison building full-stack and AI-powered products
+              through internships, leadership roles, and independent projects. I care most about software that feels
+              sharp, useful, and considered.
             </motion.p>
-            <motion.div
-              className="flex items-center gap-3 pt-1"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.28, duration: 0.45 }}
-            >
-              <span className="font-accent text-xl italic text-foreground/80 sm:text-2xl">
-                crafted with energy
-              </span>
-              <span className="h-px flex-1 bg-gradient-to-r from-foreground/20 to-transparent" />
-            </motion.div>
           </div>
 
           <motion.div
@@ -94,18 +82,18 @@ export default function About() {
             <Button
               size="lg"
               className="rounded-full px-5 text-sm transition-transform duration-300 hover:-translate-y-0.5 sm:text-base"
-              onClick={() => document.getElementById("experience")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => scrollToSection("experience")}
             >
-              View Projects
+              View Work
               <ArrowDownRight data-icon="inline-end" />
             </Button>
             <Button
               variant="outline"
               size="lg"
               className="rounded-full border-foreground/15 bg-background/80 px-5 text-sm transition-transform duration-300 hover:-translate-y-0.5 sm:text-base"
-              onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => scrollToSection("contact")}
             >
-              Contact Me
+              Get In Touch
             </Button>
           </motion.div>
 
@@ -115,7 +103,7 @@ export default function About() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.34, duration: 0.5 }}
           >
-            {heroPills.slice(0, 6).map((pill) => (
+            {heroPills.slice(0, 4).map((pill) => (
               <motion.div
                 key={pill.label}
                 initial={{ opacity: 0, y: 10 }}
@@ -131,30 +119,10 @@ export default function About() {
               </motion.div>
             ))}
           </motion.div>
-
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {proofHighlights.slice(0, 4).map((item) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.42, duration: 0.45 }}
-              >
-                <Card className="liquid-panel liquid-soft rounded-[1.75rem] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_hsl(var(--glass-shadow)/0.14)]">
-                  <CardContent className="flex flex-col gap-1.5 p-4">
-                    <span className="font-mono text-xs uppercase tracking-[0.24em] text-muted-foreground">Proof</span>
-                    <span className="text-2xl font-bold tracking-tight sm:text-3xl">{item.value}</span>
-                    <span className="text-sm font-semibold">{item.label}</span>
-                    <span className="text-xs leading-5 text-muted-foreground sm:text-sm">{item.description}</span>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
         </motion.div>
 
         <motion.div
-          className="editorial-frame relative hidden lg:block"
+          className="editorial-frame relative hidden lg:block lg:justify-self-end"
           initial={{ opacity: 0, y: 22, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.18, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -169,7 +137,7 @@ export default function About() {
             animate={{ y: [0, 10, 0], x: [0, -6, 0] }}
             transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
           />
-          <Card className="liquid-panel liquid-panel-strong relative overflow-hidden rounded-[2.2rem] transition-transform duration-500 hover:-translate-y-1">
+          <Card className="liquid-panel liquid-panel-strong relative max-w-[34rem] overflow-hidden rounded-[2rem] transition-transform duration-500 hover:-translate-y-1">
             <motion.div
               className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent"
               animate={{ opacity: [0.35, 0.8, 0.35], x: ["-10%", "10%", "-10%"] }}
@@ -178,9 +146,9 @@ export default function About() {
             <CardHeader className="gap-4 border-b border-border/50 pb-5">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <CardTitle className="text-2xl tracking-tight">Portfolio Snapshot</CardTitle>
+                  <CardTitle className="text-2xl tracking-tight">Quick Snapshot</CardTitle>
                   <CardDescription>
-                    A brighter, project-first overview of how I think and what I&apos;m building toward.
+                    The shortest useful version of what I&apos;m focused on now.
                   </CardDescription>
                 </div>
                 <Image
@@ -193,7 +161,7 @@ export default function About() {
                 />
               </div>
             </CardHeader>
-            <CardContent className="flex flex-col gap-6 p-6">
+            <CardContent className="flex flex-col gap-5 p-6">
               <div className="grid gap-4 sm:grid-cols-2">
                 <motion.div
                   className="liquid-panel liquid-soft rounded-[1.5rem] p-4"
@@ -205,7 +173,7 @@ export default function About() {
                     Current Focus
                   </div>
                   <p className="text-sm leading-7 text-muted-foreground">
-                    Full-stack apps, UI systems, internship work, and projects where product feel actually matters.
+                    Product engineering, AI-enabled workflows, responsive UI systems, and software that has to feel good to use.
                   </p>
                 </motion.div>
                 <motion.div
@@ -218,36 +186,31 @@ export default function About() {
                     Right Now
                   </div>
                   <p className="text-sm leading-7 text-muted-foreground">
-                    Finishing high school while leveling up through internships, hackathons, and increasingly polished builds.
+                    Studying at {educationProfile.school} with a {educationProfile.highlights[0]} while continuing to build through internships and leadership roles.
                   </p>
                 </motion.div>
               </div>
 
-              <Separator />
+              <div className="grid gap-3 sm:grid-cols-3">
+                {proofHighlights.slice(0, 3).map((item) => (
+                  <motion.div
+                    key={item.label}
+                    className="liquid-panel liquid-soft rounded-[1.35rem] p-4"
+                    whileHover={{ y: -3 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+                      {item.label}
+                    </div>
+                    <div className="mt-2 text-2xl font-semibold tracking-tight">{item.value}</div>
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">{item.description}</p>
+                  </motion.div>
+                ))}
+              </div>
 
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-semibold">What sets my work apart</span>
-                  <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                    Design + engineering
-                  </span>
-                </div>
-                <div className="grid gap-3">
-                  {[
-                    "I care about making interfaces feel modern, energetic, and genuinely good to interact with.",
-                    "I like balancing technical depth with creativity, storytelling, and strong visual taste.",
-                    "I enjoy building products that feel intentional from layout and motion to details and polish.",
-                  ].map((item) => (
-                    <motion.div
-                      key={item}
-                      className="liquid-panel liquid-soft rounded-[1.4rem] px-4 py-3 text-sm leading-7 text-muted-foreground"
-                      whileHover={{ x: 4 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {item}
-                    </motion.div>
-                  ))}
-                </div>
+              <div className="rounded-[1.4rem] border border-white/10 bg-background/30 px-4 py-3 text-sm leading-7 text-muted-foreground">
+                I&apos;m especially interested in product-minded engineering roles where strong frontend execution,
+                real systems thinking, and iteration speed all matter together.
               </div>
             </CardContent>
           </Card>

@@ -94,7 +94,7 @@ export default function Passions() {
       <SectionHeading
         eyebrow="Beyond Coding"
         title="The interests that shape how I think"
-        description="A living mindmap of the hobbies, experiences, and obsessions that keep me curious outside of software."
+        description="A living mindmap of the interests that keep me curious, balanced, and creatively sharp outside software."
         align="center"
       />
 

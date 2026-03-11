@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import SectionHeading from "@/components/portfolio/SectionHeading"
 import ExperienceCard from "@/components/portfolio/ExperienceCard"
+import ExperienceShowcase from "@/components/portfolio/ExperienceShowcase"
 import ScrollTabsSection from "@/components/portfolio/ScrollTabsSection"
 import {
   internshipEntries,
@@ -16,28 +16,6 @@ type ExperienceProps = {
   onOpenFullscreen: (project: Project) => void
 }
 
-function ExperienceList({ entries }: { entries: { title: string; subtitle: string; bullets: string[] }[] }) {
-  return (
-    <div className="grid gap-4 xl:max-h-[calc(100vh-12rem)] xl:overflow-y-auto">
-      {entries.map((entry) => (
-        <Card key={entry.title} className="liquid-panel rounded-[1.7rem] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_44px_hsl(var(--glass-shadow)/0.14)]">
-          <CardHeader>
-            <CardTitle>{entry.title}</CardTitle>
-            <CardDescription>{entry.subtitle}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="flex list-disc flex-col gap-3 pl-5 text-sm leading-7 text-muted-foreground">
-              {entry.bullets.map((bullet) => (
-                <li key={bullet}>{bullet}</li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  )
-}
-
 export default function Experience({ onApiReady, onOpenFullscreen }: ExperienceProps) {
   return (
     <>
@@ -47,7 +25,7 @@ export default function Experience({ onApiReady, onOpenFullscreen }: ExperienceP
           <SectionHeading
             eyebrow="Selected Work"
             title="Projects and experience that show how I actually build"
-            description="A mix of internships, shipped products, and hands-on work with stronger pacing. Scroll through the pinned sections to rotate each project."
+            description="A mix of shipped projects, internship work, and hands-on product building. On desktop, the section stays pinned just long enough to compare projects without crowding the viewport."
           />
         }
         items={projects.map((project) => ({
@@ -64,33 +42,30 @@ export default function Experience({ onApiReady, onOpenFullscreen }: ExperienceP
         listClassName="grid-cols-2 md:grid-cols-3 xl:grid-cols-6"
       />
 
-      <ScrollTabsSection
-        className="pt-4"
-        heading={
-          <SectionHeading
-            eyebrow="Real-world Experience"
-            title="Internships, work, and volunteering"
-            description="The practical environments where I built discipline, collaboration skills, communication, and hands-on momentum."
-          />
-        }
+      <ExperienceShowcase
         items={[
           {
             value: "internships",
             label: "Internships",
-            content: <ExperienceList entries={internshipEntries} />,
+            eyebrow: "Internships",
+            description: "Product-building roles where I worked inside real teams, real constraints, and live delivery cycles.",
+            entries: internshipEntries,
           },
           {
             value: "work",
             label: "Work",
-            content: <ExperienceList entries={workEntries} />,
+            eyebrow: "Work",
+            description: "Operational and leadership experience that shaped reliability, communication, and execution under pressure.",
+            entries: workEntries,
           },
           {
             value: "volunteering",
             label: "Volunteering",
-            content: <ExperienceList entries={volunteerEntries} />,
+            eyebrow: "Volunteering",
+            description: "Mentorship and service roles that sharpened teaching, empathy, and adapting technical communication to people.",
+            entries: volunteerEntries,
           },
         ]}
-        listClassName="grid-cols-3"
       />
     </>
   )

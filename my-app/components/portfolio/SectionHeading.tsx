@@ -15,7 +15,7 @@ export default function SectionHeading({
   align = "left",
 }: SectionHeadingProps) {
   const alignmentClass = align === "center" ? "items-center text-center" : "items-start text-left"
-  const widthClass = align === "center" ? "mx-auto max-w-3xl" : "max-w-3xl"
+  const widthClass = align === "center" ? "mx-auto max-w-4xl" : "max-w-4xl"
 
   return (
     <motion.div

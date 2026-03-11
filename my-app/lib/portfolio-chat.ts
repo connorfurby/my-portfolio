@@ -3,15 +3,14 @@ import path from "path"
 
 import {
   achievements,
-  academicStats,
   contactLinks,
-  coursework,
+  courseworkGroups,
+  educationProfile,
   heroPills,
   internshipEntries,
   passions,
   projects,
   proofHighlights,
-  schoolActivities,
   signatureStacks,
   skillGroups,
   techClusters,
@@ -165,7 +164,7 @@ function buildPortfolioChunks() {
       "overview",
       "Portfolio",
       [
-        "Connor Furby is a student software engineer focused on fast, polished, memorable software experiences.",
+        "Connor Furby is a software engineer and UW-Madison student focused on polished full-stack and AI-powered product work.",
         `Current themes: ${heroPills.map((pill) => pill.label).join(", ")}.`,
         `Highlighted proof points: ${proofHighlights.map((highlight) => `${highlight.label}: ${highlight.value}`).join("; ")}.`,
       ].join("\n")
@@ -234,10 +233,14 @@ function buildPortfolioChunks() {
       "education",
       "Education",
       [
-        "School: Naperville Central High School (2021-2025).",
-        `Academic stats: ${academicStats.join("; ")}.`,
-        `Coursework: ${coursework.join("; ")}.`,
-        `Activities: ${schoolActivities.join("; ")}.`,
+        `School: ${educationProfile.school}, ${educationProfile.location}.`,
+        `Credential: ${educationProfile.credential}.`,
+        `Timeline: ${educationProfile.timeline}.`,
+        `Summary: ${educationProfile.summary}`,
+        `Highlights: ${educationProfile.highlights.join("; ")}.`,
+        `Involvement: ${educationProfile.involvement.join("; ")}.`,
+        `Honors: ${educationProfile.honors.join("; ")}.`,
+        `Coursework groups: ${courseworkGroups.map((group) => `${group.title}: ${group.items.join(", ")}`).join(" | ")}.`,
       ].join("\n")
     )
   )

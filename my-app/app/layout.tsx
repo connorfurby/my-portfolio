@@ -26,10 +26,10 @@ const cormorantGaramond = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: 'Connor Furby',
-  description: 'A showcase of my skills and achievements',
+  title: 'Connor Furby | Software Engineer',
+  description: 'Software engineer building polished full-stack and AI-powered products with a strong focus on product feel, responsive UI, and thoughtful execution.',
   icons: {
-    icon: '/favicon.ico', // Ensure this path is correct
+    icon: '/favicon.ico',
   },
 }
 

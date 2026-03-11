@@ -26,7 +26,13 @@ export type Project = {
 export type ExperienceEntry = {
   title: string
   subtitle: string
+  summary?: string
   bullets: string[]
+  logoText?: string
+  accent?: string
+  accentSecondary?: string
+  stats?: string[]
+  particleWords?: string[]
 }
 
 export type Passion = {
@@ -37,6 +43,7 @@ export type Passion = {
 }
 
 export type SpotifyPlaylist = {
+  label: string
   src: string
   description: string
 }
@@ -79,4 +86,34 @@ export type SignatureStack = {
 
 export type HeroPill = {
   label: string
+}
+
+export type EducationProfile = {
+  school: string
+  location: string
+  credential: string
+  timeline: string
+  summary: string
+  highlights: string[]
+  involvement: string[]
+  honors: string[]
+}
+
+export type CourseworkGroup = {
+  title: string
+  caption: string
+  items: string[]
+}
+
+export type ContactLink = {
+  label: string
+  href: string
+  value: string
+  description: string
+  ctaLabel: string
+}
+
+export type ContactFocus = {
+  title: string
+  description: string
 }

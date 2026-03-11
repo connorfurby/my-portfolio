@@ -26,7 +26,7 @@ type ChatSource = {
 
 const suggestedQuestions = [
   "What technologies do you use most?",
-  "Tell me about your Discord-related or community projects.",
+  "What kind of software roles are you targeting?",
   "What are you currently learning?",
   "What experience do you have with internships?",
 ] as const
@@ -59,7 +59,7 @@ export default function PortfolioChat() {
       id: "intro",
       role: "assistant",
       content:
-        "Ask anything about Connor's projects, experience, technical strengths, leadership, or current learning focus.",
+        "Ask anything about Connor's projects, internships, technical strengths, leadership, or current learning focus.",
     },
   ])
   const [input, setInput] = useState("")
@@ -189,7 +189,7 @@ export default function PortfolioChat() {
               Explore the portfolio through conversation
             </h3>
             <p className="max-w-xl text-sm leading-7 text-muted-foreground sm:text-base">
-              Visitors can ask about projects, technical depth, leadership, internships, awards, and what Connor is focused on next.
+              Visitors can ask about projects, technical depth, internships, leadership, education, and what Connor is focused on next.
             </p>
           </div>
 
@@ -206,7 +206,7 @@ export default function PortfolioChat() {
                 Guided discovery
               </div>
               <p className="text-sm leading-7 text-muted-foreground">
-                Turn a static portfolio into an interactive conversation about impact, choices, and depth.
+                Turns a static portfolio into an interactive conversation about impact, choices, and technical depth.
               </p>
             </motion.div>
             <motion.div
@@ -221,7 +221,7 @@ export default function PortfolioChat() {
                 Grounded answers
               </div>
               <p className="text-sm leading-7 text-muted-foreground">
-                Responses stay anchored to the portfolio content and supporting documents instead of generic filler.
+                Responses stay anchored to portfolio content, resume details, and supporting documents instead of generic filler.
               </p>
             </motion.div>
           </div>
@@ -427,7 +427,7 @@ export default function PortfolioChat() {
                     submitQuestion(input)
                   }
                 }}
-                placeholder="Ask about projects, technologies, leadership, internships, impact, or what Connor is learning next..."
+                placeholder="Ask about projects, technologies, internships, leadership, education, impact, or what Connor is learning next..."
                 className="min-h-[8rem] w-full resize-none bg-transparent px-4 py-4 pr-24 text-sm text-foreground outline-none placeholder:text-muted-foreground/80"
               />
               <div className="absolute bottom-3 right-3">

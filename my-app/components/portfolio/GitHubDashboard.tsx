@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import {
   Bot,
   CalendarClock,
+  Command,
   ExternalLink,
   FolderGit2,
   GitBranch,
@@ -21,8 +22,10 @@ import {
 import { motion } from "framer-motion"
 
 import AnimatedSection from "@/components/portfolio/AnimatedSection"
+import IntegrationTerminal from "@/components/portfolio/IntegrationTerminal"
 import PortfolioChat from "@/components/portfolio/PortfolioChat"
 import SectionHeading from "@/components/portfolio/SectionHeading"
+import { spotifyPlaylists } from "@/components/portfolio/data"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -254,7 +257,7 @@ function formatSpotifyValue(value?: string | null) {
 
 export default function GitHubDashboard() {
   const sectionRef = useRef<HTMLElement | null>(null)
-  const [activeTab, setActiveTab] = useState("github")
+  const [activeTab, setActiveTab] = useState("terminal")
   const [githubData, setGitHubData] = useState<GitHubDashboardResponse | null>(null)
   const [githubError, setGitHubError] = useState<string | null>(null)
   const [githubLoading, setGitHubLoading] = useState(true)
@@ -427,13 +430,17 @@ export default function GitHubDashboard() {
       <div className="mb-3">
         <SectionHeading
           eyebrow="Integrations"
-          title="Live signals from the platforms tied to my work"
-          description="A shared hub for external profiles and activity. GitHub is fully live, Spotify can surface personal listening data from my own account, and LinkedIn is wired through a feed adapter so it can slot into the portfolio cleanly."
+          title="A live hub around the work"
+          description="Code signal, Spotify, LinkedIn, AI chat, and a terminal-style interface that makes the portfolio feel more like a product."
         />
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-3 grid h-auto w-full max-w-3xl grid-cols-1 gap-2 sm:grid-cols-4">
+        <TabsList className="mb-3 grid h-auto w-full max-w-5xl grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <TabsTrigger value="terminal" className="gap-2">
+            <Command className="h-4 w-4" />
+            Terminal
+          </TabsTrigger>
           <TabsTrigger value="github" className="gap-2">
             <FolderGit2 className="h-4 w-4" />
             GitHub
@@ -444,7 +451,7 @@ export default function GitHubDashboard() {
           </TabsTrigger>
           <TabsTrigger value="linkedin" className="gap-2">
             <Linkedin className="h-4 w-4" />
-            LinkedIn Blog
+            LinkedIn
           </TabsTrigger>
           <TabsTrigger value="ai-chat" className="gap-2">
             <Bot className="h-4 w-4" />
@@ -452,8 +459,28 @@ export default function GitHubDashboard() {
           </TabsTrigger>
         </TabsList>
 
+        <TabsContent value="terminal" className="mt-0">
+          <IntegrationTerminal
+            githubUrl={githubData?.profile.htmlUrl ?? "https://github.com/connorfurby"}
+            githubRepoCount={githubData?.stats.originalRepos}
+            latestRepoName={githubData?.repositories[0]?.name}
+            linkedinProfileUrl={linkedinData?.profileUrl}
+            linkedinPostCount={linkedinData?.posts.length}
+            onSelectTab={setActiveTab}
+            spotifyTrack={
+              spotifyData?.playback
+                ? {
+                    title: spotifyData.playback.title,
+                    artist: spotifyData.playback.artist,
+                    url: spotifyData.playback.url,
+                  }
+                : undefined
+            }
+          />
+        </TabsContent>
+
         <TabsContent value="github" className="mt-0">
-          <div className="grid gap-8 xl:grid-cols-[0.9fr_1.1fr]">
+          <div className="grid gap-8 xl:grid-cols-[minmax(320px,0.88fr)_minmax(0,1.12fr)]">
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -487,7 +514,7 @@ export default function GitHubDashboard() {
                       {githubData?.profile.name ?? "Connor Furby"}
                     </div>
                     <p className="max-w-xl text-sm leading-7 text-muted-foreground sm:text-base">
-                      This tab turns my GitHub profile into a cleaner long-view summary: total repo footprint, public audience, language mix, and the work patterns showing up across the account.
+                      This tab turns my GitHub profile into a cleaner long-view summary of account activity, language mix, repo footprint, and recent engineering output.
                     </p>
                   </div>
 
@@ -795,7 +822,7 @@ export default function GitHubDashboard() {
 
         <TabsContent value="spotify" className="!mt-0">
           {spotifyLoading ? (
-            <div className="grid gap-3 xl:grid-cols-[minmax(0,1.15fr)_minmax(24rem,0.95fr)]">
+            <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(24rem,0.95fr)]">
               <div className="h-[22rem] rounded-[1.3rem] bg-foreground/6 animate-pulse" />
               <div className="h-[22rem] rounded-[1.3rem] bg-foreground/6 animate-pulse" />
             </div>
@@ -810,7 +837,7 @@ export default function GitHubDashboard() {
               <div className="p-4 text-sm leading-7 text-muted-foreground">{spotifyData.message}</div>
             </Card>
           ) : (
-            <div className="grid gap-3 xl:grid-cols-[minmax(0,1.15fr)_minmax(24rem,0.95fr)]">
+            <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(24rem,0.95fr)]">
               <Card className="surface-card relative overflow-hidden rounded-[1.3rem] border-border bg-card">
                 <motion.div
                   className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.22),transparent_70%)] blur-3xl"
@@ -959,98 +986,129 @@ export default function GitHubDashboard() {
                 </div>
               </Card>
 
-              <Card className="surface-card rounded-[1.3rem] border-border bg-card">
-                <div className="p-3.5 sm:p-4">
-                  <div className="mb-3 flex items-center gap-2 text-xl font-display font-semibold tracking-tight">
-                    <Users className="h-5 w-5 text-primary" />
-                    Top listening
-                  </div>
-
-                  <div className="grid gap-4 lg:grid-cols-2">
-                    <div>
-                      <div className="mb-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                        Top tracks {spotifyData.topWindowLabel}
-                      </div>
-                      <div className="grid gap-2">
-                        {spotifyData.topTracks.length ? (
-                          spotifyData.topTracks.map((track, index) => (
-                            <div key={track.id} className="flex items-center gap-3 rounded-[1.05rem] border border-foreground/10 bg-background/45 p-2.5">
-                              <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
-                                {track.imageUrl ? (
-                                  <Image src={track.imageUrl} alt={track.title} fill className="object-cover" unoptimized />
-                                ) : (
-                                  <div className="flex h-full items-center justify-center">
-                                    <Music4 className="h-5 w-5 text-muted-foreground" />
-                                  </div>
-                                )}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="truncate text-sm font-semibold text-foreground">
-                                  #{index + 1} {track.title}
-                                </div>
-                                <div className="truncate text-xs uppercase tracking-[0.18em] text-muted-foreground">{track.artist}</div>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="rounded-[1.3rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
-                            {spotifyData.accountDataState === "needs_reauth"
-                              ? "Top tracks need a fresh Spotify reconnect with the updated scopes."
-                              : spotifyData.accountDataState === "rate_limited"
-                                ? "Top tracks are temporarily rate-limited by Spotify."
-                                : spotifyData.accountDataMessage ?? "Top tracks will appear after Spotify returns affinity data."}
-                          </div>
-                        )}
-                      </div>
+              <div className="grid gap-3">
+                <Card className="surface-card rounded-[1.3rem] border-border bg-card">
+                  <div className="p-3.5 sm:p-4">
+                    <div className="mb-3 flex items-center gap-2 text-xl font-display font-semibold tracking-tight">
+                      <Users className="h-5 w-5 text-primary" />
+                      Top listening
                     </div>
 
-                    <div>
-                      <div className="mb-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                        Top artists {spotifyData.topWindowLabel}
-                      </div>
-                      <div className="grid gap-2">
-                        {spotifyData.topArtists.length ? (
-                          spotifyData.topArtists.map((artist, index) => (
-                            <div key={artist.id} className="flex items-center gap-3 rounded-[1.05rem] border border-foreground/10 bg-background/45 p-2.5">
-                              <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
-                                {artist.imageUrl ? (
-                                  <Image src={artist.imageUrl} alt={artist.name} fill className="object-cover" unoptimized />
-                                ) : (
-                                  <div className="flex h-full items-center justify-center">
-                                    <Users className="h-5 w-5 text-muted-foreground" />
+                    <div className="grid gap-4 lg:grid-cols-2">
+                      <div>
+                        <div className="mb-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                          Top tracks {spotifyData.topWindowLabel}
+                        </div>
+                        <div className="grid gap-2">
+                          {spotifyData.topTracks.length ? (
+                            spotifyData.topTracks.map((track, index) => (
+                              <div key={track.id} className="flex items-center gap-3 rounded-[1.05rem] border border-foreground/10 bg-background/45 p-2.5">
+                                <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
+                                  {track.imageUrl ? (
+                                    <Image src={track.imageUrl} alt={track.title} fill className="object-cover" unoptimized />
+                                  ) : (
+                                    <div className="flex h-full items-center justify-center">
+                                      <Music4 className="h-5 w-5 text-muted-foreground" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="truncate text-sm font-semibold text-foreground">
+                                    #{index + 1} {track.title}
                                   </div>
-                                )}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="truncate text-sm font-semibold text-foreground">
-                                  #{index + 1} {artist.name}
-                                </div>
-                                <div className="truncate text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                                  {artist.genres.join(" • ") || "Top artist"}
+                                  <div className="truncate text-xs uppercase tracking-[0.18em] text-muted-foreground">{track.artist}</div>
                                 </div>
                               </div>
+                            ))
+                          ) : (
+                            <div className="rounded-[1.3rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
+                              {spotifyData.accountDataState === "needs_reauth"
+                                ? "Top tracks need a fresh Spotify reconnect with the updated scopes."
+                                : spotifyData.accountDataState === "rate_limited"
+                                  ? "Top tracks are temporarily rate-limited by Spotify."
+                                  : spotifyData.accountDataMessage ?? "Top tracks will appear after Spotify returns affinity data."}
                             </div>
-                          ))
-                        ) : (
-                          <div className="rounded-[1.3rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
-                            {spotifyData.accountDataState === "needs_reauth"
-                              ? "Top artists need a fresh Spotify reconnect with the updated scopes."
-                              : spotifyData.accountDataState === "rate_limited"
-                                ? "Top artists are temporarily rate-limited by Spotify."
-                                : spotifyData.accountDataMessage ?? "Top artists will appear after Spotify returns affinity data."}
-                          </div>
-                        )}
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="mb-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                          Top artists {spotifyData.topWindowLabel}
+                        </div>
+                        <div className="grid gap-2">
+                          {spotifyData.topArtists.length ? (
+                            spotifyData.topArtists.map((artist, index) => (
+                              <div key={artist.id} className="flex items-center gap-3 rounded-[1.05rem] border border-foreground/10 bg-background/45 p-2.5">
+                                <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
+                                  {artist.imageUrl ? (
+                                    <Image src={artist.imageUrl} alt={artist.name} fill className="object-cover" unoptimized />
+                                  ) : (
+                                    <div className="flex h-full items-center justify-center">
+                                      <Users className="h-5 w-5 text-muted-foreground" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="truncate text-sm font-semibold text-foreground">
+                                    #{index + 1} {artist.name}
+                                  </div>
+                                  <div className="truncate text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                                    {artist.genres.join(" • ") || "Top artist"}
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="rounded-[1.3rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
+                              {spotifyData.accountDataState === "needs_reauth"
+                                ? "Top artists need a fresh Spotify reconnect with the updated scopes."
+                                : spotifyData.accountDataState === "rate_limited"
+                                  ? "Top artists are temporarily rate-limited by Spotify."
+                                  : spotifyData.accountDataMessage ?? "Top artists will appear after Spotify returns affinity data."}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </Card>
+                </Card>
+
+                <Card className="surface-card rounded-[1.3rem] border-border bg-card">
+                  <CardContent className="p-4">
+                    <div className="mb-4 flex items-center gap-2 text-xl font-display font-semibold tracking-tight">
+                      <Music4 className="h-5 w-5 text-primary" />
+                      Playlist picks
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-3">
+                      {spotifyPlaylists.map((playlist) => (
+                        <div key={playlist.src} className="rounded-[1.2rem] border border-foreground/10 bg-background/45 p-3">
+                          <div className="mb-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                            {playlist.label}
+                          </div>
+                          <iframe
+                            style={{ borderRadius: "12px" }}
+                            src={playlist.src}
+                            width="100%"
+                            height="232"
+                            frameBorder="0"
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy"
+                            title={playlist.description}
+                          />
+                          <p className="mt-3 text-sm leading-6 text-muted-foreground">{playlist.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           )}
         </TabsContent>
 
         <TabsContent value="linkedin" className="mt-0">
-          <div className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
+          <div className="grid gap-6 xl:grid-cols-[minmax(320px,0.82fr)_minmax(0,1.18fr)]">
             <Card className="surface-card rounded-[2rem] border-border bg-card">
               <CardContent className="flex h-full flex-col gap-6 p-8">
                 <div className="flex flex-wrap items-center gap-3">
@@ -1065,13 +1123,13 @@ export default function GitHubDashboard() {
 
                 <div className="space-y-3">
                   <div className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">
-                    LinkedIn blog layer
+                    LinkedIn activity
                   </div>
                   <h3 className="font-display text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">
-                    Activity from LinkedIn, shaped into a cleaner reading format
+                    Professional updates, shaped into a cleaner on-site format
                   </h3>
                   <p className="text-sm leading-7 text-muted-foreground sm:text-base">
-                    LinkedIn personal posts do not offer the same clean public API surface as GitHub, so this tab is built around a durable feed adapter. Point it at a LinkedIn-synced RSS or JSON feed later, and the portfolio will render your latest writing here automatically.
+                    LinkedIn does not offer the same clean public surface as GitHub, so this tab uses a durable feed adapter. Once connected, it can surface writing and updates in a format that feels native to the portfolio.
                   </p>
                 </div>
 
@@ -1082,7 +1140,7 @@ export default function GitHubDashboard() {
                       Supported source
                     </div>
                     <p className="text-sm leading-7 text-muted-foreground">
-                      Any LinkedIn-synced RSS feed or JSON feed can be connected through `LINKEDIN_FEED_URL`.
+                      Any LinkedIn-synced RSS or JSON feed can be connected through `LINKEDIN_FEED_URL`.
                     </p>
                   </div>
                   <div className="rounded-[1.4rem] border border-foreground/10 bg-background/45 p-4">
@@ -1091,7 +1149,7 @@ export default function GitHubDashboard() {
                       Portfolio behavior
                     </div>
                     <p className="text-sm leading-7 text-muted-foreground">
-                      Posts are normalized into short blog-style cards so the content feels native to the site instead of embedded.
+                      Posts are normalized into short article-style cards so the content feels native to the site instead of embedded.
                     </p>
                   </div>
                 </div>
@@ -1125,7 +1183,7 @@ export default function GitHubDashboard() {
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-xl">
                   <Linkedin className="h-5 w-5 text-primary" />
-                  LinkedIn activity posts
+                  LinkedIn posts
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4">
