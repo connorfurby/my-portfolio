@@ -15,7 +15,7 @@ export default function About() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="section-wash relative flex min-h-[calc(100dvh-1.5rem)] w-full flex-col justify-center overflow-hidden px-0 pb-4 pt-24 md:pb-6 md:pt-24"
+      className="section-wash relative flex min-h-[calc(100dvh-1.5rem)] w-full flex-col justify-center overflow-hidden px-0 pb-8 pt-24 md:justify-center md:pb-6 md:pt-24"
     >
       <div className="hero-rings absolute inset-0 z-0">
         <div className="hero-ring hero-ring-one" />
@@ -35,9 +35,9 @@ export default function About() {
         <div className="banner-gradient absolute inset-0 bg-gradient-to-b from-transparent to-background" />
       </div>
 
-      <div className="portfolio-container portfolio-grid-gap relative z-10 grid items-center lg:grid-cols-[minmax(0,0.96fr)_minmax(320px,0.78fr)] 2xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.8fr)]">
+      <div className="portfolio-container portfolio-grid-gap relative z-10 grid items-center lg:items-center lg:grid-cols-[minmax(0,0.96fr)_minmax(320px,0.78fr)] 2xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.8fr)]">
         <motion.div
-          className="flex flex-col gap-6 text-left"
+          className="flex flex-col gap-5 text-left md:gap-6"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
@@ -54,7 +54,7 @@ export default function About() {
               Software engineer and UW-Madison student
             </div>
             <motion.h1
-              className="max-w-4xl font-display text-4xl font-semibold tracking-[-0.05em] sm:text-5xl md:text-6xl xl:text-[4rem] 2xl:text-[4.45rem]"
+              className="max-w-4xl font-display text-[2.65rem] font-semibold leading-[0.98] tracking-[-0.05em] sm:text-5xl md:text-6xl xl:text-[4rem] 2xl:text-[4.45rem]"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.16, duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
@@ -103,7 +103,7 @@ export default function About() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.34, duration: 0.5 }}
           >
-            {heroPills.slice(0, 4).map((pill) => (
+            {heroPills.slice(0, 6).map((pill) => (
               <motion.div
                 key={pill.label}
                 initial={{ opacity: 0, y: 10 }}
@@ -118,6 +118,62 @@ export default function About() {
                 </Badge>
               </motion.div>
             ))}
+          </motion.div>
+
+          <motion.div
+            className="grid gap-3 lg:hidden"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.38, duration: 0.45 }}
+          >
+            <Card className="liquid-panel liquid-panel-strong overflow-hidden rounded-[1.65rem]">
+              <CardContent className="grid gap-3 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Quick Snapshot</div>
+                    <div className="mt-1 text-sm text-muted-foreground">A compact view of what I&apos;m focused on right now.</div>
+                  </div>
+                  <Image
+                    src="/imgs/pfp2.png"
+                    alt="Connor Furby"
+                    width={56}
+                    height={56}
+                    priority
+                    className="rounded-[1rem] border border-white/20 object-cover shadow-[0_12px_28px_hsl(var(--glass-shadow)/0.18)]"
+                  />
+                </div>
+
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="liquid-panel liquid-soft rounded-[1.2rem] p-3">
+                    <div className="mb-2 flex items-center gap-2 text-sm font-medium">
+                      <BriefcaseBusiness className="h-4 w-4 text-primary" />
+                      Current Focus
+                    </div>
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      Product engineering, AI-enabled workflows, responsive UI systems, and software that feels good to use.
+                    </p>
+                  </div>
+                  <div className="liquid-panel liquid-soft rounded-[1.2rem] p-3">
+                    <div className="mb-2 flex items-center gap-2 text-sm font-medium">
+                      <GraduationCap className="h-4 w-4 text-primary" />
+                      Right Now
+                    </div>
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      Studying at {educationProfile.school} with a {educationProfile.highlights[0]} while continuing to build through internships and leadership roles.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {proofHighlights.slice(0, 4).map((item) => (
+                    <div key={item.label} className="liquid-panel liquid-soft rounded-[1.1rem] p-3">
+                      <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">{item.label}</div>
+                      <div className="mt-1.5 text-xl font-semibold tracking-tight">{item.value}</div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </motion.div>
         </motion.div>
 

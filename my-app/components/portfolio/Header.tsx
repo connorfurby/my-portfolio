@@ -2,20 +2,12 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { Menu, Moon, Sparkles, Sun, SunMoon } from "lucide-react"
-import { motion } from "framer-motion"
+import { Menu, Moon, Sparkles, Sun, SunMoon, X } from "lucide-react"
+import { AnimatePresence, motion } from "framer-motion"
 import { useTheme } from "next-themes"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
 import type { NavItem, SectionId } from "@/components/portfolio/types"
 
 type HeaderProps = {
@@ -26,7 +18,20 @@ type HeaderProps = {
 
 export default function Header({ navItems, activeSection, onNavigate }: HeaderProps) {
   const { resolvedTheme, setTheme } = useTheme()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [themeReady, setThemeReady] = useState(false)
+
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow
+
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden"
+    }
+
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [mobileMenuOpen])
 
   useEffect(() => {
     setThemeReady(true)
@@ -40,7 +45,7 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="portfolio-container-wide py-2">
-        <div className="header-glass pointer-events-auto relative flex h-16 items-center gap-3 overflow-hidden rounded-[1.85rem] border border-white/10 px-4 md:px-6">
+        <div className="header-glass pointer-events-auto relative flex h-16 items-center gap-3 overflow-hidden rounded-[1.85rem] border border-border/55 px-4 md:px-6">
           <div className="header-warp pointer-events-none absolute inset-0 overflow-hidden">
             <div className="header-warp-orb header-warp-orb-one" />
             <div className="header-warp-orb header-warp-orb-two" />
@@ -82,39 +87,18 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
               })}
             </nav>
 
-            <div className="flex-1 md:hidden">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="icon" aria-label="Menu" className="rounded-full">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="border-border bg-background/92">
-                  <SheetHeader>
-                    <SheetTitle>Menu</SheetTitle>
-                    <SheetDescription>Navigate through the portfolio sections</SheetDescription>
-                  </SheetHeader>
-                  <nav className="mt-6 flex flex-col gap-3">
-                    {navItems.map((item) => {
-                      const sectionId = item.href.slice(1) as SectionId
-
-                      return (
-                        <Button
-                          key={item.name}
-                          variant={activeSection === sectionId ? "default" : "ghost"}
-                          className="justify-start rounded-xl"
-                          onClick={() => {
-                            onNavigate(sectionId)
-                            document.body.classList.remove("overflow-hidden")
-                          }}
-                        >
-                          {item.name}
-                        </Button>
-                      )
-                    })}
-                  </nav>
-                </SheetContent>
-              </Sheet>
+            <div className="ml-auto md:hidden">
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-portfolio-menu"
+                className="rounded-full border-border/55 bg-background/88 backdrop-blur-xl"
+                onClick={() => setMobileMenuOpen((current) => !current)}
+              >
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
             </div>
 
             <div className="ml-auto hidden items-center gap-2 sm:flex">
@@ -129,16 +113,16 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
               <Button
                 variant="outline"
                 size="sm"
-                aria-label="Toggle Theme"
+                aria-label="Toggle theme"
                 onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
                 className="rounded-full"
               >
                 {!themeReady ? (
-                  <SunMoon className="h-5 w-5" />
+                  <SunMoon className="h-4 w-4" />
                 ) : resolvedTheme === "dark" ? (
-                  <Sun className="h-5 w-5" />
+                  <Sun className="h-4 w-4" />
                 ) : (
-                  <Moon className="h-5 w-5" />
+                  <Moon className="h-4 w-4" />
                 )}
                 Theme
               </Button>
@@ -146,6 +130,88 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {mobileMenuOpen ? (
+          <>
+            <motion.button
+              type="button"
+              aria-label="Close mobile navigation"
+              className="pointer-events-auto fixed inset-x-0 top-20 bottom-0 bg-[hsl(var(--glass-shadow)/0.58)] backdrop-blur-md md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+            />
+
+            <motion.div
+              className="pointer-events-auto portfolio-container-wide mt-2 md:hidden"
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div
+                id="mobile-portfolio-menu"
+                className="liquid-panel liquid-panel-strong relative overflow-hidden rounded-[1.85rem] border border-border/55 px-4 py-4 shadow-[0_18px_50px_hsl(var(--glass-shadow)/0.28)]"
+              >
+                <div className="mb-4 flex items-start justify-between gap-4">
+                  <div>
+                    <div className="font-display text-lg font-semibold tracking-[-0.03em] text-foreground">Menu</div>
+                    <div className="mt-1 text-sm text-muted-foreground">Navigate through the portfolio sections</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      aria-label="Toggle theme"
+                      className="rounded-full border-border/55 bg-background/88 backdrop-blur-xl"
+                      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+                    >
+                      {!themeReady ? (
+                        <SunMoon className="h-4 w-4" />
+                      ) : resolvedTheme === "dark" ? (
+                        <Sun className="h-4 w-4" />
+                      ) : (
+                        <Moon className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      aria-label="Close menu"
+                      className="rounded-full border-border/55 bg-background/88 backdrop-blur-xl"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <nav className="grid gap-2">
+                  {navItems.map((item) => {
+                    const sectionId = item.href.slice(1) as SectionId
+
+                    return (
+                      <Button
+                        key={item.name}
+                        variant={activeSection === sectionId ? "default" : "ghost"}
+                        className="justify-start rounded-2xl px-4 py-6 text-base"
+                        onClick={() => {
+                          setMobileMenuOpen(false)
+                          window.setTimeout(() => onNavigate(sectionId), 30)
+                        }}
+                      >
+                        {item.name}
+                      </Button>
+                    )
+                  })}
+                </nav>
+              </div>
+            </motion.div>
+          </>
+        ) : null}
+      </AnimatePresence>
     </motion.header>
   )
 }

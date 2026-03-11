@@ -25,6 +25,7 @@ import AnimatedSection from "@/components/portfolio/AnimatedSection"
 import IntegrationTerminal from "@/components/portfolio/IntegrationTerminal"
 import PortfolioChat from "@/components/portfolio/PortfolioChat"
 import SectionHeading from "@/components/portfolio/SectionHeading"
+import { useNearViewport } from "@/components/portfolio/useNearViewport"
 import { spotifyPlaylists } from "@/components/portfolio/data"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -256,7 +257,10 @@ function formatSpotifyValue(value?: string | null) {
 }
 
 export default function GitHubDashboard() {
-  const sectionRef = useRef<HTMLElement | null>(null)
+  const { ref: sectionRef, isNearViewport: isIntegrationsVisible } = useNearViewport<HTMLElement>({
+    rootMargin: "260px 0px",
+    threshold: 0.18,
+  })
   const [activeTab, setActiveTab] = useState("terminal")
   const [githubData, setGitHubData] = useState<GitHubDashboardResponse | null>(null)
   const [githubError, setGitHubError] = useState<string | null>(null)
@@ -264,33 +268,17 @@ export default function GitHubDashboard() {
   const [spotifyData, setSpotifyData] = useState<SpotifyDashboardResponse | null>(null)
   const [spotifyError, setSpotifyError] = useState<string | null>(null)
   const [spotifyLoading, setSpotifyLoading] = useState(true)
-  const [isIntegrationsVisible, setIsIntegrationsVisible] = useState(false)
   const [linkedinData, setLinkedinData] = useState<LinkedInActivityResponse | null>(null)
   const [linkedinError, setLinkedinError] = useState<string | null>(null)
   const [linkedinLoading, setLinkedinLoading] = useState(true)
+  const shouldLoadGitHub = !githubData && !githubError
+  const shouldLoadLinkedIn = !linkedinData && !linkedinError
+  const shouldLoadSpotify = !spotifyData && !spotifyError
 
   useEffect(() => {
-    const element = sectionRef.current
-
-    if (!element) {
+    if (!isIntegrationsVisible || (!shouldLoadGitHub && !shouldLoadLinkedIn && !shouldLoadSpotify)) {
       return
     }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsIntegrationsVisible(entry.isIntersecting)
-      },
-      {
-        threshold: 0.35,
-      }
-    )
-
-    observer.observe(element)
-
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
     let isCancelled = false
 
     async function loadGitHubDashboard() {
@@ -373,14 +361,22 @@ export default function GitHubDashboard() {
       }
     }
 
-    loadGitHubDashboard()
-    loadSpotifyActivity()
-    loadLinkedInActivity()
+    if (shouldLoadGitHub) {
+      void loadGitHubDashboard()
+    }
+
+    if (shouldLoadSpotify) {
+      void loadSpotifyActivity()
+    }
+
+    if (shouldLoadLinkedIn) {
+      void loadLinkedInActivity()
+    }
 
     return () => {
       isCancelled = true
     }
-  }, [])
+  }, [isIntegrationsVisible, shouldLoadGitHub, shouldLoadLinkedIn, shouldLoadSpotify])
 
   useEffect(() => {
     if (!isIntegrationsVisible || activeTab !== "spotify") {
@@ -436,7 +432,7 @@ export default function GitHubDashboard() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-3 grid h-auto w-full max-w-5xl grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <TabsList className="mb-3 grid h-auto w-full max-w-5xl grid-cols-2 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <TabsTrigger value="terminal" className="gap-2">
             <Command className="h-4 w-4" />
             Terminal
@@ -490,7 +486,7 @@ export default function GitHubDashboard() {
               <Card className="surface-card relative overflow-hidden rounded-[2rem] border-border bg-card">
                 <motion.div
                   className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.22),transparent_70%)] blur-3xl"
-                  animate={{ x: [0, 16, 0], y: [0, -10, 0] }}
+                  animate={isIntegrationsVisible ? { x: [0, 16, 0], y: [0, -10, 0] } : undefined}
                   transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <CardContent className="relative flex flex-col gap-6 p-8">
@@ -841,7 +837,7 @@ export default function GitHubDashboard() {
               <Card className="surface-card relative overflow-hidden rounded-[1.3rem] border-border bg-card">
                 <motion.div
                   className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.22),transparent_70%)] blur-3xl"
-                  animate={{ x: [0, 16, 0], y: [0, -10, 0] }}
+                  animate={isIntegrationsVisible ? { x: [0, 16, 0], y: [0, -10, 0] } : undefined}
                   transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <div className="relative grid gap-0 md:grid-cols-[minmax(13rem,14rem)_1fr]">
@@ -869,7 +865,7 @@ export default function GitHubDashboard() {
                         </Badge>
                         {isIntegrationsVisible ? (
                           <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
-                            5s in view
+                            Live refresh
                           </Badge>
                         ) : null}
                       </div>

@@ -49,11 +49,11 @@ body {
     --radius: 1rem;
     --spotlight: 229 91% 62%;
     --spotlight-secondary: 171 82% 52%;
-    --glass-surface: 0 0% 100%;
+    --glass-surface: 220 32% 98%;
     --glass-surface-strong: 0 0% 100%;
     --glass-shadow: 224 45% 20%;
     --glass-inner: 0 0% 100%;
-    --glass-stroke: 220 28% 86%;
+    --glass-stroke: 220 24% 80%;
     --glass-frost: 22px;
   }
   .dark {
@@ -98,6 +98,11 @@ body {
   }
   html {
     scroll-behavior: smooth;
+    color-scheme: light;
+  }
+  .dark html,
+  html.dark {
+    color-scheme: dark;
   }
   body {
     @apply bg-background text-foreground antialiased;
@@ -117,12 +122,12 @@ body {
   overflow: hidden;
   border: 1px solid hsl(var(--glass-stroke) / 0.48);
   background:
-    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.46), hsl(var(--glass-surface) / 0.16)),
+    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.84), hsl(var(--glass-surface) / 0.64)),
     linear-gradient(135deg, hsl(var(--glass-inner) / 0.12), transparent 44%);
   box-shadow:
-    0 1px 0 hsl(var(--glass-inner) / 0.24),
+    0 1px 0 hsl(var(--glass-inner) / 0.56),
     0 18px 42px hsl(var(--glass-shadow) / 0.09),
-    inset 0 1px 0 hsl(var(--glass-inner) / 0.38);
+    inset 0 1px 0 hsl(var(--glass-inner) / 0.7);
   backdrop-filter: blur(var(--glass-frost)) saturate(132%);
   -webkit-backdrop-filter: blur(var(--glass-frost)) saturate(132%);
 }
@@ -146,29 +151,29 @@ body {
 
 .liquid-panel-strong {
   background:
-    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.54), hsl(var(--glass-surface) / 0.2)),
+    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.92), hsl(var(--glass-surface) / 0.72)),
     linear-gradient(140deg, hsl(var(--glass-inner) / 0.12), transparent 46%);
   box-shadow:
-    0 1px 0 hsl(var(--glass-inner) / 0.24),
+    0 1px 0 hsl(var(--glass-inner) / 0.58),
     0 22px 54px hsl(var(--glass-shadow) / 0.11),
-    inset 0 1px 0 hsl(var(--glass-inner) / 0.42);
+    inset 0 1px 0 hsl(var(--glass-inner) / 0.74);
 }
 
 .liquid-soft {
   background:
-    linear-gradient(180deg, hsl(var(--glass-surface) / 0.36), hsl(var(--glass-surface) / 0.12));
-  border-color: hsl(var(--glass-stroke) / 0.38);
+    linear-gradient(180deg, hsl(var(--glass-surface) / 0.88), hsl(var(--glass-surface) / 0.62));
+  border-color: hsl(var(--glass-stroke) / 0.54);
 }
 
 .liquid-chip {
   border: 1px solid hsl(var(--glass-stroke) / 0.42);
   background:
-    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.38), hsl(var(--glass-surface) / 0.12)),
+    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.86), hsl(var(--glass-surface) / 0.66)),
     linear-gradient(135deg, hsl(var(--glass-inner) / 0.12), transparent 50%);
   box-shadow:
-    0 1px 0 hsl(var(--glass-inner) / 0.24),
+    0 1px 0 hsl(var(--glass-inner) / 0.54),
     0 10px 24px hsl(var(--glass-shadow) / 0.08),
-    inset 0 1px 0 hsl(var(--glass-inner) / 0.34);
+    inset 0 1px 0 hsl(var(--glass-inner) / 0.7);
   backdrop-filter: blur(16px) saturate(122%);
   -webkit-backdrop-filter: blur(16px) saturate(122%);
 }
@@ -442,11 +447,11 @@ body {
 
 .header-glass {
   background:
-    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.38), hsl(var(--glass-surface) / 0.12)),
+    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.88), hsl(var(--glass-surface) / 0.7)),
     linear-gradient(120deg, hsl(var(--glass-inner) / 0.1), transparent 40%);
   box-shadow:
     0 16px 38px hsl(var(--glass-shadow) / 0.12),
-    inset 0 1px 0 hsl(var(--glass-inner) / 0.32);
+    inset 0 1px 0 hsl(var(--glass-inner) / 0.62);
   backdrop-filter: blur(24px) saturate(126%);
   -webkit-backdrop-filter: blur(24px) saturate(126%);
 }
@@ -640,6 +645,39 @@ body {
   .hero-ring-one,
   .hero-ring-two,
   .hero-grid {
+    display: none;
+  }
+
+  body {
+    background-attachment: scroll;
+  }
+
+  .ambient-stage::after,
+  .portfolio-shell::before {
+    opacity: 0.22;
+  }
+}
+
+@media (max-width: 767px) {
+  .section-title {
+    font-size: 2rem;
+    line-height: 1.05;
+  }
+
+  .section-subtitle {
+    line-height: 1.65;
+  }
+
+  .portfolio-container,
+  .portfolio-container-wide {
+    width: min(100% - 1rem, 100%);
+  }
+
+  [role="tablist"] {
+    scrollbar-width: none;
+  }
+
+  [role="tablist"]::-webkit-scrollbar {
     display: none;
   }
 }

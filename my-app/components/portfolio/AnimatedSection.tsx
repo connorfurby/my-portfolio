@@ -1,31 +1,7 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
 import { motion, useReducedMotion } from "framer-motion"
-
-function useIntersectionObserver(
-  callback: IntersectionObserverCallback,
-  options: IntersectionObserverInit = {}
-) {
-  const ref = useRef<HTMLElement | null>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(callback, options)
-    const node = ref.current
-
-    if (node) {
-      observer.observe(node)
-    }
-
-    return () => {
-      if (node) {
-        observer.unobserve(node)
-      }
-    }
-  }, [callback, options])
-
-  return ref
-}
+import { useNearViewport } from "@/components/portfolio/useNearViewport"
 
 type AnimatedSectionProps = {
   children: React.ReactNode
@@ -35,17 +11,12 @@ type AnimatedSectionProps = {
 }
 
 export default function AnimatedSection({ children, className, id, delay = 0 }: AnimatedSectionProps) {
-  const [isVisible, setIsVisible] = useState(false)
   const reduceMotion = useReducedMotion()
-
-  const ref = useIntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting) {
-        setIsVisible(true)
-      }
-    },
-    { threshold: 0.1 }
-  )
+  const { ref, isNearViewport: isVisible } = useNearViewport<HTMLElement>({
+    rootMargin: "180px 0px",
+    threshold: 0.08,
+    freezeOnceVisible: true,
+  })
 
   return (
     <motion.section

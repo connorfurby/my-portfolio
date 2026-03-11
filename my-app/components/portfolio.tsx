@@ -16,14 +16,14 @@ import Experience from "@/components/portfolio/Experience"
 import Header from "@/components/portfolio/Header"
 import { navItems, projects } from "@/components/portfolio/data"
 import type { Project, SectionId } from "@/components/portfolio/types"
-import { scrollToSection, sectionIds } from "@/components/portfolio/utils"
+import { PORTFOLIO_SCROLL_OFFSET, getElementPageTop, scrollToSection, sectionIds } from "@/components/portfolio/utils"
+import { useScrollFrameSync } from "@/components/portfolio/useScrollFrameSync"
 import { FullscreenModal } from "@/components/ui/fullscreen-modal"
 import type { CarouselApi } from "@/components/ui/carousel"
 
 const Education = dynamic(() => import("@/components/portfolio/Education"))
 const Awards = dynamic(() => import("@/components/portfolio/Awards"))
 const GitHubDashboard = dynamic(() => import("@/components/portfolio/GitHubDashboard"))
-const Passions = dynamic(() => import("@/components/portfolio/Passions"))
 const Contact = dynamic(() => import("@/components/portfolio/Contact"))
 const Footer = dynamic(() => import("@/components/portfolio/Footer"))
 
@@ -150,34 +150,37 @@ export default function Portfolio() {
   }, [carouselApis, scrollNext])
 
   useEffect(() => {
+    if (!sectionIds.includes(activeSection)) {
+      setActiveSection("about")
+    }
+  }, [activeSection])
+
+  useScrollFrameSync(() => {
     const sections = sectionIds
-      .map((sectionId) => document.getElementById(sectionId))
-      .filter((element): element is HTMLElement => Boolean(element))
+      .map((sectionId) => {
+        const element = document.getElementById(sectionId)
+
+        return element ? { id: sectionId, element } : null
+      })
+      .filter((entry): entry is { id: SectionId; element: HTMLElement } => Boolean(entry))
 
     if (!sections.length) {
       return
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const activeEntry = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((left, right) => left.boundingClientRect.top - right.boundingClientRect.top)[0]
+    const markerY = window.scrollY + PORTFOLIO_SCROLL_OFFSET + 8
+    let nextSection = sections[0]?.id ?? "about"
 
-        if (activeEntry?.target.id) {
-          setActiveSection(activeEntry.target.id as SectionId)
-        }
-      },
-      {
-        rootMargin: "-96px 0px -50% 0px",
-        threshold: [0.15, 0.35, 0.6],
+    for (const section of sections) {
+      if (getElementPageTop(section.element) <= markerY) {
+        nextSection = section.id
+      } else {
+        break
       }
-    )
+    }
 
-    sections.forEach((section) => observer.observe(section))
-
-    return () => observer.disconnect()
-  }, [])
+    setActiveSection((current) => (current === nextSection ? current : nextSection))
+  })
 
   return (
     <div className="portfolio-shell min-h-screen bg-background text-foreground">
@@ -228,7 +231,6 @@ export default function Portfolio() {
           <Education />
           <Awards />
           <GitHubDashboard />
-          <Passions />
           <Contact />
         </div>
       </main>

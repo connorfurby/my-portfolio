@@ -10,14 +10,14 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "liquid-chip border-transparent bg-foreground/92 text-white shadow-[0_10px_24px_hsl(var(--glass-shadow)/0.12)] hover:-translate-y-0.5 hover:bg-foreground",
+          "border border-transparent bg-foreground text-background shadow-[0_10px_24px_hsl(var(--glass-shadow)/0.14)] hover:-translate-y-0.5 hover:bg-foreground/94 dark:bg-foreground/92 dark:text-background dark:hover:bg-foreground",
         destructive:
-          "liquid-chip border-transparent bg-destructive/86 text-destructive-foreground shadow-[0_10px_24px_hsl(var(--glass-shadow)/0.1)] hover:-translate-y-0.5 hover:bg-destructive/92",
+          "border border-transparent bg-destructive text-destructive-foreground shadow-[0_10px_24px_hsl(var(--glass-shadow)/0.1)] hover:-translate-y-0.5 hover:bg-destructive/92",
         outline:
-          "liquid-chip border-foreground/10 bg-background/26 text-foreground shadow-[0_8px_20px_hsl(var(--glass-shadow)/0.08)] hover:-translate-y-0.5 hover:bg-background/34",
+          "liquid-chip border-foreground/12 bg-background/72 text-foreground shadow-[0_8px_20px_hsl(var(--glass-shadow)/0.08)] hover:-translate-y-0.5 hover:bg-background/82 dark:bg-background/26 dark:hover:bg-background/34",
         secondary:
-          "liquid-chip border-transparent bg-background/2 text-secondary-foreground hover:-translate-y-0.5 hover:bg-background/12",
-        ghost: "border border-transparent bg-transparent text-muted-foreground hover:bg-background/18 hover:text-foreground",
+          "liquid-chip border-transparent bg-secondary text-secondary-foreground hover:-translate-y-0.5 hover:bg-secondary/86 dark:bg-background/2 dark:hover:bg-background/12",
+        ghost: "border border-transparent bg-transparent text-muted-foreground hover:bg-background/55 hover:text-foreground dark:hover:bg-background/18",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

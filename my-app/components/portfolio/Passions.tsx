@@ -3,10 +3,9 @@ import { useId, useState } from "react"
 import { Sparkles } from "lucide-react"
 import { motion, useReducedMotion } from "framer-motion"
 
-import AnimatedSection from "@/components/portfolio/AnimatedSection"
 import { passions } from "@/components/portfolio/data"
+import { useNearViewport } from "@/components/portfolio/useNearViewport"
 import type { Passion } from "@/components/portfolio/types"
-import SectionHeading from "@/components/portfolio/SectionHeading"
 import { Badge } from "@/components/ui/badge"
 
 type MindmapLayout = {
@@ -78,6 +77,8 @@ const nodeLookup = Object.fromEntries(mindmapNodes.map((node) => [node.title, no
 export default function Passions() {
   const reduceMotion = useReducedMotion()
   const [activeTitle, setActiveTitle] = useState("Software Development")
+  const { ref: sectionRef, isNearViewport } = useNearViewport<HTMLDivElement>({ rootMargin: "280px 0px" })
+  const shouldAnimate = !reduceMotion && isNearViewport
   const activePassion = nodeLookup[activeTitle] ?? mindmapNodes[0]
   const ActiveIcon = activePassion.icon
   const svgId = useId().replace(/:/g, "")
@@ -85,20 +86,14 @@ export default function Passions() {
   const linkGlowId = `${svgId}-mindmap-glow`
 
   return (
-    <AnimatedSection id="passions" className="relative z-30 mb-16 pt-16" delay={0.03}>
+    <div ref={sectionRef} className="relative z-30">
       <motion.div
         className="pointer-events-none absolute inset-x-0 top-6 h-28 bg-[radial-gradient(circle_at_center,hsl(var(--spotlight)/0.18),transparent_68%)] blur-3xl"
-        animate={reduceMotion ? undefined : { opacity: [0.36, 0.76, 0.36], scale: [0.96, 1.04, 0.96] }}
+        animate={shouldAnimate ? { opacity: [0.36, 0.76, 0.36], scale: [0.96, 1.04, 0.96] } : undefined}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
-      <SectionHeading
-        eyebrow="Beyond Coding"
-        title="The interests that shape how I think"
-        description="A living mindmap of the interests that keep me curious, balanced, and creatively sharp outside software."
-        align="center"
-      />
 
-      <div className="relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-[linear-gradient(135deg,hsl(var(--background)/0.92),hsl(var(--background)/0.68))] p-4 shadow-[0_28px_90px_hsl(var(--foreground)/0.12)] backdrop-blur-2xl sm:p-6 lg:p-8">
+      <div className="relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-[linear-gradient(135deg,hsl(var(--background)/0.92),hsl(var(--background)/0.68))] p-4 shadow-[0_28px_90px_hsl(var(--foreground)/0.12)] backdrop-blur-2xl sm:p-5 lg:p-6">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 opacity-80 [background-image:radial-gradient(circle_at_18%_16%,hsl(var(--spotlight)/0.18),transparent_24%),radial-gradient(circle_at_82%_18%,hsl(var(--spotlight-secondary)/0.16),transparent_22%),radial-gradient(circle_at_50%_88%,hsl(var(--primary)/0.1),transparent_28%)]" />
           <div
@@ -112,18 +107,35 @@ export default function Passions() {
           />
           <motion.div
             className="absolute -left-8 top-8 h-40 w-40 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.28),transparent_72%)] blur-3xl"
-            animate={reduceMotion ? undefined : { x: [0, 26, 0], y: [0, 18, 0], scale: [1, 1.08, 1] }}
+            animate={shouldAnimate ? { x: [0, 26, 0], y: [0, 18, 0], scale: [1, 1.08, 1] } : undefined}
             transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
             className="absolute -right-8 bottom-6 h-44 w-44 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.24),transparent_70%)] blur-3xl"
-            animate={reduceMotion ? undefined : { x: [0, -22, 0], y: [0, -14, 0], scale: [1, 1.06, 1] }}
+            animate={shouldAnimate ? { x: [0, -22, 0], y: [0, -14, 0], scale: [1, 1.06, 1] } : undefined}
             transition={{ duration: 19, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
           />
         </div>
 
-        <div className="relative grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
-          <div className="relative min-h-[32rem] overflow-hidden rounded-[1.75rem] border border-foreground/10 bg-[linear-gradient(155deg,hsl(var(--background)/0.7),hsl(var(--background)/0.24))] p-4 sm:min-h-[36rem] sm:p-6 lg:min-h-[40rem]">
+        <div className="relative mb-4 max-w-3xl">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Badge variant="outline" className="rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em]">
+              Beyond Coding
+            </Badge>
+            <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              {mindmapNodes.length} interest nodes
+            </span>
+          </div>
+          <h3 className="text-[1.3rem] font-semibold tracking-[-0.04em] md:text-[1.55rem]">
+            The interests that shape how I think
+          </h3>
+          <p className="mt-1.5 max-w-2xl text-sm leading-5 text-muted-foreground">
+            A live map of the interests that keep the work creative, balanced, and personal outside software.
+          </p>
+        </div>
+
+        <div className="relative grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(300px,0.8fr)] xl:gap-5">
+          <div className="relative min-h-[23rem] overflow-hidden rounded-[1.75rem] border border-foreground/10 bg-[linear-gradient(155deg,hsl(var(--background)/0.7),hsl(var(--background)/0.24))] p-4 sm:min-h-[25rem] sm:p-5 lg:min-h-[27rem]">
             <div className="absolute left-4 top-4 z-30 flex flex-wrap gap-2 sm:left-6 sm:top-6">
               <Badge
                 variant="outline"
@@ -143,17 +155,17 @@ export default function Passions() {
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
               <motion.div
                 className="absolute left-1/2 top-1/2 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-foreground/10"
-                animate={reduceMotion ? undefined : { rotate: 360 }}
+                animate={shouldAnimate ? { rotate: 360 } : undefined}
                 transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
               />
               <motion.div
                 className="absolute left-1/2 top-1/2 h-[62%] w-[62%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-foreground/10"
-                animate={reduceMotion ? undefined : { rotate: -360 }}
+                animate={shouldAnimate ? { rotate: -360 } : undefined}
                 transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
               />
               <motion.div
                 className="absolute left-1/2 top-1/2 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0deg,hsl(var(--spotlight)/0.14)_55deg,transparent_120deg,hsl(var(--spotlight-secondary)/0.1)_180deg,transparent_245deg)] blur-3xl"
-                animate={reduceMotion ? undefined : { rotate: 360 }}
+                animate={shouldAnimate ? { rotate: 360 } : undefined}
                 transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
               />
 
@@ -169,7 +181,7 @@ export default function Passions() {
                     opacity: particle.opacity,
                   }}
                   animate={
-                    reduceMotion
+                    !shouldAnimate
                       ? undefined
                       : {
                           x: [0, particle.driftX, 0],
@@ -238,7 +250,7 @@ export default function Passions() {
                       strokeDasharray={isActive ? "0 0" : "3 6"}
                       initial={{ pathLength: 0, opacity: 0 }}
                       animate={
-                        reduceMotion
+                        !shouldAnimate
                           ? { pathLength: 1, opacity: isActive ? 0.92 : 0.34 }
                           : {
                               pathLength: 1,
@@ -252,6 +264,8 @@ export default function Passions() {
                           ease: [0.22, 1, 0.36, 1],
                         },
                         opacity: reduceMotion
+                          ? { duration: 0 }
+                          : !shouldAnimate
                           ? { duration: 0 }
                           : {
                               duration: isActive ? 2.8 : 4.6,
@@ -273,12 +287,12 @@ export default function Passions() {
                   key={`mindmap-ring-${ring}`}
                   className="absolute left-1/2 top-1/2 rounded-full border border-foreground/10"
                   style={{
-                    width: `${11 + ring * 3.5}rem`,
-                    height: `${11 + ring * 3.5}rem`,
-                    marginLeft: `${-(11 + ring * 3.5) / 2}rem`,
-                    marginTop: `${-(11 + ring * 3.5) / 2}rem`,
+                    width: `${7.5 + ring * 2.8}rem`,
+                    height: `${7.5 + ring * 2.8}rem`,
+                    marginLeft: `${-(7.5 + ring * 2.8) / 2}rem`,
+                    marginTop: `${-(7.5 + ring * 2.8) / 2}rem`,
                   }}
-                  animate={reduceMotion ? undefined : { scale: [0.94, 1.04, 0.94], opacity: [0.12, 0.4, 0.12] }}
+                  animate={shouldAnimate ? { scale: [0.94, 1.04, 0.94], opacity: [0.12, 0.4, 0.12] } : undefined}
                   transition={{
                     duration: 5 + ring * 1.2,
                     delay: ring * 0.45,
@@ -289,20 +303,20 @@ export default function Passions() {
               ))}
 
               <motion.div
-                className="relative flex h-32 w-32 flex-col items-center justify-center rounded-full border border-foreground/12 bg-[radial-gradient(circle_at_30%_25%,hsl(var(--spotlight)/0.22),transparent_42%),linear-gradient(145deg,hsl(var(--background)/0.92),hsl(var(--background)/0.68))] px-4 text-center shadow-[0_0_0_1px_hsl(var(--foreground)/0.03),0_24px_60px_hsl(var(--foreground)/0.2)] sm:h-36 sm:w-36 lg:h-44 lg:w-44"
-                animate={reduceMotion ? undefined : { y: [0, -8, 0], rotate: [0, 1.4, 0] }}
+                className="relative flex h-[4.5rem] w-[4.5rem] flex-col items-center justify-center rounded-full border border-foreground/12 bg-[radial-gradient(circle_at_30%_25%,hsl(var(--spotlight)/0.22),transparent_42%),linear-gradient(145deg,hsl(var(--background)/0.92),hsl(var(--background)/0.68))] px-2 text-center shadow-[0_0_0_1px_hsl(var(--foreground)/0.03),0_20px_46px_hsl(var(--foreground)/0.18)] sm:h-[5.1rem] sm:w-[5.1rem] lg:h-[5.7rem] lg:w-[5.7rem]"
+                animate={shouldAnimate ? { y: [0, -6, 0], rotate: [0, 1.2, 0] } : undefined}
                 transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
               >
-                <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.32em] text-muted-foreground sm:text-[11px]">
+                <div className="mb-1 font-mono text-[8px] uppercase tracking-[0.2em] text-muted-foreground sm:text-[9px]">
                   Curiosity core
                 </div>
-                <div className="font-display text-lg font-semibold tracking-[-0.05em] text-foreground sm:text-xl lg:text-2xl">
+                <div className="font-display text-[13px] font-semibold leading-4 tracking-[-0.05em] text-foreground sm:text-[15px] lg:text-[17px]">
                   Beyond
                   <br />
                   Coding
                 </div>
-                <div className="mt-2 text-[10px] leading-4 text-muted-foreground sm:text-[11px]">
-                  Hover a node to surface the story behind it.
+                <div className="mt-1 text-[8px] leading-3 text-muted-foreground sm:text-[9px]">
+                  Hover
                 </div>
               </motion.div>
             </div>
@@ -316,7 +330,7 @@ export default function Passions() {
                   key={node.title}
                   className="absolute z-30 -translate-x-1/2 -translate-y-1/2 will-change-transform"
                   style={{ left: `${node.x}%`, top: `${node.y}%` }}
-                  animate={reduceMotion ? undefined : { x: [0, node.driftX, 0], y: [0, node.driftY, 0] }}
+                  animate={shouldAnimate ? { x: [0, node.driftX, 0], y: [0, node.driftY, 0] } : undefined}
                   transition={{
                     duration: node.duration,
                     delay: node.delay,
@@ -331,9 +345,9 @@ export default function Passions() {
                     onMouseEnter={() => setActiveTitle(node.title)}
                     onFocus={() => setActiveTitle(node.title)}
                     onClick={() => setActiveTitle(node.title)}
-                    whileHover={reduceMotion ? undefined : { scale: 1.08, y: -4 }}
+                    whileHover={reduceMotion ? undefined : { scale: 1.06, y: -3 }}
                     whileTap={{ scale: 0.96 }}
-                    className={`group relative flex h-14 w-14 items-center justify-center rounded-full border backdrop-blur-xl transition-all duration-300 sm:h-16 sm:w-16 lg:h-[4.5rem] lg:w-[4.5rem] ${
+                    className={`group relative flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-xl transition-all duration-300 sm:h-11 sm:w-11 lg:h-[3rem] lg:w-[3rem] ${
                       isActive
                         ? "border-foreground/25 bg-background/88 shadow-[0_0_0_1px_hsl(var(--foreground)/0.06),0_16px_42px_hsl(var(--foreground)/0.24)]"
                         : "border-foreground/10 bg-background/62 shadow-[0_0_0_1px_hsl(var(--foreground)/0.03),0_12px_30px_hsl(var(--foreground)/0.12)] hover:border-foreground/20 hover:bg-background/75"
@@ -346,18 +360,18 @@ export default function Passions() {
                     />
                     <motion.span
                       className="absolute inset-0 rounded-full border border-foreground/10"
-                      animate={reduceMotion ? undefined : { scale: isActive ? [1, 1.16, 1] : [1, 1.08, 1], opacity: isActive ? [0.2, 0.55, 0.2] : [0.12, 0.28, 0.12] }}
+                      animate={shouldAnimate ? { scale: isActive ? [1, 1.16, 1] : [1, 1.08, 1], opacity: isActive ? [0.2, 0.55, 0.2] : [0.12, 0.28, 0.12] } : undefined}
                       transition={{
                         duration: isActive ? 2.6 : 3.8,
                         repeat: Infinity,
                         ease: "easeInOut",
                       }}
                     />
-                    <span className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full bg-foreground/6 text-foreground sm:h-10 sm:w-10">
-                      <Icon className="h-4 w-4 sm:h-[1.1rem] sm:w-[1.1rem]" />
+                    <span className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full bg-foreground/6 text-foreground sm:h-7 sm:w-7">
+                      <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     </span>
                     <span
-                      className={`pointer-events-none absolute left-1/2 top-full mt-3 w-max max-w-[8rem] -translate-x-1/2 rounded-2xl border border-foreground/10 bg-background/88 px-3 py-1.5 text-center text-[10px] font-medium leading-tight text-foreground shadow-[0_10px_24px_hsl(var(--foreground)/0.16)] backdrop-blur-xl transition-all duration-300 sm:max-w-[9.5rem] sm:text-[11px] ${
+                      className={`pointer-events-none absolute left-1/2 top-full mt-2 w-max max-w-[6.25rem] -translate-x-1/2 rounded-2xl border border-foreground/10 bg-background/88 px-2 py-1 text-center text-[8px] font-medium leading-tight text-foreground shadow-[0_10px_24px_hsl(var(--foreground)/0.16)] backdrop-blur-xl transition-all duration-300 sm:max-w-[7rem] sm:text-[9px] ${
                         isActive ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0"
                       }`}
                     >
@@ -373,7 +387,7 @@ export default function Passions() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-foreground/10 bg-[linear-gradient(160deg,hsl(var(--background)/0.82),hsl(var(--background)/0.5))] p-4 shadow-[0_24px_70px_hsl(var(--foreground)/0.14)] backdrop-blur-xl sm:p-5 lg:min-h-[40rem] lg:p-6">
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-foreground/10 bg-[linear-gradient(160deg,hsl(var(--background)/0.82),hsl(var(--background)/0.5))] p-4 shadow-[0_24px_70px_hsl(var(--foreground)/0.14)] backdrop-blur-xl sm:p-5 lg:p-5">
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/25 to-transparent" />
             <div className="pointer-events-none absolute right-0 top-0 h-36 w-36 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.16),transparent_72%)] blur-3xl" />
 
@@ -383,12 +397,12 @@ export default function Passions() {
                   <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
                     Selected node
                   </div>
-                  <h3 className="font-display text-2xl font-semibold tracking-[-0.05em] text-foreground sm:text-[2rem]">
+                  <h3 className="font-display text-[1.6rem] font-semibold tracking-[-0.05em] text-foreground sm:text-[1.8rem]">
                     {activePassion.title}
                   </h3>
                 </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-foreground/10 bg-background/72 shadow-[0_14px_30px_hsl(var(--foreground)/0.12)]">
-                  <ActiveIcon className="h-5 w-5" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-foreground/10 bg-background/72 shadow-[0_14px_30px_hsl(var(--foreground)/0.12)]">
+                  <ActiveIcon className="h-4.5 w-4.5" />
                 </div>
               </div>
 
@@ -397,9 +411,9 @@ export default function Passions() {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="flex h-full flex-col gap-4"
+                className="flex h-full flex-col gap-3"
               >
-                <div className="relative aspect-[4/3] overflow-hidden rounded-[1.5rem] border border-foreground/10 bg-background/50">
+                <div className="relative aspect-[1.5/1] overflow-hidden rounded-[1.35rem] border border-foreground/10 bg-background/50">
                   <Image
                     src={activePassion.imageSrc}
                     alt={activePassion.title}
@@ -408,7 +422,7 @@ export default function Passions() {
                     className="object-cover"
                   />
                   <div className="absolute inset-0 bg-[linear-gradient(to_top,hsl(var(--background)/0.88),transparent_48%)]" />
-                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 p-4">
+                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 p-3">
                     <div>
                       <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-foreground/70">
                         Beyond coding
@@ -417,45 +431,23 @@ export default function Passions() {
                     </div>
                     <Badge
                       variant="outline"
-                      className="rounded-full border-white/12 bg-background/72 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/85 backdrop-blur-xl"
+                      className="rounded-full border-border/55 bg-background/84 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/85 backdrop-blur-xl dark:border-white/12 dark:bg-background/72"
                     >
                       Active
                     </Badge>
                   </div>
                 </div>
 
-                <div className="rounded-[1.4rem] border border-foreground/10 bg-background/45 p-4 shadow-[inset_0_1px_0_hsl(var(--foreground)/0.04)]">
-                  <p className="text-sm leading-7 text-muted-foreground sm:text-[15px]">
+                <div className="rounded-[1.25rem] border border-foreground/10 bg-background/45 p-3.5 shadow-[inset_0_1px_0_hsl(var(--foreground)/0.04)]">
+                  <p className="text-sm leading-6 text-muted-foreground">
                     {activePassion.description}
                   </p>
-                </div>
-
-                <div className="mt-auto space-y-3">
-                  <div className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
-                    Jump to another node
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {mindmapNodes.map((node) => (
-                      <button
-                        key={`chip-${node.title}`}
-                        type="button"
-                        onClick={() => setActiveTitle(node.title)}
-                        className={`rounded-full border px-3 py-1.5 text-xs transition-all duration-200 ${
-                          node.title === activePassion.title
-                            ? "border-foreground/20 bg-foreground/8 text-foreground shadow-[0_10px_24px_hsl(var(--foreground)/0.08)]"
-                            : "border-foreground/10 bg-background/50 text-muted-foreground hover:border-foreground/16 hover:bg-background/70 hover:text-foreground"
-                        }`}
-                      >
-                        {node.title}
-                      </button>
-                    ))}
-                  </div>
                 </div>
               </motion.div>
             </div>
           </div>
         </div>
       </div>
-    </AnimatedSection>
+    </div>
   )
 }

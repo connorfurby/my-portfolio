@@ -9,12 +9,12 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "liquid-chip border-transparent bg-foreground/88 text-background shadow-[0_8px_18px_hsl(var(--glass-shadow)/0.08)]",
+          "border border-transparent bg-foreground text-background shadow-[0_8px_18px_hsl(var(--glass-shadow)/0.1)] dark:bg-foreground/88",
         secondary:
-          "liquid-chip border-transparent bg-background/10 text-secondary-foreground",
+          "liquid-chip border-transparent bg-secondary text-secondary-foreground dark:bg-background/10",
         destructive:
-          "liquid-chip border-transparent bg-destructive/84 text-destructive-foreground shadow-[0_8px_18px_hsl(var(--glass-shadow)/0.08)]",
-        outline: "liquid-chip bg-background/18 text-foreground",
+          "border border-transparent bg-destructive text-destructive-foreground shadow-[0_8px_18px_hsl(var(--glass-shadow)/0.08)] dark:bg-destructive/84",
+        outline: "liquid-chip bg-background/70 text-foreground dark:bg-background/18",
       },
     },
     defaultVariants: {

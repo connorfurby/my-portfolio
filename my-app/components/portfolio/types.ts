@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react"
 
-export type SectionId = "about" | "experience" | "education" | "skills" | "integrations" | "passions" | "contact"
+export type SectionId = "about" | "experience" | "education" | "skills" | "integrations" | "contact"
 
 export type PortfolioMedia = {
   src: string
@@ -29,8 +29,10 @@ export type ExperienceEntry = {
   summary?: string
   bullets: string[]
   logoText?: string
+  logoImageSrc?: string
   accent?: string
   accentSecondary?: string
+  accentTertiary?: string
   stats?: string[]
   particleWords?: string[]
 }

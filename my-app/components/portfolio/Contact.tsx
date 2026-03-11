@@ -87,7 +87,7 @@ export default function Contact() {
                   rel={link.href.startsWith("http") ? "noreferrer" : undefined}
                   aria-label={link.label}
                   title={link.label}
-                  className="group relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-[1.15rem] border border-white/12 bg-[linear-gradient(180deg,hsl(var(--glass-surface-strong)/0.5),hsl(var(--glass-surface)/0.18))] shadow-[0_18px_40px_hsl(var(--glass-shadow)/0.16)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/30"
+                  className="group relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-[1.15rem] border border-border/55 bg-[linear-gradient(180deg,hsl(var(--glass-surface-strong)/0.9),hsl(var(--glass-surface)/0.72))] shadow-[0_18px_40px_hsl(var(--glass-shadow)/0.16)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 dark:border-white/12 dark:bg-[linear-gradient(180deg,hsl(var(--glass-surface-strong)/0.5),hsl(var(--glass-surface)/0.18))]"
                   whileHover={{ y: -4, scale: 1.03 }}
                   transition={{ duration: 0.2 }}
                 >

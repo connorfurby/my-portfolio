@@ -39,12 +39,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} ${syne.variable} ${cormorantGaramond.variable}`}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
           {children}
         </ThemeProvider>
       </body>
