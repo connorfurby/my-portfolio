@@ -1,971 +1,241 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
-import { Moon, Sun, Book, Heart, Music, Menu, Waves, Snowflake, Code, Gamepad2, Users, Medal, Palette, Film, Utensils, Expand } from "lucide-react"
-import { motion} from "framer-motion"
-import { useTheme } from "next-themes"
-import Image from "next/image"
-import { AspectRatio } from "@/components/ui/aspect-ratio"
+import dynamic from "next/dynamic"
+import { useCallback, useEffect, useState } from "react"
+import {
+  BriefcaseBusiness,
+  Code2,
+  GraduationCap,
+  Palette,
+  Rocket,
+  Users,
+} from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
+import About from "@/components/portfolio/About"
+import Experience from "@/components/portfolio/Experience"
+import Header from "@/components/portfolio/Header"
+import { navItems, projects } from "@/components/portfolio/data"
+import type { Project, SectionId } from "@/components/portfolio/types"
+import { PORTFOLIO_SCROLL_OFFSET, getElementPageTop, scrollToSection, sectionIds } from "@/components/portfolio/utils"
+import { useScrollFrameSync } from "@/components/portfolio/useScrollFrameSync"
 import { FullscreenModal } from "@/components/ui/fullscreen-modal"
-import useEmblaCarousel from 'embla-carousel-react'
-/* eslint-disable react/no-unescaped-entities */
+import type { CarouselApi } from "@/components/ui/carousel"
 
-function useIntersectionObserver(callback: IntersectionObserverCallback, options: IntersectionObserverInit = {}) {
-  const ref = useRef<HTMLElement | null>(null)
+const Education = dynamic(() => import("@/components/portfolio/Education"))
+const Awards = dynamic(() => import("@/components/portfolio/Awards"))
+const GitHubDashboard = dynamic(() => import("@/components/portfolio/GitHubDashboard"))
+const Contact = dynamic(() => import("@/components/portfolio/Contact"))
+const Footer = dynamic(() => import("@/components/portfolio/Footer"))
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(callback, options)
-    if (ref.current) {
-      observer.observe(ref.current)
-    }
+const careerParticles = [
+  {
+    label: "Projects",
+    icon: Rocket,
+    className: "left-[6%] top-[18%]",
+    duration: 16,
+    delay: 0.2,
+  },
+  {
+    label: "Code",
+    icon: Code2,
+    className: "right-[8%] top-[24%]",
+    duration: 20,
+    delay: 0.5,
+  },
+  {
+    label: "Design",
+    icon: Palette,
+    className: "left-[9%] bottom-[22%]",
+    duration: 18,
+    delay: 0.9,
+  },
+  {
+    label: "Internships",
+    icon: BriefcaseBusiness,
+    className: "right-[10%] bottom-[26%]",
+    duration: 19,
+    delay: 0.3,
+  },
+  {
+    label: "Leadership",
+    icon: Users,
+    className: "left-[42%] bottom-[10%]",
+    duration: 17,
+    delay: 0.6,
+  },
+  {
+    label: "Growth",
+    icon: GraduationCap,
+    className: "right-[34%] top-[10%]",
+    duration: 21,
+    delay: 0.8,
+  },
+] as const
 
-    return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current)
-      }
-    }
-  }, [callback, options])
-
-  return ref
-}
-
-const AnimatedSection = ({ children, className, id }: { children: React.ReactNode, className?: string, id?: string }) => {
-  const [isVisible, setIsVisible] = useState(false)
-  const ref = useIntersectionObserver(
-    ([entry]) => {
-      if (entry.isIntersecting) {
-        setIsVisible(true)
-      }
-    },
-    { threshold: 0.1 }
-  )
-
-  return (
-    <motion.section
-      ref={ref}
-      id={id}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.5 }}
-      className={className}
-    >
-      {children}
-    </motion.section>
-  )
-}
-
-interface PassionCardProps {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  imageSrc: string;
-}
-
-const PassionCard: React.FC<PassionCardProps> = ({ icon: Icon, title, description, imageSrc }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (cardRef.current) {
-      const rect = cardRef.current.getBoundingClientRect();
-      const isInOriginalBounds = 
-        event.clientX >= rect.left &&
-        event.clientX <= rect.right &&
-        event.clientY >= rect.top &&
-        event.clientY <= rect.bottom;
-      
-      setIsHovered(isInOriginalBounds);
-    }
-  };
-
-  return (
-    <div 
-      className="relative" 
-      ref={cardRef}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onMouseMove={handleMouseMove}
-    >
-      <Card 
-        className={`transition-all duration-300 ease-in-out ${
-          isHovered ? 'absolute w-full shadow-lg' : ''
-        }`}
-        style={{
-          transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-          zIndex: isHovered ? 40 : 'auto', // Changed from 9999 to 40
-        }}
-      >
-        <div className="p-4">
-          <div className={`transition-opacity duration-300 ${isHovered ? 'hidden' : 'block'}`}>
-            <Icon className="h-12 w-12 mb-2 mx-auto" />
-            <CardTitle className="text-lg text-center">{title}</CardTitle>
-          </div>
-          {isHovered && (
-            <div className="flex flex-col items-center justify-start">
-              <div className="w-full h-48 relative mb-4 overflow-hidden rounded-lg"> {/* Added overflow-hidden and rounded-lg */}
-                <Image
-                  src={imageSrc}
-                  alt={title}
-                  layout="fill"
-                  objectFit="cover" // Changed from "contain" to "cover"
-                  className="rounded-lg" // This ensures the image itself has rounded corners
-                />
-              </div>
-              <CardTitle className="text-lg mb-2">{title}</CardTitle>
-              <p className="text-sm text-center overflow-y-auto max-h-[100px]">{description}</p>
-            </div>
-          )}
-        </div>
-      </Card>
-    </div>
-  )
-}
+const ambientDots = [
+  { className: "left-[14%] top-[30%]", duration: 10, delay: 0.2 },
+  { className: "left-[28%] top-[16%]", duration: 13, delay: 0.9 },
+  { className: "right-[18%] top-[36%]", duration: 12, delay: 0.4 },
+  { className: "right-[30%] top-[18%]", duration: 14, delay: 1.1 },
+  { className: "left-[18%] bottom-[18%]", duration: 11, delay: 0.7 },
+  { className: "left-[48%] bottom-[12%]", duration: 12, delay: 0.1 },
+  { className: "right-[12%] bottom-[20%]", duration: 15, delay: 0.6 },
+  { className: "right-[24%] bottom-[12%]", duration: 10, delay: 1.2 },
+] as const
 
 export default function Portfolio() {
-  const [mounted, setMounted] = useState(false)
-  const { theme, setTheme } = useTheme()
-  const [activeSection, setActiveSection] = useState("about")
+  const [activeSection, setActiveSection] = useState<SectionId>("about")
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false)
-  const [currentProjectImages, setCurrentProjectImages] = useState<typeof projects[0]['images']>([])
+  const [currentProjectImages, setCurrentProjectImages] = useState<Project["images"]>(projects[0]?.images ?? [])
   const [fullscreenIndex, setFullscreenIndex] = useState(0)
-  const [carouselApis, setCarouselApis] = useState<{ [key: string]: ReturnType<typeof useEmblaCarousel>[1] }>({})
+  const [carouselApis, setCarouselApis] = useState<Record<string, CarouselApi>>({})
 
-  // Move the projects array definition here, before the useEffect hooks
-  const projects = [
-    {
-      title: "SlideCentral",
-      description: "A web app that allows teachers and students who manage clubs or activities to create and manage slides for their meetings and events to be displayed throughout the school.",
-      bullets: [
-        "Developed a comprehensive project using React JS, Express, Node, and the school database, completed over four sprints across seven months alongside three teammates.",
-        "Integrated Google authentication and dynamic user views tailored for roles such as admin, teacher, and student, enhancing user experience and security.",
-        "Implemented interactive image carousels with fullscreen and timer functionalities, providing a visually engaging platform for content display.",
-        "Created custom activity and club dashboards with auto-generated slides, built from form-collected data to streamline information sharing for clubs and activities.",
-        "Applied Agile methodologies, including sprints, retrospectives, and daily scrums, to maintain project momentum and continuous improvement, coordinated through Trello for task organization and collaboration."
-      ],
-      images: [
-        { src: "/imgs/slidecentral/slcimg1.png", alt: "Homepage; authentication highlighted", description: "Home Page (Signed in)" },
-        { src: "/imgs/slidecentral/slcimg2.png", alt: "Maze generation process", description: "Home Page (Authentication highlighted)" },
-        { src: "/imgs/slidecentral/slcimg3.png", alt: "Maze generation process", description: "Main slideshow view (w/ fullscreen capabilities)" },
-        { src: "/imgs/slidecentral/slcimg4.png", alt: "Maze generation process", description: "Activity creation prompts" },
-        { src: "/imgs/slidecentral/slcimg5.png", alt: "Maze generation process", description: "Student side basics" },
-        { src: "/imgs/slidecentral/slcimg6.png", alt: "Maze generation process", description: "Dashboard view populated w/ activities" },
-        { src: "/imgs/slidecentral/slcimg7.png", alt: "Maze generation process", description: "Activity Dashboard" },
-        { src: "/imgs/slidecentral/slcimg8.png", alt: "Maze generation process", description: "Slide generation options" },
-        { src: "/imgs/slidecentral/slcimg9.png", alt: "Maze generation process", description: "Basic slide generation form" },
-        { src: "/imgs/slidecentral/slcimg10.png", alt: "Maze generation process", description: "Activity dashboard with generated slides per activity" },
-      ]
+  const scrollNext = useCallback(
+    (projectTitle: string) => {
+      carouselApis[projectTitle]?.scrollNext()
     },
-    {
-      title: "Ice Dodo",
-        description: "A popular chrome extension game I contributed to, with over 600,000 users",
-        bullets: [
-          "Revamped User Interface: Designed and implemented a completely new UI to enhance the game's visual appeal and user experience.",
-          "Level Creation: Developed 17 additional levels, expanding the game content for players.",
-          "Community Engagement: Actively participated in the game's Discord community, receiving positive feedback and support for my work.",
-          "Trailer Production: Produced a new game trailer, which attracted over 63,000 views, boosting the game's visibility.",
-          "Recognition: Earned a prominent spot in the game's credits, highlighting my contributions and dedication."
-        ],
-        images: [
-          { 
-            src: "/imgs/icedodo/icedodo.mp4", 
-            alt: "Game Trailer", 
-            description: "Trailer I made in 2021 with over 63,000 views on YouTube",
-            isVideo: true
-          },
-          { 
-            src: "/imgs/icedodo/icedodo1.png", 
-            alt: "My levels", 
-            description: "My personal 'cup' of 17 levels I developed" 
-          },
-          { 
-            src: "/imgs/icedodo/icedodo2.png", 
-            alt: "Credits", 
-            description: "My spot at the top of the credits" 
-          },
-          { 
-            src: "/imgs/icedodo/icedodo3.png", 
-            alt: "Level", 
-            description: "One of my favorite levels I made" 
-          },
-          { 
-            src: "/imgs/icedodo/icedodo4.png", 
-            alt: "UI Update", 
-            description: "A screenshot from my first UI update" 
-          },
-        ]
-      },
-      
-    {
-      title: "Animated Cityscape",
-      description: "An animated cityscape created using Java",
-      bullets: [
-        "Cityscape Animation Framework: Made with Java, uses JFrame and JComponent to create and animate a cityscape scene with various elements like buildings, bridges, trees, and clouds.",
-        "Building Class: Handles dynamic building creation with a variety of visual characteristics, including randomized dimensions and positions, and window lighting based on a probability threshold, creating a day/night effect.",
-        "Billboards, Trees, Cars, etc: Adds diversity with various types of elements throughout the entire project",
-        "Multi-object Management: Contains logic to check overlapping positions, ensuring no buildings overlap and maintaining realistic spacing within the cityscape.",
-        "Animation and Frame Updates: Utilizes Runnable interface to animate buildings, moving them across the screen to simulate a scrolling city. The nextFrame() method updates the scene continuously.",
-        "Custom Colors and Graphics: Implements custom colors for buildings, windows, and sidewalks to create a visually cohesive cityscape.",
-        "Agile Techniques in Code Structure: The code is organized into functions and classes to modularize each cityscape component, demonstrating structured coding practices."
-      ],
-      images: [
-        { 
-          src: "/imgs/cityscape/cityscape.mp4", 
-          alt: "Animated Cityscape", 
-          description: "This is the animation of the cityscape",
-          isVideo: true
-        },
-        { 
-          src: "/imgs/cityscape/cityscape.png", 
-          alt: "Photo of Java Classes", 
-          description: "Classes and flows in this project" 
-        },
-      ]
-    },
-    {
-      title: "SlasherCrush",
-      description: "A Candy Crush inspired game with a Halloween theme, made for AP Microeconomics as an extension to show the near perfect market of 'Match 3' games, and how easy it is to enter the market.",
-      bullets: [
-        "Utilized a modern stack including NextJS, Tailwind CSS, ShadCN components, and various libraries, all hosted on Vercel, to develop the game.",
-        "Rapid Development: Completed in just a few days as part of an economics class project.",
-        "Game Development Insights: Gained practical knowledge on game mechanics and design principles, learning how to make gameplay engaging and intuitive.",
-        "Implemented Advanced Game Logic: Created features like progressive difficulty, move-based gameplay, and level balancing to ensure a challenging yet enjoyable experience.",
-        "Responsive and Adaptive Gameplay: Designed the game to respond dynamically to player actions, providing a personalized and fun gaming experience."
-      ],
-      images: [
-        { src: "/imgs/slashercrush/scimg1.png", alt: "SlasherCrush Title Screen", description: "Simple Title screen of SlasherCrush" },
-        { src: "/imgs/slashercrush/scimg2.png", alt: "Gameplay Screenshot", description: "In-game screenshot showing game board" },
-        { src: "/imgs/slashercrush/scimg3.png", alt: "Scaling Gameplay", description: "Scaling Gameplay to level 20" },
-        { src: "/imgs/slashercrush/scimg4.png", alt: "Game Over Screen", description: "Game over screen functionality and score" }
-      ]
-    },
-    {
-      title: "Personal Portfolio Site",
-      description: "This is the site you are currently on! It is a portfolio website that showcases my skills and achievements.",
-      bullets: [
-        "Built with a modern stack using NextJS, Tailwind CSS, ShadCN components, and various libraries, hosted on Vercel, to create a personal website.",
-        "Invested substantial time and effort to ensure the site reflects my personality and achievements effectively.",
-        "Gained experience with advanced features like embedding Spotify cards, implementing fullscreen modals, and integrating other dynamic elements.",
-        "Optimized for responsiveness across all screen sizes, providing a seamless experience on both mobile and desktop devices.",
-        "Adaptive Navigation: Navigation bars transform into a side dropdown menu on mobile, enhancing accessibility and usability.",
-        "Dynamic Adjustments for Immersive Experience: Various elements adapt to different devices, ensuring a consistent and engaging user experience."
-      ],
-      images: [
-        { src: "/imgs/personalportfolio/ppimg1.png", alt: "Early Stages", description: "Early stages of development" },
-        { src: "/imgs/personalportfolio/ppimg2.png", alt: "Heart Image", description: "Thank you for visting!" },
-      ]
-    },
-    {
-      title: "And More!!",
-      description: "Over my course of learning to code, I have made many smaller projects along the way as well, inclduing but not limited to:",
-      bullets: [
-        "Maze Solver app in Java using Data Structures such as Stacks and Queues",
-        "A Text-to-Speech physical Calculator using a Raspberry Pi and buttons connected to a Breadboard",
-        "Various Text-based RPG Python games",
-        "A Universal Paperclips inspired game made in React",
-        "A Mental Health AI Chatbot called LiveMore during a Hackathon",
-        "Multiple Simple Minecraft Mods",
-        "Small 3D experiments in Unity and Blender",
-      ],
-      images: [
-        { src: "/imgs/github1.png", alt: "GitHub projects", description: "Just some of my many tests and GitHub projects" },
-        { src: "/imgs/Replit1.png", alt: "Replit projects", description: "Replit is where I started my programming journey" },
-      ]
-    },
+    [carouselApis]
+  )
 
-  ]
+  const registerCarouselApi = useCallback((title: string, api: CarouselApi) => {
+    setCarouselApis((prev) => {
+      if (prev[title] === api) {
+        return prev
+      }
 
-  const scrollNext = useCallback((projectTitle: string) => {
-    if (carouselApis[projectTitle]) {
-      carouselApis[projectTitle].scrollNext()
-    }
-  }, [carouselApis])
+      return { ...prev, [title]: api }
+    })
+  }, [])
+
+  const openProjectFullscreen = useCallback(
+    (project: Project) => {
+      const currentIndex = carouselApis[project.title]?.selectedScrollSnap() ?? 0
+      setCurrentProjectImages(project.images)
+      setFullscreenIndex(currentIndex)
+      setIsFullscreenOpen(true)
+    },
+    [carouselApis]
+  )
 
   useEffect(() => {
-    const intervals: { [key: string]: NodeJS.Timeout } = {}
+    const intervals: NodeJS.Timeout[] = []
+    const cleanupCallbacks: Array<() => void> = []
 
     Object.entries(carouselApis).forEach(([projectTitle, api]) => {
-      if (api) {
-        intervals[projectTitle] = setInterval(() => {
+      if (!api) {
+        return
+      }
+
+      const startInterval = () =>
+        setInterval(() => {
           scrollNext(projectTitle)
         }, 10000)
 
-        const onSelect = () => {
-          clearInterval(intervals[projectTitle])
-          intervals[projectTitle] = setInterval(() => {
-            scrollNext(projectTitle)
-          }, 10000)
-        }
+      let interval = startInterval()
+      intervals.push(interval)
 
-        api.on('select', onSelect)
+      const onSelect = () => {
+        clearInterval(interval)
+        interval = startInterval()
       }
+
+      api.on("select", onSelect)
+      cleanupCallbacks.push(() => api.off("select", onSelect))
     })
 
     return () => {
-      Object.values(intervals).forEach(clearInterval)
-      Object.values(carouselApis).forEach(api => {
-        if (api && typeof api.off === 'function') {
-          api.off('select', () => {})
-        }
-      })
+      intervals.forEach(clearInterval)
+      cleanupCallbacks.forEach((cleanup) => cleanup())
     }
   }, [carouselApis, scrollNext])
 
   useEffect(() => {
-    setMounted(true)
+    if (!sectionIds.includes(activeSection)) {
+      setActiveSection("about")
+    }
+  }, [activeSection])
 
-    const handleScroll = () => {
-      const sections = ["about", "education", "experience", "skills", "passions"]
+  useScrollFrameSync(() => {
+    const sections = sectionIds
+      .map((sectionId) => {
+        const element = document.getElementById(sectionId)
 
-      for (const section of sections) {
-        const element = document.getElementById(section)
-        if (element) {
-          const { top, bottom } = element.getBoundingClientRect()
-          if (top <= 100 && bottom > 100) {
-            setActiveSection(section)
-            break
-          }
-        }
+        return element ? { id: sectionId, element } : null
+      })
+      .filter((entry): entry is { id: SectionId; element: HTMLElement } => Boolean(entry))
+
+    if (!sections.length) {
+      return
+    }
+
+    const markerY = window.scrollY + PORTFOLIO_SCROLL_OFFSET + 8
+    let nextSection = sections[0]?.id ?? "about"
+
+    for (const section of sections) {
+      if (getElementPageTop(section.element) <= markerY) {
+        nextSection = section.id
+      } else {
+        break
       }
     }
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  if (!mounted) return null
-
-  const navItems = [
-    { name: "About", href: "#about" },
-    { name: "Experience", href: "#experience" },
-    { name: "Education", href: "#education" },
-    { name: "Skills", href: "#skills" },
-    { name: "Passions", href: "#passions" },
-  ]
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId)
-    if (element) {
-      const navbarHeight = 56 // Adjust this value to match your navbar height
-      const elementPosition = element.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight - 20 // Added extra 20px for visual padding
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      })
-    }
-  }
+    setActiveSection((current) => (current === nextSection ? current : nextSection))
+  })
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <div className="mr-4 flex">
-            <Image src="/imgs/logo.png" alt="Logo" width={24} height={24} className="ml-6 h-6 w-6" />
-            <span className="ml-2 font-bold hidden sm:inline">Connor Furby</span>
-          </div>
-          <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 mx-6">
-            {navItems.map((item) => (
-              <Button
-                key={item.name}
-                variant={activeSection === item.href.slice(1) ? "default" : "ghost"}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  activeSection === item.href.slice(1) ? "bg-primary text-primary-foreground" : ""
-                }`}
-                onClick={() => scrollToSection(item.href.slice(1))}
-              >
-                {item.name}
-              </Button>
-            ))}
-          </nav>
-          <div className="md:hidden flex-1">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Menu">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left">
-                <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
-                  <SheetDescription>Navigate through the portfolio sections</SheetDescription>
-                </SheetHeader>
-                <nav className="flex flex-col space-y-4 mt-4">
-                  {navItems.map((item) => (
-                    <Button
-                      key={item.name}
-                      variant={activeSection === item.href.slice(1) ? "default" : "ghost"}
-                      className={`text-sm font-medium transition-colors hover:text-primary ${
-                        activeSection === item.href.slice(1) ? "bg-primary text-primary-foreground" : ""
-                      }`}
-                      onClick={() => {
-                        scrollToSection(item.href.slice(1))
-                        document.body.classList.remove("overflow-hidden")
-                      }}
-                    >
-                      {item.name}
-                    </Button>
-                  ))}
-                </nav>
-              </SheetContent>
-            </Sheet>
-          </div>
-          <div className="ml-auto">
-            <Button
-              variant="ghost"
-              size="sm"
-              aria-label="Toggle Theme"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="flex items-center gap-2"
+    <div className="portfolio-shell min-h-screen bg-background text-foreground">
+      <div className="ambient-stage" aria-hidden="true">
+        <div className="ambient-orb ambient-orb-one ambient-float-slow" />
+        <div className="ambient-orb ambient-orb-two ambient-float-medium" />
+        <div className="ambient-orb ambient-orb-three ambient-float-fast" />
+        <div className="ambient-noise" />
+        {ambientDots.map((dot, index) => (
+          <span
+            key={`ambient-dot-${index}`}
+            className={`ambient-dot ambient-dot-float ${dot.className}`}
+            style={{
+              animationDuration: `${dot.duration}s`,
+              animationDelay: `${dot.delay}s`,
+            }}
+          />
+        ))}
+        {careerParticles.map((particle) => {
+          const Icon = particle.icon
+
+          return (
+            <div
+              key={particle.label}
+              className={`career-particle particle-float hidden lg:flex ${particle.className}`}
+              style={{
+                animationDuration: `${particle.duration}s`,
+                animationDelay: `${particle.delay}s`,
+              }}
             >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-              Change Theme
-            </Button>
-          </div>
-        </div>
-      </header>
+              <span className="career-particle-ring" />
+              <span className="career-particle-icon">
+                <Icon className="h-3.5 w-3.5" />
+              </span>
+              <span className="career-particle-label">{particle.label}</span>
+            </div>
+          )
+        })}
+      </div>
+
+      <Header navItems={navItems} activeSection={activeSection} onNavigate={scrollToSection} />
 
       <main className="w-full">
-        <motion.section
-          id="about"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="relative w-full min-h-[70vh] overflow-hidden pt-20 pb-16 flex flex-col justify-center" // Updated classes
-        >
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/imgs/banner1.jpg"
-              alt="Banner"
-              layout="fill"
-              objectFit="cover"
-              className="brightness-75"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background banner-gradient"></div>
-          </div>
-          <div className="relative z-10 flex flex-col justify-center items-center text-center h-full px-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 drop-shadow-lg">Connor Furby</h1>
-            <p className="text-lg sm:text-xl mb-8 drop-shadow-md max-w-3xl">Aspiring Software Engineer | Passionate Learner | Future Innovator</p>
-            <Image
-              src="/imgs/pfp2.png"
-              alt="Connor Furby"
-              width={180}
-              height={180}
-              className="rounded-full mx-auto mb-6 border-4 border-white shadow-lg"
-              priority
-            />
-            <p className="max-w-4xl mx-auto bg-background/30 dark:bg-background/50 p-6 rounded-lg backdrop-blur-sm text-sm sm:text-base">
-              Hello! My name is Connor Furby, an ambitious and driven student with career aspirations in Computer Science, actively engaged in a variety of extracurricular and career exploration activities. A dedicated club member, athlete, and volunteer, who consistently excels academically. Participated in multiple internships and Hackathons, gaining hands-on experience in app development and programming across a range of languages. Comfortable adapting to new challenges and committed to continuous learning and personal growth.
-            </p>
-          </div>
-        </motion.section>
+        <About />
 
-        <div className="container mx-auto px-4 py-8 bg-background">
-          <AnimatedSection id="experience" className="mb-12 pt-16">
-            <h2 className="text-3xl font-bold mb-6 text-center">Experience</h2>
-            <Tabs defaultValue="projects" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-4">
-                <TabsTrigger value="projects">Projects</TabsTrigger>
-                <TabsTrigger value="internships">Internships</TabsTrigger>
-                <TabsTrigger value="work">Work</TabsTrigger>
-                <TabsTrigger value="volunteering">Volunteering</TabsTrigger>
-              </TabsList>
-              <TabsContent value="projects">
-                {projects.map((project, index) => (
-                  <Card key={index} className="mb-6">
-                    <CardHeader>
-                      <CardTitle>{project.title}</CardTitle>
-                      <CardDescription>{project.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex flex-col md:flex-row gap-4">
-                      <div className="w-full md:w-1/2">
-                        <ul className="list-disc pl-5 space-y-2">
-                          {project.bullets.map((bullet, bulletIndex) => (
-                            <li key={bulletIndex}>{bullet}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="w-full md:w-1/2">
-                        <Carousel 
-                          className="w-full max-w-md mx-auto"
-                          opts={{ loop: true }}
-                          setApi={(api) => {
-                            if (api) {
-                              setCarouselApis(prev => {
-                                if (prev[project.title] !== api) {
-                                  return { ...prev, [project.title]: api }
-                                }
-                                return prev
-                              })
-                            }
-                          }}
-                        >
-                          <CarouselContent>
-                            {project.images.map((image, imageIndex) => (
-                              <CarouselItem key={imageIndex}>
-                                <div className="p-1">
-                                  <Card>
-                                    <CardContent className="p-2">
-                                      <AspectRatio ratio={4/3} className="bg-muted">
-                                        <div className="relative w-full h-full">
-                                          {image.isVideo ? (
-                                            <video
-                                              src={image.src}
-                                              autoPlay
-                                              loop
-                                              muted
-                                              playsInline
-                                              className="absolute inset-0 w-full h-full object-cover"
-                                            />
-                                          ) : (
-                                            <>
-                                              <Image
-                                                src={image.src}
-                                                alt={image.alt}
-                                                fill
-                                                className="object-contain"
-                                              />
-                                              <div 
-                                                className="absolute inset-0 z-10"
-                                                style={{
-                                                  backgroundImage: `url(${image.src})`,
-                                                  backgroundSize: 'cover',
-                                                  backgroundPosition: 'center',
-                                                  filter: 'blur(20px)',
-                                                  opacity: 0.5,
-                                                }}
-                                              />
-                                              <Image
-                                                src={image.src}
-                                                alt={image.alt}
-                                                fill
-                                                className="object-contain z-20"
-                                              />
-                                            </>
-                                          )}
-                                        </div>
-                                      </AspectRatio>
-                                      <p className="mt-2 text-center text-sm">{image.description}</p>
-                                    </CardContent>
-                                  </Card>
-                                </div>
-                              </CarouselItem>
-                            ))}
-                          </CarouselContent>
-                          <div className="flex justify-center mt-4 space-x-2">
-                            <CarouselPrevious />
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => {
-                                const currentIndex = carouselApis[project.title]?.selectedScrollSnap() || 0
-                                setCurrentProjectImages(project.images)
-                                setFullscreenIndex(currentIndex)
-                                setIsFullscreenOpen(true)
-                              }}
-                              className="h-8 w-8"
-                            >
-                              <Expand className="h-4 w-4" />
-                            </Button>
-                            <CarouselNext />
-                          </div>
-                        </Carousel>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </TabsContent>
-              <TabsContent value="internships">
-                <Card className="mb-4">
-                  <CardHeader>
-                    <CardTitle>Campbell Holzhauer Concierge Law - AI Development Intern</CardTitle>
-                    <CardDescription>06/2024 - Current</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Applied software knowledge from classes and school, as well as individual AI research, into a real-world business application.</li>
-                      <li>Learned business skills, such as working in a hybrid environment, scheduling and attending meetings, and working with a team, as well as individually.</li>
-                      <li>Met with Industry Leaders in the field to compare our products with theirs and learn more about the top tech.</li>
-                      <li>Learned about the intersection of tech and AI with the legal industry and how to cater to and develop an AI tool for that field, while maintaining industry standards and precautions</li>
-                      <li>Learned how to integrate multiple APIs and software into one application to create the desired product.</li>
-                      <li>Went through rigorous testing and tweaking of all of our work.</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>DistrictZero - QA Technical Support Intern</CardTitle>
-                    <CardDescription>09/2024 - Current</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Assisted in restructuring the app's front-end, improving the UI/UX and interface consistency.</li>
-                      <li>Identified, reported, and resolved app bugs to enhance user experience, contributing to the mental health mentorship platform for students.</li>
-                      <li>Worked with various frameworks, libraries, applications, and more tech.</li>
-                      <li>Enhanced attention to detail by thoroughly testing app features and user flows before implementation</li>
-                      <li>Collaborated with the technical team to ensure solutions aligned with the overall project goals and user needs</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              <TabsContent value="work">
-                <Card className="mb-4">
-                  <CardHeader>
-                    <CardTitle>Jimmy John's Franchise - In Shop Worker</CardTitle>
-                    <CardDescription>11/2023 - Current</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Learned to work fast and efficiently with groups of people, balancing making sandwiches, taking orders, and doing all the other tasks necessary to keep the store afloat.</li>
-                      <li>Memorized how to make 25+ different types of sandwiches with all of their nuances and ingredients.</li>
-                      <li>Kept all foods fresh by practicing food safety techniques.</li>
-                      <li>Learned to close and open a shop, as well as doing cleaning duties, such as bathroom and dish duties.</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                <Card className="mb-4">
-                  <CardHeader>
-                    <CardTitle>Centennial Beach Grill Naperville - Grill Attendant</CardTitle>
-                    <CardDescription>05/2023 - 08/2023</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Worked with many types of people cashiering, including some with special needs or large groups of children within summer camps.</li>
-                      <li>Worked shifts between 6 and 8.5 hours.</li>
-                      <li>Efficiently managed grill operations, boosting customer satisfaction and service speed.</li>
-                      <li>Maintained high standards of food safety.</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Naperville Park District - Youth Soccer Referee</CardTitle>
-                    <CardDescription>05/2021 - 08/2021</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Worked with young kids, as well as parents, to run a smooth soccer game where kids behaved properly, but also had fun and learned patience skills, as well as the game of soccer.</li>
-                      <li>Worked around 6 games in a row on average every weekend and got used to a schedule at a young age.</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              <TabsContent value="volunteering">
-                <Card className="mb-4">
-                  <CardHeader>
-                    <CardTitle>CodeBytes Camp - Volunteer Leader</CardTitle>
-                    <CardDescription>25+ Hours</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Co-led an engaging camp with 80+ participants for middle school students focused on Python programming fundamentals.</li>
-                      <li>Developed and implemented lesson plans, projects, and activities to introduce coding concepts.</li>
-                      <li>Mentored students, fostering their interest in computer science and problem-solving skills.</li>
-                      <li>Assisted in developing a Middle School 6 hour Hackathon</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                <Card className="mb-4">
-                  <CardHeader>
-                    <CardTitle>Schoolhouse - SAT Tutoring</CardTitle>
-                    <CardDescription>25+ Hours</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Provided engaging SAT tutoring to 20 high school students, focusing on math and reading comprehension in two seperate bootcamps of 10 students each.</li>
-                      <li>Developed personalized study plans and practice materials to address individual student needs.</li>
-                      <li>Helped students improve their test-taking strategies and boost their confidence.</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                <Card className="mb-4">
-                  <CardHeader>
-                    <CardTitle>Special Needs STEM Summer Camp - Volunteer Leader</CardTitle>
-                    <CardDescription>15 Hours</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Assisted in hands-on STEM activities for special needs high school students.</li>
-                      <li>Learned how to work with special needs students and how to make learning fun for them, as well as various patience and safety skills.</li>
-                      <li>Mentored learners, encouraging their curiosity and interest in STEM fields.</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </AnimatedSection>
-
-          <AnimatedSection id="education" className="mb-12 pt-16">
-            <h2 className="text-3xl font-bold mb-6 text-center">Education</h2>
-            <Tabs defaultValue="stats" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-4">
-                <TabsTrigger value="stats">Stats</TabsTrigger>
-                <TabsTrigger value="activities">Activities</TabsTrigger>
-                <TabsTrigger value="coursework">Coursework</TabsTrigger>
-              </TabsList>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Naperville Central High School</CardTitle>
-                  <CardDescription>2021-2025</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <TabsContent value="stats">
-                    <h3 className="text-lg font-semibold mb-2">Academic Statistics</h3>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li><strong>GPA:</strong> 4.262</li>
-                      <li><strong>SAT Score:</strong> 1510 (760 Math, 750 Reading & Writing)</li>
-                    </ul>
-                  </TabsContent>
-                  <TabsContent value="activities">
-                    <h3 className="text-lg font-semibold mb-2">Extracurricular Activities</h3>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>3 Year Cross Country Runner (including extended summer season)</li>
-                      <li>3 Year Lacrosse Goalie</li>
-                      <li>2 Year Winter Track Distance Runner</li>
-                      <li>Senior Class Council Member</li>
-                      <li>Computer Science Club Member</li>
-                      <li>National Honors Society Member</li>
-                      <li>German Club Attendee</li>
-                    </ul>
-                  </TabsContent>
-                  <TabsContent value="coursework">
-                    <h3 className="text-lg font-semibold mb-2">Relevant Coursework</h3>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Computer Programming 1</li>
-                      <li>Computer Programming 2</li>
-                      <li>AP Computer Science A (Received 5 on Exam)</li>
-                      <li>Software Engineering 1</li>
-                      <li>Software Engineering 2</li>
-                      <li>AP Calculus BC (Taking exam in May)</li>
-                      <li>AP Physics 1 (Received 4 on Exam)</li>
-                      <li>Honors Chemistry</li>
-                      <li>AP Microeconomics (Taking exam in May)</li>
-                      <li>AP Macroeconomics (Taking exam in May)</li>
-                    </ul>
-                  </TabsContent>
-                </CardContent>
-              </Card>
-            </Tabs>
-          </AnimatedSection>
-
-          <AnimatedSection id="skills" className="mb-12 pt-16">
-            <h2 className="text-3xl font-bold mb-6 text-center">Skills & Achievements</h2>
-            <Tabs defaultValue="skills" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="skills">Skills</TabsTrigger>
-                <TabsTrigger value="achievements">Achievements</TabsTrigger>
-              </TabsList>
-              <TabsContent value="skills">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Key Skills</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>Programming (Python, Java, some knowledge in more languages)</li>
-                      <li>Web Development (HTML, CSS, ReactJS, NextJs, TailwindCSS, NodeJS, ExpressJS, some SQL)</li>
-                      <li>Data Structures and Algorithms</li>
-                      <li>Problem Solving</li>
-                      <li>Team Collaboration</li>
-                      <li>Creativity</li>
-                      <li>Leadership</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              <TabsContent value="achievements">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Notable Achievements</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li>National Honors Society Award</li>
-                      <li>4.0 Award every semester</li>
-                      <li>Software Engineering May 2024 Student of the Month</li>
-                      <li>Top 4 Project in HSHacks Hackathon 2024</li>
-                      <li>Completed requirements to earn an endorsement in the IT Career Path from the state of Illinois at graduation</li>
-                      <li>On pace to graduate with the Illinois Global Scholar Award</li>
-                      <li>Earned a spot near the top of the credits of a popular Chrome Extension game with 600,000+ users: Ice Dodo</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </AnimatedSection>
-
-          <AnimatedSection id="passions" className="mb-12 pt-16 relative z-30">
-            <h2 className="text-3xl font-bold mb-6 text-center">Passions</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              <PassionCard 
-                icon={Book} 
-                title="Reading" 
-                description="I have always loved reading a good book, especially sci-fi and dystopian novels."
-                imageSrc="/imgs/passions/reading.JPG"
-              />
-              <PassionCard 
-                icon={Waves} 
-                title="Water Sports" 
-                description="Jet skiing, wakeboarding, and water skiing are my favorite summer activities. On mornings at the lake, I always wake up at the crack of dawn to glide on the smooth glass water."
-                imageSrc="/imgs/passions/watersports.jpg"
-              />
-              <PassionCard 
-                icon={Snowflake} 
-                title="Snow Skiing" 
-                description="Skiing has been a big part of my family for generations, so I fell in love with the winter sport too."
-                imageSrc="/imgs/passions/skiing.jpg"
-              />
-              <PassionCard 
-                icon={Code} 
-                title="Software Development" 
-                description="Creating innovative solutions through code and learning new technologies is one of my favorite things to do."
-                imageSrc="/imgs/passions/softwaredevelopment.png"
-              />
-              <PassionCard 
-                icon={Heart} 
-                title="Volunteering" 
-                description="This is a picture of me instructing middle schoolers at a coding camp. Giving back to the community brings joy and fulfillment, especially when I can share my passions with others."
-                imageSrc="/imgs/passions/volunteering.JPG"
-              />
-              <PassionCard 
-                icon={Gamepad2} 
-                title="The Legend of Zelda" 
-                description="Since I was young, Zelda is what made me fall in love with games. I have beat all 20 games over time. Exploring Hyrule and solving puzzles is my favorite gaming experience."
-                imageSrc="/imgs/passions/zelda.jpg"
-              />
-              <PassionCard 
-                icon={Music} 
-                title="Music" 
-                description="Music and making playlists is something I have been doing for a long time. I love to create playlists for different activities and moods."
-                imageSrc="/imgs/passions/music.jpg"
-              />
-              <PassionCard 
-                icon={Users} 
-                title="Family & Friends" 
-                description="Hanging out with friends and family is something I value a lot. I love to make memories with the people I care about."
-                imageSrc="/imgs/passions/family.jpg"
-              />
-              <PassionCard 
-                icon={Medal} 
-                title="Running" 
-                description="I began running in middle school, and it has become a big part of my life. Pushing my limits and staying fit through running is a rewarding challenge."
-                imageSrc="/imgs/passions/running.png"
-              />
-              <PassionCard 
-                icon={Palette} 
-                title="Graphic Design" 
-                description="Expressing creativity through visual design is a fulfilling hobby."
-                imageSrc="/imgs/passions/graphicdesign.PNG"
-              />
-              <PassionCard 
-                icon={Film} 
-                title="Movies" 
-                description="A picture of me with Stan Lee, the creator of the Marvel Universe. Marvel and Disney movies are my favorite."
-                imageSrc="/imgs/passions/movies.jpg"
-              />
-              <PassionCard 
-                icon={Utensils} 
-                title="Food" 
-                description="Exploring diverse cuisines and flavors is always a blast. I love trying new foods from different cultures."
-                imageSrc="/imgs/passions/food.png"
-              />
-            </div>
-          </AnimatedSection>
-
-          <AnimatedSection className="text-center">
-            <h2 className="text-3xl font-bold mb-6 mt-10">Let's Connect!</h2>
-            <p className="mb-4">
-              I'm always eager to learn and grow. Feel free to reach out if you have any questions or would like to know
-              more about my experiences and aspirations.
-            </p>
-            <p className="mb-4">
-              Email: cafurby27@icloud.com
-            </p>
-            <div className="w-full max-w-7xl mx-auto mb-6">
-              <h3 className="text-2xl font-semibold mb-4 mt-10">My Favorite Spotify Playlists</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <iframe 
-                    style={{ borderRadius: "12px" }} 
-                    src="https://open.spotify.com/embed/playlist/4moPgBwt9bJWz3UgFhJTd3?utm_source=generator" 
-                    width="100%" 
-                    height="352" 
-                    frameBorder="0" 
-                    allowFullScreen 
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                    loading="lazy"
-                  ></iframe>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    My favorite playlist to listen to on the Jet Ski or to give summer vibes
-                  </p>
-                </div>
-                <div>
-                  <iframe 
-                    style={{ borderRadius: "12px" }} 
-                    src="https://open.spotify.com/embed/playlist/48LiOY4hhigjbcIFvzOsPd?utm_source=generator" 
-                    width="100%" 
-                    height="352" 
-                    frameBorder="0" 
-                    allowFullScreen 
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                    loading="lazy"
-                  ></iframe>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    My favorite playlist to listen to at night, while it's raining, or while studying
-                  </p>
-                </div>
-                <div>
-                  <iframe 
-                    style={{ borderRadius: "12px" }} 
-                    src="https://open.spotify.com/embed/playlist/1mVVns1bUDQBd14TnNOu1I?utm_source=generator" 
-                    width="100%" 
-                    height="352" 
-                    frameBorder="0" 
-                    allowFullScreen 
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                    loading="lazy"
-                  ></iframe>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    My upbeat playlist for running or when I'm in a great mood
-                  </p>
-                </div>
-              </div>
-            </div>
-          </AnimatedSection>
+        <div className="portfolio-container-wide bg-background/20 py-8">
+          <Experience onApiReady={registerCarouselApi} onOpenFullscreen={openProjectFullscreen} />
+          <Education />
+          <Awards />
+          <GitHubDashboard />
+          <Contact />
         </div>
       </main>
 
-      <footer className="border-t py-6 md:py-0">
-        <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-          <p className="text-center text-sm leading-loose text-muted-foreground md:text-left ml-5">
-            Built with ❤️ by Connor Furby in 2024. Thank you for visiting!
-          </p>
-        </div>
-      </footer>
+      <Footer />
 
       <FullscreenModal
         isOpen={isFullscreenOpen}

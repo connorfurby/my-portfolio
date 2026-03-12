@@ -1,0 +1,212 @@
+%-------------------------
+% Resume in Latex
+% Author : Connor Furby
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
+%------------------------
+
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+
+%----------FONT OPTIONS----------
+% sans-serif
+% \usepackage[sfdefault]{FiraSans}
+% \usepackage[sfdefault]{roboto}
+% \usepackage[sfdefault]{noto-sans}
+% \usepackage[default]{sourcesanspro}
+
+% serif
+% \usepackage{CormorantGaramond}
+% \usepackage{charter}
+
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+% Make bullets small (not thick) while keeping template format
+\renewcommand\labelitemi{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    \textbf{\Huge \scshape Connor Furby} \\ \vspace{1pt}
+    \small (630) 470-2210 $|$ \href{mailto:cfurby@wisc.edu}{\underline{cfurby@wisc.edu}} $|$
+    \href{https://linkedin.com/in/connorfurby}{\underline{linkedin.com/in/connorfurby}} $|$
+    \href{https://www.connorfurby.com}{\underline{www.connorfurby.com}}
+\end{center}
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {University of Wisconsin--Madison}{Madison, WI}
+      {B.S. Computer Science, Certificate in Business \& African-American Studies, 4.0 GPA}{Expected 2029}
+      \resumeItemListStart
+        \resumeItem{Wisconsin AI Safety Initiative (WAISI), Team Lead in Software Development Club}
+        \resumeItem{Awards: Illinois Global Scholar, College and Career Pathway Endorsement in Information Technology, Academic Excellence Award, Wallace C. Doud Balanced Man Award}
+      \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+
+    \resumeSubheading
+      {Software Engineer Intern}{Sep 2024 -- Present}
+      {DistrictZero}{Elmhurst, IL}
+      \resumeItemListStart
+        \resumeItem{Architected a real-time mental health alert system detecting 100+ problematic emotion categories deployed to 500+ students, reducing response time for at-risk cases by $\sim$95\%}
+        \resumeItem{Built full-stack architecture (React, Node.js, Vercel AI SDK, Clerk, AWS (CDK)) processing thousands of daily check-ins}
+        \resumeItem{Served enterprise clients, including Loyola University, collaborating with the startup community at Drive Capital (largest VC firm in the Midwest with \$2.2B+ AUM)}
+        \resumeItem{Led or contributed to 15+ products from prototype through production deployment to thousands across various tech stacks}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {AI Software Project Team Lead}{Jul 2024 -- Jun 2025}
+      {Concierge Law, by Campbell Holzhauer}{Naperville, IL}
+      \resumeItemListStart
+        \resumeItem{Built and deployed 6 AI-powered legal automation tools for researching and drafting legal documents, extensively trained on ILCS Laws, handling 100+ weekly queries, reducing top lawyers' research time by $\sim$75\%}
+        \resumeItem{Led a 5+ intern development team, coordinating feature delivery from prototype to production}
+        \resumeItem{Engineered secure authentication and database architecture for persistent data and role-based access}
+        \resumeItem{Designed real-time analytics dashboard enabling usage tracking and model optimization}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {Shift Lead / Closing Manager}{Nov 2023 -- Aug 2025}
+      {Jimmy John's}{Naperville, IL}
+      \resumeItemListStart
+        \resumeItem{Led shift operations for a team of 50+ employees at the highest-grossing franchise location (100+ stores), generating \$4K--\$10K in daily revenue}
+        \resumeItem{Oversaw end-of-day inventory management, operational compliance, and food operations, maintaining 100\% food safety and service standards}
+        \resumeItem{Trained 10+ new employees on operational procedures and customer service}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {Vice President (Programming)}{Oct 2025 -- Present}
+      {Sigma Phi Epsilon}{Madison, WI}
+      \resumeItemListStart
+        \resumeItem{Led strategic planning of all fraternity programming for 50+ members, overseeing multiple weekly events}
+        \resumeItem{Oversaw programming budget of $\sim$\$25K, ensuring cost-effective event allocation}
+        \resumeItem{Managed vendor coordination, contracts, venue selection, transportation, and risk compliance logistics}
+        \resumeItem{Coordinated teams to execute formals, campus collaborations, and raised \$3K+ for philanthropy}
+      \resumeItemListEnd
+
+  \resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{Projects}
+    \resumeSubHeadingListStart
+
+      \resumeProjectHeading
+          {\textbf{SlideCentral} $|$ \emph{React, Node.js, Express, SQL}}{}
+          \resumeItemListStart
+            \resumeItem{Developed a full-stack web platform across 4 Agile sprints to create and manage slides for school clubs and activities}
+            \resumeItem{Engineered Google OAuth authentication with dynamic role-based dashboards}
+            \resumeItem{Automated slide generation from structured form data, enabling scalable content display for 100+ activities serving $\sim$2,800 students}
+          \resumeItemListEnd
+
+      \resumeProjectHeading
+          {\textbf{Ice Dodo} $|$ \emph{Chrome Extension, JavaScript, CSS, HTML, Blender}}{}
+          \resumeItemListStart
+            \resumeItem{Revamped UI for a Chrome extension game with 600,000+ users}
+            \resumeItem{Designed and launched 17 new game levels featured in official content}
+            \resumeItem{Produced promotional trailer generating 63,000+ YouTube views}
+          \resumeItemListEnd
+
+      \resumeProjectHeading
+          {\textbf{Animated Cityscape} $|$ \emph{Java, Swing}}{}
+          \resumeItemListStart
+            \resumeItem{Built a Java-based animated cityscape using Swing (JFrame, JComponent)}
+            \resumeItem{Implemented randomized object generation and overlap detection for realistic spacing}
+            \resumeItem{Designed frame-update animation logic to simulate continuous city scrolling}
+          \resumeItemListEnd
+
+      \resumeProjectHeading
+          {\textbf{SlasherCrush} $|$ \emph{NextJS, Tailwind CSS, Vercel}}{}
+          \resumeItemListStart
+            \resumeItem{Built a Halloween-themed Match-3 web game with progressive difficulty scaling and move-based logic, deployed via Vercel}
+            \resumeItem{Implemented complex level balancing algorithms to simulate competitive game market dynamics}
+          \resumeItemListEnd
+
+    \resumeSubHeadingListEnd
+
+\end{document}

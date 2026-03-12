@@ -1,7 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['example.com'], // Add any external domains you're using for images
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.scdn.co",
+      },
+      {
+        protocol: "https",
+        hostname: "mosaic.scdn.co",
+      },
+    ],
   },
   webpack(config) {
     config.module.rules.push({
