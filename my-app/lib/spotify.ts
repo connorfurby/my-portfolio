@@ -689,7 +689,7 @@ async function fetchRecentlyPlayed(
     return null
   }
 
-  const playback = {
+  const playback: SpotifyPlaybackSummary = {
     state: "recent",
     label: "Last played",
     title: last.track.name ?? "Recently played track",

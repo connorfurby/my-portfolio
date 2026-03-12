@@ -28,27 +28,27 @@ body {
     --card-foreground: 222 28% 12%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 28% 12%;
-    --primary: 230 88% 58%;
-    --primary-foreground: 0 0% 100%;
+    --primary: var(--accent-primary);
+    --primary-foreground: var(--accent-primary-foreground);
     --secondary: 220 40% 96%;
     --secondary-foreground: 222 28% 16%;
     --muted: 220 35% 95%;
     --muted-foreground: 222 18% 42%;
-    --accent: 37 93% 94%;
+    --accent: var(--accent-surface);
     --accent-foreground: 222 28% 16%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 220 22% 88%;
     --input: 220 22% 88%;
-    --ring: 230 88% 58%;
+    --ring: var(--accent-ring);
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 1rem;
-    --spotlight: 229 91% 62%;
-    --spotlight-secondary: 171 82% 52%;
+    --spotlight: var(--accent-spotlight);
+    --spotlight-secondary: var(--accent-spotlight-secondary);
     --glass-surface: 220 32% 98%;
     --glass-surface-strong: 0 0% 100%;
     --glass-shadow: 224 45% 20%;
@@ -57,8 +57,16 @@ body {
     --glass-frost: 22px;
     --scrollbar-track: 220 28% 92%;
     --scrollbar-track-border: 220 20% 82%;
-    --scrollbar-thumb: 229 91% 62%;
-    --scrollbar-thumb-secondary: 171 82% 52%;
+    --scrollbar-thumb: var(--accent-scrollbar-thumb);
+    --scrollbar-thumb-secondary: var(--accent-scrollbar-thumb-secondary);
+    --accent-primary: 230 88% 58%;
+    --accent-primary-foreground: 0 0% 100%;
+    --accent-ring: 230 88% 58%;
+    --accent-spotlight: 229 91% 62%;
+    --accent-spotlight-secondary: 171 82% 52%;
+    --accent-scrollbar-thumb: 229 91% 62%;
+    --accent-scrollbar-thumb-secondary: 171 82% 52%;
+    --accent-surface: 224 100% 97%;
   }
   .dark {
     --background: 222 37% 8%;
@@ -67,26 +75,26 @@ body {
     --card-foreground: 210 40% 98%;
     --popover: 223 32% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 223 47% 11%;
+    --primary: var(--accent-primary);
+    --primary-foreground: var(--accent-primary-foreground);
     --secondary: 223 24% 17%;
     --secondary-foreground: 210 40% 98%;
     --muted: 223 24% 17%;
     --muted-foreground: 215 20% 70%;
-    --accent: 223 24% 17%;
+    --accent: var(--accent-surface);
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 223 20% 20%;
     --input: 223 20% 20%;
-    --ring: 212 100% 78%;
+    --ring: var(--accent-ring);
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --spotlight: 227 91% 66%;
-    --spotlight-secondary: 171 82% 60%;
+    --spotlight: var(--accent-spotlight);
+    --spotlight-secondary: var(--accent-spotlight-secondary);
     --glass-surface: 223 34% 14%;
     --glass-surface-strong: 224 38% 17%;
     --glass-shadow: 222 52% 4%;
@@ -95,9 +103,247 @@ body {
     --glass-frost: 24px;
     --scrollbar-track: 223 24% 15%;
     --scrollbar-track-border: 223 20% 24%;
-    --scrollbar-thumb: 227 91% 66%;
-    --scrollbar-thumb-secondary: 171 82% 60%;
+    --scrollbar-thumb: var(--accent-scrollbar-thumb);
+    --scrollbar-thumb-secondary: var(--accent-scrollbar-thumb-secondary);
+    --accent-primary: 227 91% 66%;
+    --accent-primary-foreground: 222 37% 8%;
+    --accent-ring: 212 100% 78%;
+    --accent-spotlight: 227 91% 66%;
+    --accent-spotlight-secondary: 171 82% 60%;
+    --accent-scrollbar-thumb: 227 91% 66%;
+    --accent-scrollbar-thumb-secondary: 171 82% 60%;
+    --accent-surface: 223 34% 16%;
   }
+}
+
+:root[data-accent="azure"] {
+  --accent-primary: 230 88% 58%;
+  --accent-primary-foreground: 0 0% 100%;
+  --accent-ring: 230 88% 58%;
+  --accent-spotlight: 229 91% 62%;
+  --accent-spotlight-secondary: 171 82% 52%;
+  --accent-scrollbar-thumb: 229 91% 62%;
+  --accent-scrollbar-thumb-secondary: 171 82% 52%;
+  --accent-surface: 224 100% 97%;
+}
+
+:root.dark[data-accent="azure"],
+.dark[data-accent="azure"] {
+  --accent-primary: 227 91% 66%;
+  --accent-primary-foreground: 222 37% 8%;
+  --accent-ring: 212 100% 78%;
+  --accent-spotlight: 227 91% 66%;
+  --accent-spotlight-secondary: 171 82% 60%;
+  --accent-scrollbar-thumb: 227 91% 66%;
+  --accent-scrollbar-thumb-secondary: 171 82% 60%;
+  --accent-surface: 223 34% 16%;
+}
+
+:root[data-accent="violet"] {
+  --accent-primary: 267 84% 63%;
+  --accent-primary-foreground: 0 0% 100%;
+  --accent-ring: 267 84% 63%;
+  --accent-spotlight: 257 92% 68%;
+  --accent-spotlight-secondary: 316 78% 64%;
+  --accent-scrollbar-thumb: 267 84% 63%;
+  --accent-scrollbar-thumb-secondary: 316 78% 64%;
+  --accent-surface: 284 100% 97%;
+}
+
+:root.dark[data-accent="violet"],
+.dark[data-accent="violet"] {
+  --accent-primary: 270 90% 72%;
+  --accent-primary-foreground: 222 37% 8%;
+  --accent-ring: 274 95% 80%;
+  --accent-spotlight: 264 92% 74%;
+  --accent-spotlight-secondary: 320 82% 70%;
+  --accent-scrollbar-thumb: 270 90% 72%;
+  --accent-scrollbar-thumb-secondary: 320 82% 70%;
+  --accent-surface: 273 30% 17%;
+}
+
+:root[data-accent="rose"] {
+  --accent-primary: 344 82% 58%;
+  --accent-primary-foreground: 0 0% 100%;
+  --accent-ring: 344 82% 58%;
+  --accent-spotlight: 339 84% 62%;
+  --accent-spotlight-secondary: 18 92% 60%;
+  --accent-scrollbar-thumb: 344 82% 58%;
+  --accent-scrollbar-thumb-secondary: 18 92% 60%;
+  --accent-surface: 350 100% 97%;
+}
+
+:root.dark[data-accent="rose"],
+.dark[data-accent="rose"] {
+  --accent-primary: 343 87% 68%;
+  --accent-primary-foreground: 222 37% 8%;
+  --accent-ring: 343 92% 78%;
+  --accent-spotlight: 340 88% 70%;
+  --accent-spotlight-secondary: 18 96% 68%;
+  --accent-scrollbar-thumb: 343 87% 68%;
+  --accent-scrollbar-thumb-secondary: 18 96% 68%;
+  --accent-surface: 344 29% 17%;
+}
+
+:root[data-accent="emerald"] {
+  --accent-primary: 160 72% 40%;
+  --accent-primary-foreground: 0 0% 100%;
+  --accent-ring: 160 72% 40%;
+  --accent-spotlight: 158 74% 44%;
+  --accent-spotlight-secondary: 190 88% 44%;
+  --accent-scrollbar-thumb: 160 72% 40%;
+  --accent-scrollbar-thumb-secondary: 190 88% 44%;
+  --accent-surface: 156 64% 96%;
+}
+
+:root.dark[data-accent="emerald"],
+.dark[data-accent="emerald"] {
+  --accent-primary: 160 66% 52%;
+  --accent-primary-foreground: 222 37% 8%;
+  --accent-ring: 160 72% 64%;
+  --accent-spotlight: 160 70% 56%;
+  --accent-spotlight-secondary: 190 90% 56%;
+  --accent-scrollbar-thumb: 160 66% 52%;
+  --accent-scrollbar-thumb-secondary: 190 90% 56%;
+  --accent-surface: 160 24% 16%;
+}
+
+:root[data-accent="amber"] {
+  --accent-primary: 35 92% 52%;
+  --accent-primary-foreground: 24 40% 12%;
+  --accent-ring: 35 92% 52%;
+  --accent-spotlight: 42 96% 58%;
+  --accent-spotlight-secondary: 18 94% 63%;
+  --accent-scrollbar-thumb: 35 92% 52%;
+  --accent-scrollbar-thumb-secondary: 18 94% 63%;
+  --accent-surface: 40 100% 96%;
+}
+
+:root.dark[data-accent="amber"],
+.dark[data-accent="amber"] {
+  --accent-primary: 38 96% 60%;
+  --accent-primary-foreground: 222 37% 8%;
+  --accent-ring: 42 100% 72%;
+  --accent-spotlight: 42 98% 64%;
+  --accent-spotlight-secondary: 20 96% 68%;
+  --accent-scrollbar-thumb: 38 96% 60%;
+  --accent-scrollbar-thumb-secondary: 20 96% 68%;
+  --accent-surface: 30 28% 16%;
+}
+
+:root[data-accent="crimson"] {
+  --accent-primary: 352 84% 52%;
+  --accent-primary-foreground: 0 0% 100%;
+  --accent-ring: 352 84% 52%;
+  --accent-spotlight: 352 88% 56%;
+  --accent-spotlight-secondary: 328 82% 62%;
+  --accent-scrollbar-thumb: 352 84% 52%;
+  --accent-scrollbar-thumb-secondary: 328 82% 62%;
+  --accent-surface: 342 100% 97%;
+}
+
+:root.dark[data-accent="crimson"],
+.dark[data-accent="crimson"] {
+  --accent-primary: 350 88% 64%;
+  --accent-primary-foreground: 222 37% 8%;
+  --accent-ring: 347 94% 76%;
+  --accent-spotlight: 350 92% 68%;
+  --accent-spotlight-secondary: 328 84% 70%;
+  --accent-scrollbar-thumb: 350 88% 64%;
+  --accent-scrollbar-thumb-secondary: 328 84% 70%;
+  --accent-surface: 344 28% 17%;
+}
+
+:root[data-accent="cyan"] {
+  --accent-primary: 190 88% 46%;
+  --accent-primary-foreground: 0 0% 100%;
+  --accent-ring: 190 88% 46%;
+  --accent-spotlight: 188 92% 48%;
+  --accent-spotlight-secondary: 212 94% 62%;
+  --accent-scrollbar-thumb: 190 88% 46%;
+  --accent-scrollbar-thumb-secondary: 212 94% 62%;
+  --accent-surface: 195 100% 96%;
+}
+
+:root.dark[data-accent="cyan"],
+.dark[data-accent="cyan"] {
+  --accent-primary: 190 90% 58%;
+  --accent-primary-foreground: 222 37% 8%;
+  --accent-ring: 194 100% 74%;
+  --accent-spotlight: 188 92% 62%;
+  --accent-spotlight-secondary: 212 96% 70%;
+  --accent-scrollbar-thumb: 190 90% 58%;
+  --accent-scrollbar-thumb-secondary: 212 96% 70%;
+  --accent-surface: 198 28% 16%;
+}
+
+:root[data-accent="lime"] {
+  --accent-primary: 92 74% 48%;
+  --accent-primary-foreground: 22 35% 12%;
+  --accent-ring: 92 74% 48%;
+  --accent-spotlight: 88 80% 54%;
+  --accent-spotlight-secondary: 146 62% 44%;
+  --accent-scrollbar-thumb: 92 74% 48%;
+  --accent-scrollbar-thumb-secondary: 146 62% 44%;
+  --accent-surface: 92 80% 95%;
+}
+
+:root.dark[data-accent="lime"],
+.dark[data-accent="lime"] {
+  --accent-primary: 94 72% 58%;
+  --accent-primary-foreground: 222 37% 8%;
+  --accent-ring: 88 84% 72%;
+  --accent-spotlight: 92 78% 62%;
+  --accent-spotlight-secondary: 146 68% 58%;
+  --accent-scrollbar-thumb: 94 72% 58%;
+  --accent-scrollbar-thumb-secondary: 146 68% 58%;
+  --accent-surface: 96 24% 16%;
+}
+
+:root[data-accent="slate"] {
+  --accent-primary: 216 24% 46%;
+  --accent-primary-foreground: 0 0% 100%;
+  --accent-ring: 216 24% 46%;
+  --accent-spotlight: 212 34% 54%;
+  --accent-spotlight-secondary: 236 20% 58%;
+  --accent-scrollbar-thumb: 216 24% 46%;
+  --accent-scrollbar-thumb-secondary: 236 20% 58%;
+  --accent-surface: 220 24% 95%;
+}
+
+:root.dark[data-accent="slate"],
+.dark[data-accent="slate"] {
+  --accent-primary: 214 24% 64%;
+  --accent-primary-foreground: 222 37% 8%;
+  --accent-ring: 214 32% 76%;
+  --accent-spotlight: 214 30% 68%;
+  --accent-spotlight-secondary: 236 24% 72%;
+  --accent-scrollbar-thumb: 214 24% 64%;
+  --accent-scrollbar-thumb-secondary: 236 24% 72%;
+  --accent-surface: 223 18% 17%;
+}
+
+:root[data-accent="sunset"] {
+  --accent-primary: 24 96% 58%;
+  --accent-primary-foreground: 0 0% 100%;
+  --accent-ring: 24 96% 58%;
+  --accent-spotlight: 20 100% 62%;
+  --accent-spotlight-secondary: 334 86% 62%;
+  --accent-scrollbar-thumb: 24 96% 58%;
+  --accent-scrollbar-thumb-secondary: 334 86% 62%;
+  --accent-surface: 18 100% 96%;
+}
+
+:root.dark[data-accent="sunset"],
+.dark[data-accent="sunset"] {
+  --accent-primary: 24 98% 66%;
+  --accent-primary-foreground: 222 37% 8%;
+  --accent-ring: 22 100% 78%;
+  --accent-spotlight: 22 100% 70%;
+  --accent-spotlight-secondary: 334 90% 70%;
+  --accent-scrollbar-thumb: 24 98% 66%;
+  --accent-scrollbar-thumb-secondary: 334 90% 70%;
+  --accent-surface: 18 28% 17%;
 }
 
 @layer base {
@@ -525,24 +771,26 @@ body,
 
 .header-glass {
   background:
-    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.88), hsl(var(--glass-surface) / 0.7)),
-    linear-gradient(120deg, hsl(var(--glass-inner) / 0.1), transparent 40%);
+    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.8), hsl(var(--glass-surface) / 0.56)),
+    linear-gradient(120deg, hsl(var(--glass-inner) / 0.16), transparent 38%),
+    linear-gradient(90deg, hsl(var(--spotlight) / 0.06), transparent 32%, transparent 68%, hsl(var(--spotlight-secondary) / 0.06));
   box-shadow:
-    0 16px 38px hsl(var(--glass-shadow) / 0.12),
-    inset 0 1px 0 hsl(var(--glass-inner) / 0.62);
-  backdrop-filter: blur(24px) saturate(126%);
-  -webkit-backdrop-filter: blur(24px) saturate(126%);
+    0 18px 42px hsl(var(--glass-shadow) / 0.14),
+    inset 0 1px 0 hsl(var(--glass-inner) / 0.72),
+    inset 0 -1px 0 hsl(var(--glass-inner) / 0.16);
+  backdrop-filter: blur(28px) saturate(138%);
+  -webkit-backdrop-filter: blur(28px) saturate(138%);
 }
 
 .header-warp {
-  opacity: 0.55;
+  opacity: 0.72;
 }
 
 .header-warp-orb {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(24px);
-  opacity: 0.22;
+  filter: blur(28px);
+  opacity: 0.3;
 }
 
 .header-warp-orb-one {
@@ -567,9 +815,9 @@ body,
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(120deg, transparent 10%, hsl(var(--glass-inner) / 0.12) 24%, transparent 56%),
-    linear-gradient(180deg, hsl(var(--glass-inner) / 0.08), transparent 58%);
-  opacity: 0.7;
+    linear-gradient(120deg, transparent 8%, hsl(var(--glass-inner) / 0.18) 22%, transparent 54%),
+    linear-gradient(180deg, hsl(var(--glass-inner) / 0.12), transparent 58%);
+  opacity: 0.82;
 }
 
 .section-title {

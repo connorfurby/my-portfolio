@@ -85,6 +85,8 @@ const PARTICLE_SOURCE_SIZE = 240
 const OUTLINE_SOURCE_SIZE = 720
 const MAX_PARTICLES_STANDARD = 1200
 const MAX_PARTICLES_DEPTH = 2200
+const MOBILE_PARTICLE_DENSITY_RATIO = 0.42
+const TABLET_PARTICLE_DENSITY_RATIO = 0.7
 const CONTENT_TRANSITION = {
   duration: 0.28,
   ease: [0.22, 1, 0.36, 1],
@@ -590,7 +592,7 @@ function simplifyLoopGeometry(points: Point2D[], tolerance: number) {
     return points
   }
 
-  const sharpCornerIndices = [...detectSharpCornerIndices(points)].sort((left, right) => left - right)
+  const sharpCornerIndices = Array.from(detectSharpCornerIndices(points)).sort((left, right) => left - right)
 
   if (sharpCornerIndices.length < 2) {
     const startIndex = sharpCornerIndices[0] ?? 0
@@ -978,6 +980,8 @@ function LogoParticleField({
     pressed: false,
   })
   const reduceMotion = useReducedMotion()
+  const isMobile = useMediaQuery("(max-width: 767px)")
+  const isTablet = useMediaQuery("(max-width: 1023px)")
   const { ref: nearViewportRef, isNearViewport } = useNearViewport<HTMLDivElement>({ rootMargin: "240px 0px" })
   const shouldAnimate = !reduceMotion && isNearViewport && isActive
 
@@ -1118,7 +1122,12 @@ function LogoParticleField({
       }
 
       const maxParticles = densityMode === "depth" ? MAX_PARTICLES_DEPTH : MAX_PARTICLES_STANDARD
-      const particleLimit = reduceMotion ? Math.min(maxParticles / 2, rawPoints.length) : Math.min(maxParticles, rawPoints.length)
+      const viewportDensityRatio = isMobile ? MOBILE_PARTICLE_DENSITY_RATIO : isTablet ? TABLET_PARTICLE_DENSITY_RATIO : 1
+      const responsiveParticleCap = Math.max(120, Math.floor(maxParticles * viewportDensityRatio))
+      const baseParticleLimit = Math.min(responsiveParticleCap, rawPoints.length)
+      const particleLimit = reduceMotion
+        ? Math.min(Math.max(80, responsiveParticleCap / 2), rawPoints.length)
+        : baseParticleLimit
       const takeEvery = Math.max(1, Math.ceil(rawPoints.length / particleLimit))
       const logoWidth = Math.max(maxX - minX + 1, 1)
       const logoHeight = Math.max(maxY - minY + 1, 1)
@@ -1197,7 +1206,7 @@ function LogoParticleField({
         }
       })
     },
-    [accentColor, accentSecondaryColor, densityMode, entry, reduceMotion]
+    [accentColor, accentSecondaryColor, densityMode, entry, isMobile, isTablet, reduceMotion]
   )
 
   useEffect(() => {

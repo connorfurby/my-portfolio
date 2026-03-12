@@ -4,6 +4,7 @@ import { Sparkles } from "lucide-react"
 import { motion, useReducedMotion } from "framer-motion"
 
 import { passions } from "@/components/portfolio/data"
+import { useMediaQuery } from "@/components/portfolio/useMediaQuery"
 import { useNearViewport } from "@/components/portfolio/useNearViewport"
 import type { Passion } from "@/components/portfolio/types"
 import { Badge } from "@/components/ui/badge"
@@ -76,6 +77,7 @@ const nodeLookup = Object.fromEntries(mindmapNodes.map((node) => [node.title, no
 
 export default function Passions() {
   const reduceMotion = useReducedMotion()
+  const isMobile = useMediaQuery("(max-width: 767px)")
   const [activeTitle, setActiveTitle] = useState("Software Development")
   const { ref: sectionRef, isNearViewport } = useNearViewport<HTMLDivElement>({ rootMargin: "280px 0px" })
   const shouldAnimate = !reduceMotion && isNearViewport
@@ -84,6 +86,7 @@ export default function Passions() {
   const svgId = useId().replace(/:/g, "")
   const connectionGradientId = `${svgId}-mindmap-connection`
   const linkGlowId = `${svgId}-mindmap-glow`
+  const visibleParticleSpecs = isMobile ? particleSpecs.filter((_, index) => index % 2 === 0) : particleSpecs
 
   return (
     <div ref={sectionRef} className="relative z-30">
@@ -169,7 +172,7 @@ export default function Passions() {
                 transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
               />
 
-              {particleSpecs.map((particle, index) => (
+              {visibleParticleSpecs.map((particle, index) => (
                 <motion.span
                   key={`passion-particle-${index}`}
                   className="absolute rounded-full bg-foreground/80 shadow-[0_0_16px_hsl(var(--spotlight)/0.38)]"

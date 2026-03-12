@@ -767,7 +767,7 @@ export const contactLinks: ContactLink[] = [
   },
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/in/connor-furby/",
+    href: "https://www.linkedin.com/in/connorfurby/",
     value: "linkedin.com/in/connor-furby",
     description: "Best for professional networking, background, and longer-form updates.",
     ctaLabel: "Open LinkedIn",

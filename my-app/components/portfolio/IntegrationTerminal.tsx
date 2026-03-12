@@ -2,11 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { Command, CornerDownLeft, Sparkles, TerminalSquare } from "lucide-react"
+import { Command, CornerDownLeft, Moon, Palette, Sparkles, Sun, TerminalSquare } from "lucide-react"
+import { useTheme } from "next-themes"
 
 import { contactLinks, educationProfile, internshipEntries, projects, techClusters } from "@/components/portfolio/data"
 import type { SectionId } from "@/components/portfolio/types"
 import { scrollToSection } from "@/components/portfolio/utils"
+import { accentThemes, type AccentThemeId, useAccentTheme } from "@/components/theme-provider"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -15,6 +17,8 @@ import { cn } from "@/lib/utils"
 type IntegrationTerminalProps = {
   githubUrl: string
   githubRepoCount?: number
+  githubActiveRepoCount?: number
+  githubTopLanguage?: string
   latestRepoName?: string
   linkedinProfileUrl?: string
   linkedinPostCount?: number
@@ -31,6 +35,7 @@ type TerminalAction = {
   href?: string
   section?: SectionId
   tab?: "github" | "spotify" | "linkedin" | "ai-chat" | "terminal"
+  command?: string
 }
 
 type TerminalEntry = {
@@ -54,6 +59,9 @@ const terminalCommands: TerminalCommand[] = [
   { name: "github", aliases: ["gh", "code"], description: "Inspect public GitHub signal and open the profile." },
   { name: "linkedin", aliases: ["network"], description: "Show LinkedIn availability and synced feed status." },
   { name: "spotify", aliases: ["music", "playlists"], description: "Check the live listening surface and playlist picks." },
+  { name: "theme", aliases: ["appearance", "mode"], description: "Inspect or switch the current site theme." },
+  { name: "accent", aliases: ["color", "palette"], description: "Preview or switch the active accent theme." },
+  { name: "status", aliases: ["state", "uptime"], description: "Show a compact snapshot of loaded integrations." },
   { name: "skills", aliases: ["stack", "map"], description: "Jump to the live skills map and cluster view." },
   { name: "clear", aliases: ["cls", "reset"], description: "Clear the console output and reprint the boot log." },
 ]
@@ -94,13 +102,17 @@ function buildCommandResponse(
   {
     githubUrl,
     githubRepoCount,
+    githubActiveRepoCount,
+    githubTopLanguage,
     latestRepoName,
     linkedinProfileUrl,
     linkedinPostCount,
     spotifyTrack,
   }: IntegrationTerminalProps
-): TerminalEntry {
+): TerminalEntry | null {
   const command = findCommand(rawCommand)
+  const tokens = rawCommand.trim().toLowerCase().split(/\s+/).filter(Boolean)
+  const [, arg] = tokens
   const emailLink = contactLinks.find((link) => link.label === "Email")
   const linkedInLink = linkedinProfileUrl || contactLinks.find((link) => link.label === "LinkedIn")?.href
   const gitHubLink = githubUrl || contactLinks.find((link) => link.label === "GitHub")?.href || "https://github.com/connorfurby"
@@ -125,6 +137,7 @@ function buildCommandResponse(
         actions: [
           { label: "Open Work", section: "experience" },
           { label: "Open Contact", section: "contact" },
+          { label: "Check Status", command: "status" },
         ],
       }
     case "projects":
@@ -177,6 +190,8 @@ function buildCommandResponse(
         lines: [
           `public profile: ${gitHubLink}`,
           githubRepoCount ? `${githubRepoCount} original repositories currently tracked in the live dashboard.` : "live repository counts load from the GitHub API in this section.",
+          githubActiveRepoCount ? `${githubActiveRepoCount} repositories show recent activity right now.` : "active repo count loads from the GitHub API.",
+          githubTopLanguage ? `current leading language: ${githubTopLanguage}` : "language mix appears once GitHub data finishes loading.",
           latestRepoName ? `latest highlighted repository: ${latestRepoName}` : "latest highlighted repository becomes available when GitHub data finishes loading.",
         ],
         actions: [
@@ -209,11 +224,74 @@ function buildCommandResponse(
           spotifyTrack?.title
             ? `now playing: ${spotifyTrack.title}${spotifyTrack.artist ? ` — ${spotifyTrack.artist}` : ""}`
             : "spotify live state is available in the listening tab when playback data is present.",
-          "playlist picks live in the spotify tab for a more compact integration-first layout.",
+          "top tracks, artists, and playlist picks live in the Spotify tab.",
         ],
         actions: [
           { label: "Open Spotify Tab", tab: "spotify" },
           ...(spotifyTrack?.url ? [{ label: "Open Current Track", href: spotifyTrack.url }] : []),
+        ],
+      }
+    case "theme":
+      if (arg && !["light", "dark"].includes(arg)) {
+        return {
+          id: createId(),
+          type: "error",
+          lines: [`unknown theme mode: ${arg}`, 'use "theme", "theme dark", or "theme light"'],
+        }
+      }
+
+      return {
+        id: createId(),
+        type: "response",
+        lines: [
+          arg ? `switching theme mode to ${arg}` : "theme controls are available directly in this terminal surface.",
+          'quick commands: "theme dark", "theme light", "accent violet", "accent rose", "accent emerald"',
+        ],
+        actions: [
+          { label: "Light", command: "theme light" },
+          { label: "Dark", command: "theme dark" },
+          { label: "Accent Menu", command: "accent" },
+        ],
+      }
+    case "accent":
+      if (arg && !accentThemes.some((theme) => theme.id === arg)) {
+        return {
+          id: createId(),
+          type: "error",
+          lines: [
+            `unknown accent: ${arg}`,
+            `available accents: ${accentThemes.map((theme) => theme.id).join(", ")}`,
+          ],
+        }
+      }
+
+      return {
+        id: createId(),
+        type: "response",
+        lines: [
+          arg ? `switching accent theme to ${arg}` : `available accents: ${accentThemes.map((theme) => theme.id).join(", ")}`,
+          "accent changes update the look and feel across the site.",
+        ],
+        actions: accentThemes.slice(0, 5).map((theme) => ({
+          label: theme.label,
+          command: `accent ${theme.id}`,
+        })),
+      }
+    case "status":
+      return {
+        id: createId(),
+        type: "response",
+        lines: [
+          `github: ${githubRepoCount ? `${githubRepoCount} repos tracked` : "loading"}${githubActiveRepoCount ? ` • ${githubActiveRepoCount} active` : ""}`,
+          `linkedin: ${typeof linkedinPostCount === "number" ? `${linkedinPostCount} synced posts` : "adapter status pending"}`,
+          spotifyTrack?.title
+            ? `spotify: live track detected • ${spotifyTrack.title}${spotifyTrack.artist ? ` — ${spotifyTrack.artist}` : ""}`
+            : "spotify: playback state available when live data is present",
+        ],
+        actions: [
+          { label: "GitHub", tab: "github" },
+          { label: "Spotify", tab: "spotify" },
+          { label: "LinkedIn", tab: "linkedin" },
         ],
       }
     case "skills":
@@ -222,7 +300,7 @@ function buildCommandResponse(
         type: "response",
         lines: [
           `${techClusters.length} skill clusters mapped across frontend, full-stack, AI, foundations, creativity, and delivery.`,
-          "the visual map is meant to be the primary object now, with the surrounding UI kept intentionally minimal.",
+          "the map connects the tools and strengths that show up together most often in my projects.",
         ],
         actions: [{ label: "Open Skills Map", section: "skills" }],
       }
@@ -240,8 +318,11 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
   const [entries, setEntries] = useState<TerminalEntry[]>(() => createBootEntries())
   const [inputValue, setInputValue] = useState("")
   const [commandHistory, setCommandHistory] = useState<string[]>([])
-  const [historyIndex, setHistoryIndex] = useState(-1)
+  const [, setHistoryIndex] = useState(-1)
   const [isRunning, setIsRunning] = useState(false)
+  const { resolvedTheme, setTheme } = useTheme()
+  const { accentTheme, setAccentTheme, isAccentReady } = useAccentTheme()
+  const currentAccentLabel = accentThemes.find((theme) => theme.id === accentTheme)?.label ?? "Accent"
 
   useEffect(() => {
     const container = outputRef.current
@@ -299,7 +380,24 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
     setIsRunning(true)
 
     window.setTimeout(() => {
-      setEntries((current) => [...current, buildCommandResponse(trimmed, props)])
+      const normalized = trimmed.toLowerCase()
+      const tokens = normalized.split(/\s+/).filter(Boolean)
+      const [commandName, commandArg] = tokens
+      const resolvedCommand = findCommand(commandName ?? "")
+      const response = buildCommandResponse(trimmed, props)
+
+      if (resolvedCommand?.name === "theme" && commandArg && ["light", "dark"].includes(commandArg)) {
+        setTheme(commandArg)
+      }
+
+      if (resolvedCommand?.name === "accent" && commandArg && accentThemes.some((theme) => theme.id === commandArg)) {
+        setAccentTheme(commandArg as AccentThemeId)
+      }
+
+      if (response) {
+        setEntries((current) => [...current, response])
+      }
+
       setIsRunning(false)
     }, 180)
   }
@@ -334,10 +432,10 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
         <div className="border-b border-white/10 px-4 py-4 sm:px-5">
           <div className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
             <Sparkles className="h-4 w-4 text-cyan-300" />
-            Run commands for projects, resume, contact, GitHub, LinkedIn, and Spotify.
+            Run commands for projects, resume, contact, GitHub, LinkedIn, Spotify, and site appearance.
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            {terminalCommands.slice(0, 8).map((command) => (
+            {terminalCommands.slice(0, 10).map((command) => (
               <button
                 key={command.name}
                 type="button"
@@ -348,9 +446,76 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
               </button>
             ))}
           </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1">
+              {resolvedTheme === "light" ? "Light" : "Dark"} mode
+            </span>
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1">
+              {isAccentReady ? `${currentAccentLabel} accent` : "Loading accent"}
+            </span>
+            {props.githubRepoCount ? (
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1">
+                {props.githubRepoCount} repos
+              </span>
+            ) : null}
+            {props.spotifyTrack?.title ? (
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1">
+                Now playing: {props.spotifyTrack.title}
+              </span>
+            ) : null}
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                variant={resolvedTheme === "light" ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => setTheme("light")}
+                className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
+              >
+                <Sun className="mr-1.5 h-3.5 w-3.5" />
+                Light
+              </Button>
+              <Button
+                type="button"
+                variant={resolvedTheme === "dark" ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => setTheme("dark")}
+                className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
+              >
+                <Moon className="mr-1.5 h-3.5 w-3.5" />
+                Dark
+              </Button>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-500">
+                <Palette className="h-3 w-3 text-cyan-300" />
+                Accent
+              </span>
+              {accentThemes.slice(0, 6).map((theme) => (
+                <button
+                  key={theme.id}
+                  type="button"
+                  onClick={() => setAccentTheme(theme.id)}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] text-slate-100 transition-colors",
+                    accentTheme === theme.id ? "border-cyan-300/40 bg-white/[0.12]" : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08]"
+                  )}
+                >
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{
+                      background: `linear-gradient(135deg, hsl(${theme.swatch.start}), hsl(${theme.swatch.end}))`,
+                    }}
+                  />
+                  {theme.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div ref={outputRef} aria-live="polite" className="h-[24rem] overflow-y-auto px-4 py-4 font-mono text-sm sm:px-5">
+        <div ref={outputRef} aria-live="polite" className="h-[22rem] overflow-y-auto px-4 py-4 font-mono text-sm sm:px-5">
           <AnimatePresence initial={false}>
             {entries.map((entry) => (
               <motion.div
@@ -385,40 +550,63 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
 
                 {entry.actions?.length ? (
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {entry.actions.map((action) =>
-                      action.href ? (
-                        <Button
-                          key={`${entry.id}-${action.label}`}
-                          asChild
-                          variant="outline"
-                          size="sm"
-                          className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
-                        >
-                          <a href={action.href} target="_blank" rel="noreferrer">
-                            {action.label}
-                          </a>
-                        </Button>
-                      ) : (
-                        <Button
-                          key={`${entry.id}-${action.label}`}
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            if (action.tab) {
-                              props.onSelectTab?.(action.tab)
-                            }
+                    {entry.actions.map((action) => {
+                      if (action.href) {
+                        return (
+                          <Button
+                            key={`${entry.id}-${action.label}`}
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
+                          >
+                            <a href={action.href} target="_blank" rel="noreferrer">
+                              {action.label}
+                            </a>
+                          </Button>
+                        )
+                      }
 
-                            if (action.section) {
-                              scrollToSection(action.section)
-                            }
-                          }}
-                          className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
-                        >
-                          {action.label}
-                        </Button>
-                      )
-                    )}
+                      if (action.tab || action.section) {
+                        return (
+                          <Button
+                            key={`${entry.id}-${action.label}`}
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (action.tab) {
+                                props.onSelectTab?.(action.tab)
+                              }
+
+                              if (action.section) {
+                                scrollToSection(action.section)
+                              }
+                            }}
+                            className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
+                          >
+                            {action.label}
+                          </Button>
+                        )
+                      }
+
+                      if (action.command) {
+                        return (
+                          <Button
+                            key={`${entry.id}-${action.label}`}
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => runCommand(action.command ?? "")}
+                            className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
+                          >
+                            {action.label}
+                          </Button>
+                        )
+                      }
+
+                      return null
+                    })}
                   </div>
                 ) : null}
               </motion.div>
