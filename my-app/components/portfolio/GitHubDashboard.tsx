@@ -1,7 +1,8 @@
 "use client"
 
 import Image from "next/image"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import {
   Bot,
   CalendarClock,
@@ -18,6 +19,7 @@ import {
   Sparkles,
   Star,
   Users,
+  X,
 } from "lucide-react"
 import { motion } from "framer-motion"
 
@@ -99,17 +101,22 @@ type LinkedInActivityResponse = {
   message: string
 }
 
+type SpotifyTimeRange = "short_term" | "medium_term" | "long_term"
+
 type SpotifyDashboardResponse = {
   mode: "configured" | "unconfigured" | "error"
   updatedAt: string
   message: string
   accountDataState: "ready" | "partial" | "rate_limited" | "needs_reauth" | "stale" | null
   accountDataMessage: string | null
+  topTimeRange: SpotifyTimeRange
   topWindowLabel: string
+  topLimit: number
   profile: {
     displayName: string | null
     profileUrl: string | null
     imageUrl: string | null
+    followers: number | null
     product: string | null
     country: string | null
   } | null
@@ -142,6 +149,7 @@ type SpotifyDashboardResponse = {
     imageUrl: string | null
     url: string | null
     durationMs: number | null
+    popularity: number | null
   }>
   topArtists: Array<{
     id: string
@@ -149,6 +157,8 @@ type SpotifyDashboardResponse = {
     imageUrl: string | null
     url: string | null
     genres: string[]
+    followers: number | null
+    popularity: number | null
   }>
   recentPodcast: {
     title: string
@@ -189,6 +199,31 @@ const statCards = [
       "from-[hsl(var(--spotlight-secondary)/0.16)] via-[hsl(var(--primary)/0.08)] to-transparent",
   },
 ] as const
+
+const spotifyTimeRangeOptions: Array<{
+  value: SpotifyTimeRange
+  label: string
+  description: string
+}> = [
+  {
+    value: "short_term",
+    label: "28 days",
+    description: "Current rotation",
+  },
+  {
+    value: "medium_term",
+    label: "6 months",
+    description: "Bigger listening arc",
+  },
+  {
+    value: "long_term",
+    label: "All time",
+    description: "Long-run favorites",
+  },
+]
+
+const spotifyTopLimitOptions = [10, 25, 50] as const
+const defaultSpotifyDetailLimit = 25
 
 function formatRelative(dateString: string) {
   const relativeFormatter = new Intl.RelativeTimeFormat("en", { numeric: "auto" })
@@ -256,24 +291,75 @@ function formatSpotifyValue(value?: string | null) {
   return value.replace(/_/g, " ")
 }
 
+function formatCompactNumber(value?: number | null) {
+  if (typeof value !== "number") {
+    return "N/A"
+  }
+
+  return new Intl.NumberFormat("en-US", {
+    notation: value >= 1000 ? "compact" : "standard",
+    maximumFractionDigits: value >= 1000 ? 1 : 0,
+  }).format(value)
+}
+
+function getSpotifyTimeRangeLabel(value: SpotifyTimeRange) {
+  return spotifyTimeRangeOptions.find((option) => option.value === value)?.label ?? "28 days"
+}
+
 export default function GitHubDashboard() {
   const { ref: sectionRef, isNearViewport: isIntegrationsVisible } = useNearViewport<HTMLElement>({
     rootMargin: "260px 0px",
     threshold: 0.18,
   })
-  const [activeTab, setActiveTab] = useState("terminal")
+  const [activeTab, setActiveTab] = useState("ai-chat")
   const [githubData, setGitHubData] = useState<GitHubDashboardResponse | null>(null)
   const [githubError, setGitHubError] = useState<string | null>(null)
   const [githubLoading, setGitHubLoading] = useState(true)
   const [spotifyData, setSpotifyData] = useState<SpotifyDashboardResponse | null>(null)
   const [spotifyError, setSpotifyError] = useState<string | null>(null)
   const [spotifyLoading, setSpotifyLoading] = useState(true)
+  const [isSpotifyDetailsOpen, setIsSpotifyDetailsOpen] = useState(false)
+  const [spotifyDetailsRange, setSpotifyDetailsRange] = useState<SpotifyTimeRange>("short_term")
+  const [spotifyDetailsLimit, setSpotifyDetailsLimit] = useState<number>(defaultSpotifyDetailLimit)
+  const [spotifyDetailsData, setSpotifyDetailsData] = useState<SpotifyDashboardResponse | null>(null)
+  const [spotifyDetailsError, setSpotifyDetailsError] = useState<string | null>(null)
+  const [spotifyDetailsLoading, setSpotifyDetailsLoading] = useState(false)
   const [linkedinData, setLinkedinData] = useState<LinkedInActivityResponse | null>(null)
   const [linkedinError, setLinkedinError] = useState<string | null>(null)
   const [linkedinLoading, setLinkedinLoading] = useState(true)
   const shouldLoadGitHub = !githubData && !githubError
   const shouldLoadLinkedIn = !linkedinData && !linkedinError
   const shouldLoadSpotify = !spotifyData && !spotifyError
+
+  const requestSpotifyDashboard = useCallback(
+    async (options: { timeRange?: SpotifyTimeRange; limit?: number } = {}) => {
+      const searchParams = new URLSearchParams()
+
+      if (options.timeRange) {
+        searchParams.set("timeRange", options.timeRange)
+      }
+
+      if (typeof options.limit === "number") {
+        searchParams.set("limit", String(options.limit))
+      }
+
+      const requestPath = searchParams.size
+        ? `/api/spotify/now-playing?${searchParams.toString()}`
+        : "/api/spotify/now-playing"
+
+      const response = await fetch(requestPath, {
+        cache: "no-store",
+      })
+      const payload = (await response.json()) as SpotifyDashboardResponse | { message?: string }
+
+      if (!response.ok && !("mode" in payload)) {
+        throw new Error("message" in payload ? payload.message : "Unable to load Spotify activity")
+      }
+
+      return payload as SpotifyDashboardResponse
+    },
+    []
+  )
 
   useEffect(() => {
     if (!isIntegrationsVisible || (!shouldLoadGitHub && !shouldLoadLinkedIn && !shouldLoadSpotify)) {
@@ -338,17 +424,10 @@ export default function GitHubDashboard() {
         setSpotifyLoading(true)
         setSpotifyError(null)
 
-        const response = await fetch("/api/spotify/now-playing", {
-          cache: "no-store",
-        })
-        const payload = (await response.json()) as SpotifyDashboardResponse | { message?: string }
-
-        if (!response.ok && !("mode" in payload)) {
-          throw new Error("message" in payload ? payload.message : "Unable to load Spotify activity")
-        }
+        const payload = await requestSpotifyDashboard()
 
         if (!isCancelled) {
-          setSpotifyData(payload as SpotifyDashboardResponse)
+          setSpotifyData(payload)
         }
       } catch (fetchError) {
         if (!isCancelled) {
@@ -376,7 +455,7 @@ export default function GitHubDashboard() {
     return () => {
       isCancelled = true
     }
-  }, [isIntegrationsVisible, shouldLoadGitHub, shouldLoadLinkedIn, shouldLoadSpotify])
+  }, [isIntegrationsVisible, requestSpotifyDashboard, shouldLoadGitHub, shouldLoadLinkedIn, shouldLoadSpotify])
 
   useEffect(() => {
     if (!isIntegrationsVisible || activeTab !== "spotify") {
@@ -386,16 +465,8 @@ export default function GitHubDashboard() {
     const spotifyInterval = window.setInterval(() => {
       void (async () => {
         try {
-          const response = await fetch("/api/spotify/now-playing", {
-            cache: "no-store",
-          })
-          const payload = (await response.json()) as SpotifyDashboardResponse | { message?: string }
-
-          if (!response.ok && !("mode" in payload)) {
-            throw new Error("message" in payload ? payload.message : "Unable to load Spotify activity")
-          }
-
-          setSpotifyData(payload as SpotifyDashboardResponse)
+          const payload = await requestSpotifyDashboard()
+          setSpotifyData(payload)
           setSpotifyError(null)
         } catch (fetchError) {
           setSpotifyError(fetchError instanceof Error ? fetchError.message : "Unable to load Spotify activity")
@@ -404,7 +475,80 @@ export default function GitHubDashboard() {
     }, 5000)
 
     return () => window.clearInterval(spotifyInterval)
-  }, [activeTab, isIntegrationsVisible])
+  }, [activeTab, isIntegrationsVisible, requestSpotifyDashboard])
+
+  useEffect(() => {
+    if (!isSpotifyDetailsOpen) {
+      return
+    }
+
+    if (spotifyData?.topTimeRange === spotifyDetailsRange && spotifyData?.topLimit === spotifyDetailsLimit) {
+      setSpotifyDetailsData(spotifyData)
+      setSpotifyDetailsError(null)
+      setSpotifyDetailsLoading(false)
+      return
+    }
+
+    let isCancelled = false
+
+    void (async () => {
+      try {
+        setSpotifyDetailsLoading(true)
+        setSpotifyDetailsError(null)
+
+        const payload = await requestSpotifyDashboard({
+          timeRange: spotifyDetailsRange,
+          limit: spotifyDetailsLimit,
+        })
+
+        if (!isCancelled) {
+          setSpotifyDetailsData(payload)
+        }
+      } catch (fetchError) {
+        if (!isCancelled) {
+          setSpotifyDetailsError(fetchError instanceof Error ? fetchError.message : "Unable to load Spotify details")
+        }
+      } finally {
+        if (!isCancelled) {
+          setSpotifyDetailsLoading(false)
+        }
+      }
+    })()
+
+    return () => {
+      isCancelled = true
+    }
+  }, [
+    isSpotifyDetailsOpen,
+    requestSpotifyDashboard,
+    spotifyData?.topLimit,
+    spotifyData?.topTimeRange,
+    spotifyDetailsLimit,
+    spotifyDetailsRange,
+  ])
+
+  useEffect(() => {
+    if (!isSpotifyDetailsOpen) {
+      return
+    }
+
+    const previousBodyOverflow = document.body.style.overflow
+
+    document.body.style.overflow = "hidden"
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsSpotifyDetailsOpen(false)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [isSpotifyDetailsOpen])
 
   const maxPulse = useMemo(
     () => Math.max(...(githubData?.activityPulse.map((point) => point.total) ?? [0]), 1),
@@ -419,6 +563,31 @@ export default function GitHubDashboard() {
 
     return Math.min(100, Math.max(0, (playback.progressMs / playback.durationMs) * 100))
   }, [spotifyData?.playback])
+  const spotifyPreviewTracks = useMemo(
+    () => spotifyData?.topTracks.slice(0, 5) ?? [],
+    [spotifyData?.topTracks]
+  )
+  const spotifyPreviewArtists = useMemo(
+    () => spotifyData?.topArtists.slice(0, 5) ?? [],
+    [spotifyData?.topArtists]
+  )
+  const spotifySelectedDetails = useMemo(() => {
+    if (
+      spotifyDetailsData?.topTimeRange === spotifyDetailsRange &&
+      spotifyDetailsData?.topLimit === spotifyDetailsLimit
+    ) {
+      return spotifyDetailsData
+    }
+
+    if (
+      spotifyData?.topTimeRange === spotifyDetailsRange &&
+      spotifyData?.topLimit === spotifyDetailsLimit
+    ) {
+      return spotifyData
+    }
+
+    return null
+  }, [spotifyData, spotifyDetailsData, spotifyDetailsLimit, spotifyDetailsRange])
 
   return (
     <AnimatedSection id="integrations" className="mb-16 pt-6" delay={0.04}>
@@ -427,12 +596,20 @@ export default function GitHubDashboard() {
         <SectionHeading
           eyebrow="Integrations"
           title="A live hub around the work"
-          description="Code signal, Spotify, LinkedIn, AI chat, and a terminal-style interface that makes the portfolio feel more like a product."
+          description="AI chat, LinkedIn, a terminal-style interface, GitHub signal, and Spotify listening data arranged like a live product surface."
         />
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-3 grid h-auto w-full max-w-5xl grid-cols-2 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <TabsTrigger value="ai-chat" className="gap-2">
+            <Bot className="h-4 w-4" />
+            AI Chat
+          </TabsTrigger>
+          <TabsTrigger value="linkedin" className="gap-2">
+            <Linkedin className="h-4 w-4" />
+            LinkedIn
+          </TabsTrigger>
           <TabsTrigger value="terminal" className="gap-2">
             <Command className="h-4 w-4" />
             Terminal
@@ -444,14 +621,6 @@ export default function GitHubDashboard() {
           <TabsTrigger value="spotify" className="gap-2">
             <Music4 className="h-4 w-4" />
             Spotify
-          </TabsTrigger>
-          <TabsTrigger value="linkedin" className="gap-2">
-            <Linkedin className="h-4 w-4" />
-            LinkedIn
-          </TabsTrigger>
-          <TabsTrigger value="ai-chat" className="gap-2">
-            <Bot className="h-4 w-4" />
-            AI Chat
           </TabsTrigger>
         </TabsList>
 
@@ -821,6 +990,7 @@ export default function GitHubDashboard() {
             <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(24rem,0.95fr)]">
               <div className="h-[22rem] rounded-[1.3rem] bg-foreground/6 animate-pulse" />
               <div className="h-[22rem] rounded-[1.3rem] bg-foreground/6 animate-pulse" />
+              <div className="h-[18rem] rounded-[1.3rem] bg-foreground/6 animate-pulse xl:col-span-2" />
             </div>
           ) : spotifyError || !spotifyData ? (
             <Card className="surface-card rounded-[1.3rem] border-border bg-card">
@@ -834,13 +1004,13 @@ export default function GitHubDashboard() {
             </Card>
           ) : (
             <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(24rem,0.95fr)]">
-              <Card className="surface-card relative overflow-hidden rounded-[1.3rem] border-border bg-card">
+              <Card className="surface-card relative flex h-full items-center overflow-hidden rounded-[1.3rem] border-border bg-card">
                 <motion.div
                   className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.22),transparent_70%)] blur-3xl"
                   animate={isIntegrationsVisible ? { x: [0, 16, 0], y: [0, -10, 0] } : undefined}
                   transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
                 />
-                <div className="relative grid gap-0 md:grid-cols-[minmax(13rem,14rem)_1fr]">
+                <div className="relative grid w-full gap-0 md:grid-cols-[minmax(13rem,14rem)_1fr]">
                   <div className="relative aspect-square w-full bg-background/60">
                     {spotifyData.playback?.imageUrl ? (
                       <Image
@@ -857,7 +1027,7 @@ export default function GitHubDashboard() {
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-3 p-3.5 sm:p-4">
+                  <div className="flex h-full flex-col justify-center gap-3 p-3.5 sm:p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
@@ -982,123 +1152,430 @@ export default function GitHubDashboard() {
                 </div>
               </Card>
 
-              <div className="grid gap-3">
-                <Card className="surface-card rounded-[1.3rem] border-border bg-card">
-                  <div className="p-3.5 sm:p-4">
-                    <div className="mb-3 flex items-center gap-2 text-xl font-display font-semibold tracking-tight">
-                      <Users className="h-5 w-5 text-primary" />
-                      Top listening
+              <Card className="surface-card rounded-[1.3rem] border-border bg-card">
+                <div className="flex h-full flex-col p-3.5 sm:p-4">
+                  <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2 text-xl font-display font-semibold tracking-tight">
+                        <Users className="h-5 w-5 text-primary" />
+                        Top listening
+                      </div>
+                      <div className="mt-1 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                        {spotifyData.topWindowLabel}
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full px-3"
+                      onClick={() => setIsSpotifyDetailsOpen(true)}
+                    >
+                      More data
+                    </Button>
+                  </div>
+
+                  <div className="grid flex-1 gap-3 lg:grid-cols-2">
+                    <div className="flex flex-col">
+                      <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                        Top tracks
+                      </div>
+                      <div className="mt-2 grid flex-1 gap-2">
+                        {spotifyPreviewTracks.length ? (
+                          spotifyPreviewTracks.map((track, index) => (
+                            <div key={track.id} className="flex min-h-[4.15rem] items-center gap-3 rounded-[1rem] border border-foreground/10 bg-background/45 p-2.5">
+                              <div className="relative h-11 w-11 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
+                                {track.imageUrl ? (
+                                  <Image src={track.imageUrl} alt={track.title} fill className="object-cover" unoptimized />
+                                ) : (
+                                  <div className="flex h-full items-center justify-center">
+                                    <Music4 className="h-4.5 w-4.5 text-muted-foreground" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="truncate text-sm font-semibold text-foreground">
+                                  #{index + 1} {track.title}
+                                </div>
+                                <div className="truncate text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                                  {track.artist}
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="rounded-[1rem] border border-dashed border-foreground/12 bg-background/45 p-4 text-sm leading-6 text-muted-foreground">
+                            {spotifyData.accountDataState === "needs_reauth"
+                              ? "Top tracks need a fresh Spotify reconnect with the updated scopes."
+                              : spotifyData.accountDataState === "rate_limited"
+                                ? "Top tracks are temporarily rate-limited by Spotify."
+                                : spotifyData.accountDataMessage ?? "Top tracks will appear after Spotify returns affinity data."}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="grid gap-4 lg:grid-cols-2">
-                      <div>
-                        <div className="mb-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                          Top tracks {spotifyData.topWindowLabel}
-                        </div>
-                        <div className="grid gap-2">
-                          {spotifyData.topTracks.length ? (
-                            spotifyData.topTracks.map((track, index) => (
-                              <div key={track.id} className="flex items-center gap-3 rounded-[1.05rem] border border-foreground/10 bg-background/45 p-2.5">
-                                <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
-                                  {track.imageUrl ? (
-                                    <Image src={track.imageUrl} alt={track.title} fill className="object-cover" unoptimized />
-                                  ) : (
-                                    <div className="flex h-full items-center justify-center">
-                                      <Music4 className="h-5 w-5 text-muted-foreground" />
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="truncate text-sm font-semibold text-foreground">
-                                    #{index + 1} {track.title}
-                                  </div>
-                                  <div className="truncate text-xs uppercase tracking-[0.18em] text-muted-foreground">{track.artist}</div>
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="rounded-[1.3rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
-                              {spotifyData.accountDataState === "needs_reauth"
-                                ? "Top tracks need a fresh Spotify reconnect with the updated scopes."
-                                : spotifyData.accountDataState === "rate_limited"
-                                  ? "Top tracks are temporarily rate-limited by Spotify."
-                                  : spotifyData.accountDataMessage ?? "Top tracks will appear after Spotify returns affinity data."}
-                            </div>
-                          )}
-                        </div>
+                    <div className="flex flex-col">
+                      <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                        Top artists
                       </div>
-
-                      <div>
-                        <div className="mb-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                          Top artists {spotifyData.topWindowLabel}
-                        </div>
-                        <div className="grid gap-2">
-                          {spotifyData.topArtists.length ? (
-                            spotifyData.topArtists.map((artist, index) => (
-                              <div key={artist.id} className="flex items-center gap-3 rounded-[1.05rem] border border-foreground/10 bg-background/45 p-2.5">
-                                <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
-                                  {artist.imageUrl ? (
-                                    <Image src={artist.imageUrl} alt={artist.name} fill className="object-cover" unoptimized />
-                                  ) : (
-                                    <div className="flex h-full items-center justify-center">
-                                      <Users className="h-5 w-5 text-muted-foreground" />
-                                    </div>
-                                  )}
+                      <div className="mt-2 grid flex-1 gap-2">
+                        {spotifyPreviewArtists.length ? (
+                          spotifyPreviewArtists.map((artist, index) => (
+                            <div key={artist.id} className="flex min-h-[4.15rem] items-center gap-3 rounded-[1rem] border border-foreground/10 bg-background/45 p-2.5">
+                              <div className="relative h-11 w-11 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
+                                {artist.imageUrl ? (
+                                  <Image src={artist.imageUrl} alt={artist.name} fill className="object-cover" unoptimized />
+                                ) : (
+                                  <div className="flex h-full items-center justify-center">
+                                    <Users className="h-4.5 w-4.5 text-muted-foreground" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="truncate text-sm font-semibold text-foreground">
+                                  #{index + 1} {artist.name}
                                 </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="truncate text-sm font-semibold text-foreground">
-                                    #{index + 1} {artist.name}
-                                  </div>
-                                  <div className="truncate text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                                    {artist.genres.join(" • ") || "Top artist"}
-                                  </div>
+                                <div className="truncate text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                                  {artist.genres.join(" • ") || "Top artist"}
                                 </div>
                               </div>
-                            ))
-                          ) : (
-                            <div className="rounded-[1.3rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
-                              {spotifyData.accountDataState === "needs_reauth"
-                                ? "Top artists need a fresh Spotify reconnect with the updated scopes."
-                                : spotifyData.accountDataState === "rate_limited"
-                                  ? "Top artists are temporarily rate-limited by Spotify."
-                                  : spotifyData.accountDataMessage ?? "Top artists will appear after Spotify returns affinity data."}
                             </div>
-                          )}
-                        </div>
+                          ))
+                        ) : (
+                          <div className="rounded-[1rem] border border-dashed border-foreground/12 bg-background/45 p-4 text-sm leading-6 text-muted-foreground">
+                            {spotifyData.accountDataState === "needs_reauth"
+                              ? "Top artists need a fresh Spotify reconnect with the updated scopes."
+                              : spotifyData.accountDataState === "rate_limited"
+                                ? "Top artists are temporarily rate-limited by Spotify."
+                                : spotifyData.accountDataMessage ?? "Top artists will appear after Spotify returns affinity data."}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
-                </Card>
+                </div>
+              </Card>
 
-                <Card className="surface-card rounded-[1.3rem] border-border bg-card">
-                  <CardContent className="p-4">
-                    <div className="mb-4 flex items-center gap-2 text-xl font-display font-semibold tracking-tight">
-                      <Music4 className="h-5 w-5 text-primary" />
-                      Playlist picks
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-3">
-                      {spotifyPlaylists.map((playlist) => (
-                        <div key={playlist.src} className="rounded-[1.2rem] border border-foreground/10 bg-background/45 p-3">
-                          <div className="mb-2 text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                            {playlist.label}
-                          </div>
+              <Card className="surface-card rounded-[1.3rem] border-border bg-card xl:col-span-2">
+                <CardContent className="p-4 sm:p-5">
+                  <div className="mb-4 flex items-center gap-2 text-xl font-display font-semibold tracking-tight">
+                    <Music4 className="h-5 w-5 text-primary" />
+                    Playlist picks
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {spotifyPlaylists.map((playlist) => (
+                      <div key={playlist.src} className="flex h-full flex-col rounded-[1.2rem] border border-foreground/10 bg-background/45 p-3.5">
+                        <div className="mb-3 text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                          {playlist.label}
+                        </div>
+                        <div className="overflow-hidden rounded-[1rem] border border-foreground/10 bg-background/60">
                           <iframe
                             style={{ borderRadius: "12px" }}
                             src={playlist.src}
                             width="100%"
-                            height="232"
+                            height="352"
                             frameBorder="0"
                             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                             loading="lazy"
                             title={playlist.description}
                           />
-                          <p className="mt-3 text-sm leading-6 text-muted-foreground">{playlist.description}</p>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+                        <p className="mt-3 text-sm leading-6 text-muted-foreground">{playlist.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {typeof document !== "undefined" && isSpotifyDetailsOpen
+                ? createPortal(
+                    <div className="fixed inset-0 z-[220]" role="dialog" aria-modal="true" aria-labelledby="spotify-details-title">
+                      <button
+                        type="button"
+                        aria-label="Close Spotify details"
+                        className="absolute inset-0 bg-[hsl(var(--glass-shadow)/0.8)]"
+                        onClick={() => setIsSpotifyDetailsOpen(false)}
+                      />
+
+                      <div className="pointer-events-none absolute inset-x-4 bottom-4 top-4 mx-auto max-w-6xl sm:inset-x-6 sm:bottom-6 sm:top-6">
+                        <div className="pointer-events-auto relative flex h-full flex-col overflow-hidden rounded-[2rem] border border-border/70 bg-background shadow-[0_24px_80px_hsl(var(--glass-shadow)/0.42)]">
+                          <button
+                            type="button"
+                            aria-label="Close Spotify details"
+                            className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-foreground/10 bg-background text-muted-foreground transition-colors hover:text-foreground"
+                            onClick={() => setIsSpotifyDetailsOpen(false)}
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+
+                          <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+                            <div className="mb-4 flex flex-col gap-3 pr-10 text-left">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                                  Spotify details
+                                </Badge>
+                              </div>
+                              <h3 id="spotify-details-title" className="font-display text-2xl tracking-[-0.04em] sm:text-3xl">
+                                Top listening data
+                              </h3>
+                              <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
+                                Switch between Spotify time windows and pull a deeper top-tracks and top-artists view without crowding the main integration card.
+                              </p>
+                            </div>
+
+                            <div className="mb-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+                              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                <div className="rounded-[1.1rem] border border-foreground/10 bg-background/45 p-3">
+                                  <div className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Window</div>
+                                  <div className="text-sm font-medium text-foreground">
+                                    {spotifySelectedDetails?.topWindowLabel ?? getSpotifyTimeRangeLabel(spotifyDetailsRange)}
+                                  </div>
+                                </div>
+                                <div className="rounded-[1.1rem] border border-foreground/10 bg-background/45 p-3">
+                                  <div className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Dataset</div>
+                                  <div className="text-sm font-medium text-foreground">Top {spotifyDetailsLimit}</div>
+                                </div>
+                                <div className="rounded-[1.1rem] border border-foreground/10 bg-background/45 p-3">
+                                  <div className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Followers</div>
+                                  <div className="text-sm font-medium text-foreground">
+                                    {formatCompactNumber(spotifySelectedDetails?.profile?.followers ?? spotifyData.profile?.followers)}
+                                  </div>
+                                </div>
+                                <div className="rounded-[1.1rem] border border-foreground/10 bg-background/45 p-3">
+                                  <div className="mb-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Account</div>
+                                  <div className="text-sm font-medium text-foreground">
+                                    {spotifySelectedDetails?.profile?.product ?? spotifyData.profile?.product ?? "Spotify"}
+                                    {(spotifySelectedDetails?.profile?.country ?? spotifyData.profile?.country)
+                                      ? ` • ${spotifySelectedDetails?.profile?.country ?? spotifyData.profile?.country}`
+                                      : ""}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="flex flex-col gap-3 xl:min-w-[18rem]">
+                                <div>
+                                  <div className="mb-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Time range</div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {spotifyTimeRangeOptions.map((option) => (
+                                      <Button
+                                        key={option.value}
+                                        type="button"
+                                        size="sm"
+                                        variant={spotifyDetailsRange === option.value ? "default" : "outline"}
+                                        className="rounded-full px-3"
+                                        onClick={() => setSpotifyDetailsRange(option.value)}
+                                      >
+                                        {option.label}
+                                      </Button>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <div className="mb-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Top limit</div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {spotifyTopLimitOptions.map((limit) => (
+                                      <Button
+                                        key={limit}
+                                        type="button"
+                                        size="sm"
+                                        variant={spotifyDetailsLimit === limit ? "default" : "outline"}
+                                        className="rounded-full px-3"
+                                        onClick={() => setSpotifyDetailsLimit(limit)}
+                                      >
+                                        Top {limit}
+                                      </Button>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {spotifySelectedDetails?.accountDataMessage ? (
+                              <div className="mb-4 rounded-[1.15rem] border border-foreground/10 bg-background/45 px-4 py-3 text-sm leading-6 text-muted-foreground">
+                                {spotifySelectedDetails.accountDataMessage}
+                              </div>
+                            ) : null}
+
+                            {spotifyDetailsLoading && !spotifySelectedDetails ? (
+                              <div className="grid min-w-0 gap-4 xl:grid-cols-2">
+                                <div className="min-w-0 rounded-[1.25rem] border border-foreground/10 bg-background/45 p-4">
+                                  <div className="mb-3 h-5 w-40 rounded bg-foreground/8 animate-pulse" />
+                                  <div className="grid gap-2">
+                                    {Array.from({ length: 6 }).map((_, index) => (
+                                      <div key={`spotify-details-track-${index}`} className="h-16 rounded-[1rem] bg-foreground/8 animate-pulse" />
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="rounded-[1.25rem] border border-foreground/10 bg-background/45 p-4">
+                                  <div className="mb-3 h-5 w-40 rounded bg-foreground/8 animate-pulse" />
+                                  <div className="grid gap-2">
+                                    {Array.from({ length: 6 }).map((_, index) => (
+                                      <div key={`spotify-details-artist-${index}`} className="h-16 rounded-[1rem] bg-foreground/8 animate-pulse" />
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : spotifyDetailsError && !spotifySelectedDetails ? (
+                              <div className="rounded-[1.15rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
+                                {spotifyDetailsError}
+                              </div>
+                            ) : !spotifySelectedDetails ? (
+                              <div className="rounded-[1.15rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
+                                Spotify detail data will appear here once the deeper listening query finishes.
+                              </div>
+                            ) : spotifySelectedDetails.mode !== "configured" ? (
+                              <div className="rounded-[1.15rem] border border-dashed border-foreground/12 bg-background/45 p-5 text-sm leading-7 text-muted-foreground">
+                                {spotifySelectedDetails.message}
+                              </div>
+                            ) : (
+                              <div className="grid gap-4 xl:grid-cols-2">
+                                <div className="rounded-[1.25rem] border border-foreground/10 bg-background/45 p-4">
+                                  <div className="mb-3 flex items-center justify-between gap-3">
+                                    <div>
+                                      <div className="text-xl font-display font-semibold tracking-tight text-foreground">
+                                        Top tracks
+                                      </div>
+                                      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                                        {spotifySelectedDetails.topWindowLabel} • top {spotifySelectedDetails.topLimit}
+                                      </div>
+                                    </div>
+                                    <div className="rounded-full border border-foreground/10 bg-background/60 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                                      {spotifySelectedDetails.topTracks.length} tracks
+                                    </div>
+                                  </div>
+                                  <div className="grid min-w-0 gap-2">
+                                    {spotifySelectedDetails.topTracks.length ? (
+                                      spotifySelectedDetails.topTracks.map((track, index) => (
+                                        <div key={track.id} className="w-full min-w-0 overflow-hidden rounded-[1rem] border border-foreground/10 bg-background/55 p-3">
+                                          <div className="flex min-w-0 items-start gap-3">
+                                            <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
+                                              {track.imageUrl ? (
+                                                <Image src={track.imageUrl} alt={track.title} fill className="object-cover" unoptimized />
+                                              ) : (
+                                                <div className="flex h-full items-center justify-center">
+                                                  <Music4 className="h-5 w-5 text-muted-foreground" />
+                                                </div>
+                                              )}
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                              <div className="flex items-start justify-between gap-3">
+                                                <div className="min-w-0">
+                                                  <div className="truncate text-sm font-semibold text-foreground">
+                                                    #{index + 1} {track.title}
+                                                  </div>
+                                                  <div className="truncate text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                                                    {track.artist}
+                                                  </div>
+                                                </div>
+                                                {track.url ? (
+                                                  <a
+                                                    href={track.url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-background/60 text-muted-foreground transition-colors hover:text-foreground"
+                                                  >
+                                                    <ExternalLink className="h-3.5 w-3.5" />
+                                                  </a>
+                                                ) : null}
+                                              </div>
+                                              <div className="mt-2 flex min-w-0 flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                                                <span>{track.album ?? "Top track"}</span>
+                                                <span>{formatDuration(track.durationMs)}</span>
+                                                {typeof track.popularity === "number" ? (
+                                                  <span>{track.popularity}/100 popularity</span>
+                                                ) : null}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))
+                                    ) : (
+                                      <div className="rounded-[1rem] border border-dashed border-foreground/12 bg-background/50 p-5 text-sm leading-7 text-muted-foreground">
+                                        No top tracks are available for this range right now.
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="min-w-0 rounded-[1.25rem] border border-foreground/10 bg-background/45 p-4">
+                                  <div className="mb-3 flex items-center justify-between gap-3">
+                                    <div>
+                                      <div className="text-xl font-display font-semibold tracking-tight text-foreground">
+                                        Top artists
+                                      </div>
+                                      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                                        {spotifySelectedDetails.topWindowLabel} • top {spotifySelectedDetails.topLimit}
+                                      </div>
+                                    </div>
+                                    <div className="rounded-full border border-foreground/10 bg-background/60 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                                      {spotifySelectedDetails.topArtists.length} artists
+                                    </div>
+                                  </div>
+                                  <div className="grid min-w-0 gap-2">
+                                    {spotifySelectedDetails.topArtists.length ? (
+                                      spotifySelectedDetails.topArtists.map((artist, index) => (
+                                        <div key={artist.id} className="w-full min-w-0 overflow-hidden rounded-[1rem] border border-foreground/10 bg-background/55 p-3">
+                                          <div className="flex min-w-0 items-start gap-3">
+                                            <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-foreground/10 bg-background/60">
+                                              {artist.imageUrl ? (
+                                                <Image src={artist.imageUrl} alt={artist.name} fill className="object-cover" unoptimized />
+                                              ) : (
+                                                <div className="flex h-full items-center justify-center">
+                                                  <Users className="h-5 w-5 text-muted-foreground" />
+                                                </div>
+                                              )}
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                              <div className="flex items-start justify-between gap-3">
+                                                <div className="min-w-0">
+                                                  <div className="truncate text-sm font-semibold text-foreground">
+                                                    #{index + 1} {artist.name}
+                                                  </div>
+                                                  <div className="truncate text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                                                    {artist.genres.join(" • ") || "Top artist"}
+                                                  </div>
+                                                </div>
+                                                {artist.url ? (
+                                                  <a
+                                                    href={artist.url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-background/60 text-muted-foreground transition-colors hover:text-foreground"
+                                                  >
+                                                    <ExternalLink className="h-3.5 w-3.5" />
+                                                  </a>
+                                                ) : null}
+                                              </div>
+                                              <div className="mt-2 flex min-w-0 flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                                                {typeof artist.followers === "number" ? (
+                                                  <span>{formatCompactNumber(artist.followers)} followers</span>
+                                                ) : null}
+                                                {typeof artist.popularity === "number" ? (
+                                                  <span>{artist.popularity}/100 popularity</span>
+                                                ) : null}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))
+                                    ) : (
+                                      <div className="rounded-[1rem] border border-dashed border-foreground/12 bg-background/50 p-5 text-sm leading-7 text-muted-foreground">
+                                        No top artists are available for this range right now.
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>,
+                    document.body
+                  )
+                : null}
             </div>
           )}
         </TabsContent>

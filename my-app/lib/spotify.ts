@@ -4,6 +4,21 @@ import type { NowSignal } from "@/lib/now"
 
 const SPOTIFY_ACCOUNT_BASE = "https://accounts.spotify.com"
 const SPOTIFY_API_BASE = "https://api.spotify.com/v1"
+const SPOTIFY_DEFAULT_TOP_LIMIT = 5
+const SPOTIFY_MAX_TOP_LIMIT = 50
+
+export type SpotifyTimeRange = "short_term" | "medium_term" | "long_term"
+
+export type SpotifyDashboardOptions = {
+  topTimeRange?: SpotifyTimeRange
+  topLimit?: number
+}
+
+const SPOTIFY_TIME_RANGE_LABELS: Record<SpotifyTimeRange, string> = {
+  short_term: "past 28 days",
+  medium_term: "past 6 months",
+  long_term: "all-time favorites",
+}
 
 export const SPOTIFY_SCOPES = [
   "user-read-currently-playing",
@@ -136,6 +151,7 @@ export type SpotifyProfileSummary = {
   displayName: string | null
   profileUrl: string | null
   imageUrl: string | null
+  followers: number | null
   product: string | null
   country: string | null
 }
@@ -170,6 +186,7 @@ export type SpotifyTopTrackSummary = {
   imageUrl: string | null
   url: string | null
   durationMs: number | null
+  popularity: number | null
 }
 
 export type SpotifyTopArtistSummary = {
@@ -178,6 +195,8 @@ export type SpotifyTopArtistSummary = {
   imageUrl: string | null
   url: string | null
   genres: string[]
+  followers: number | null
+  popularity: number | null
 }
 
 export type SpotifyPodcastSummary = {
@@ -196,7 +215,9 @@ export type SpotifyDashboardResponse = {
   message: string
   accountDataState: SpotifyAccountDataState | null
   accountDataMessage: string | null
+  topTimeRange: SpotifyTimeRange
   topWindowLabel: string
+  topLimit: number
   profile: SpotifyProfileSummary | null
   playback: SpotifyPlaybackSummary | null
   recentPodcast: SpotifyPodcastSummary | null
@@ -206,6 +227,8 @@ export type SpotifyDashboardResponse = {
 
 type SpotifyStaticCache = {
   fetchedAt: number
+  topTimeRange: SpotifyTimeRange
+  topLimit: number
   profile: SpotifyProfileSummary | null
   topTracks: SpotifyTopTrackSummary[]
   topArtists: SpotifyTopArtistSummary[]
@@ -234,11 +257,12 @@ const SPOTIFY_STATIC_FAILURE_TTL_MS = 1000 * 60 * 2
 const SPOTIFY_RECENT_TRACK_CACHE_TTL_MS = 1000 * 60
 const SPOTIFY_RECENT_EPISODE_CACHE_TTL_MS = 1000 * 60 * 60 * 24
 
-let spotifyStaticCache: SpotifyStaticCache | null = null
-let spotifyStaticFailureState: SpotifyStaticFailureState | null = null
 let spotifyAccessTokenCache: SpotifyAccessTokenCache | null = null
 let spotifyRecentTrackCache: { fetchedAt: number; playback: SpotifyPlaybackSummary | null } | null = null
 let spotifyRecentEpisodeCache: { fetchedAt: number; episode: SpotifyPodcastSummary | null } | null = null
+
+const spotifyStaticCaches = new Map<string, SpotifyStaticCache>()
+const spotifyStaticFailureStates = new Map<string, SpotifyStaticFailureState>()
 
 export type SpotifyNowPlayingResponse = {
   mode: "active" | "recent" | "idle" | "unconfigured" | "error"
@@ -367,6 +391,30 @@ function buildPodcastSummary(item?: SpotifyTrack | null, playedAt?: string | nul
 
 function isFresh(timestamp: number, ttlMs: number) {
   return Date.now() - timestamp < ttlMs
+}
+
+function normalizeSpotifyTopTimeRange(value?: SpotifyTimeRange | null): SpotifyTimeRange {
+  if (value === "medium_term" || value === "long_term") {
+    return value
+  }
+
+  return "short_term"
+}
+
+function normalizeSpotifyTopLimit(value?: number | null) {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return SPOTIFY_DEFAULT_TOP_LIMIT
+  }
+
+  return Math.min(SPOTIFY_MAX_TOP_LIMIT, Math.max(1, Math.floor(value)))
+}
+
+function getSpotifyTopWindowLabel(timeRange: SpotifyTimeRange) {
+  return SPOTIFY_TIME_RANGE_LABELS[timeRange]
+}
+
+function getSpotifyStaticCacheKey(topTimeRange: SpotifyTimeRange, topLimit: number) {
+  return `${topTimeRange}:${topLimit}`
 }
 
 class SpotifyRequestError extends Error {
@@ -687,15 +735,20 @@ async function fetchCurrentUserProfile(accessToken: string): Promise<SpotifyProf
     displayName: payload.display_name ?? payload.id ?? null,
     profileUrl: payload.external_urls?.spotify ?? null,
     imageUrl: payload.images?.[0]?.url ?? null,
+    followers: payload.followers?.total ?? null,
     product: payload.product ?? null,
     country: payload.country ?? null,
   }
 }
 
-async function fetchTopTracks(accessToken: string): Promise<SpotifyTopTrackSummary[]> {
+async function fetchTopTracks(
+  accessToken: string,
+  topTimeRange: SpotifyTimeRange,
+  topLimit: number
+): Promise<SpotifyTopTrackSummary[]> {
   const response = await fetchSpotifyResource("/me/top/tracks", accessToken, {
-    time_range: "short_term",
-    limit: "5",
+    time_range: topTimeRange,
+    limit: String(topLimit),
   })
 
   if (!response.ok) {
@@ -712,13 +765,18 @@ async function fetchTopTracks(accessToken: string): Promise<SpotifyTopTrackSumma
     imageUrl: getTrackImage(track),
     url: getTrackUrl(track),
     durationMs: track.duration_ms ?? null,
+    popularity: typeof track.popularity === "number" ? track.popularity : null,
   }))
 }
 
-async function fetchTopArtists(accessToken: string): Promise<SpotifyTopArtistSummary[]> {
+async function fetchTopArtists(
+  accessToken: string,
+  topTimeRange: SpotifyTimeRange,
+  topLimit: number
+): Promise<SpotifyTopArtistSummary[]> {
   const response = await fetchSpotifyResource("/me/top/artists", accessToken, {
-    time_range: "short_term",
-    limit: "5",
+    time_range: topTimeRange,
+    limit: String(topLimit),
   })
 
   if (!response.ok) {
@@ -733,12 +791,16 @@ async function fetchTopArtists(accessToken: string): Promise<SpotifyTopArtistSum
     imageUrl: artist.images?.[0]?.url ?? null,
     url: artist.external_urls?.spotify ?? null,
     genres: artist.genres?.slice(0, 2) ?? [],
+    followers: artist.followers?.total ?? null,
+    popularity: typeof artist.popularity === "number" ? artist.popularity : null,
   }))
 }
 
-function getStaticCacheFallback() {
-  return spotifyStaticCache ?? {
+function getStaticCacheFallback(cacheKey: string, topTimeRange: SpotifyTimeRange, topLimit: number) {
+  return spotifyStaticCaches.get(cacheKey) ?? {
     fetchedAt: Date.now(),
+    topTimeRange,
+    topLimit,
     profile: null,
     topTracks: [] as SpotifyTopTrackSummary[],
     topArtists: [] as SpotifyTopArtistSummary[],
@@ -776,8 +838,14 @@ function getStaticFailureState(errors: SpotifyRequestError[]) {
   }
 }
 
-async function fetchCachedSpotifyStaticData(accessToken: string): Promise<SpotifyStaticDataResult> {
-  const cached = spotifyStaticCache
+async function fetchCachedSpotifyStaticData(
+  accessToken: string,
+  options: Required<SpotifyDashboardOptions>
+): Promise<SpotifyStaticDataResult> {
+  const topTimeRange = normalizeSpotifyTopTimeRange(options.topTimeRange)
+  const topLimit = normalizeSpotifyTopLimit(options.topLimit)
+  const cacheKey = getSpotifyStaticCacheKey(topTimeRange, topLimit)
+  const cached = spotifyStaticCaches.get(cacheKey)
 
   if (cached && isFresh(cached.fetchedAt, SPOTIFY_STATIC_CACHE_TTL_MS)) {
     return {
@@ -787,18 +855,20 @@ async function fetchCachedSpotifyStaticData(accessToken: string): Promise<Spotif
     }
   }
 
-  if (spotifyStaticFailureState && Date.now() < spotifyStaticFailureState.retryAt) {
+  const failureState = spotifyStaticFailureStates.get(cacheKey)
+
+  if (failureState && Date.now() < failureState.retryAt) {
     return {
-      ...getStaticCacheFallback(),
-      accountDataState: spotifyStaticFailureState.accountDataState,
-      accountDataMessage: spotifyStaticFailureState.accountDataMessage,
+      ...getStaticCacheFallback(cacheKey, topTimeRange, topLimit),
+      accountDataState: failureState.accountDataState,
+      accountDataMessage: failureState.accountDataMessage,
     }
   }
 
   const [profileResult, topTracksResult, topArtistsResult] = await Promise.allSettled([
     fetchCurrentUserProfile(accessToken),
-    fetchTopTracks(accessToken),
-    fetchTopArtists(accessToken),
+    fetchTopTracks(accessToken, topTimeRange, topLimit),
+    fetchTopArtists(accessToken, topTimeRange, topLimit),
   ])
 
   const rejectedResults = [profileResult, topTracksResult, topArtistsResult]
@@ -815,42 +885,51 @@ async function fetchCachedSpotifyStaticData(accessToken: string): Promise<Spotif
     topArtistsResult.status === "fulfilled"
 
   if (hasFreshStaticValue) {
-    spotifyStaticCache = {
+    const previousCache = spotifyStaticCaches.get(cacheKey)
+
+    spotifyStaticCaches.set(cacheKey, {
       fetchedAt: Date.now(),
-      profile: profileResult.status === "fulfilled" ? profileResult.value : spotifyStaticCache?.profile ?? null,
-      topTracks: topTracksResult.status === "fulfilled" ? topTracksResult.value : spotifyStaticCache?.topTracks ?? [],
-      topArtists: topArtistsResult.status === "fulfilled" ? topArtistsResult.value : spotifyStaticCache?.topArtists ?? [],
-    }
+      topTimeRange,
+      topLimit,
+      profile: profileResult.status === "fulfilled" ? profileResult.value : previousCache?.profile ?? null,
+      topTracks: topTracksResult.status === "fulfilled" ? topTracksResult.value : previousCache?.topTracks ?? [],
+      topArtists: topArtistsResult.status === "fulfilled" ? topArtistsResult.value : previousCache?.topArtists ?? [],
+    })
   }
 
   if (!rejectedResults.length) {
-    spotifyStaticFailureState = null
+    spotifyStaticFailureStates.delete(cacheKey)
 
     return {
-      ...getStaticCacheFallback(),
+      ...getStaticCacheFallback(cacheKey, topTimeRange, topLimit),
       accountDataState: "ready",
       accountDataMessage: null,
     }
   }
 
-  const failureState = getStaticFailureState(rejectedResults)
-  const fallback = getStaticCacheFallback()
+  const nextFailureState = getStaticFailureState(rejectedResults)
+  const fallback = getStaticCacheFallback(cacheKey, topTimeRange, topLimit)
 
-  spotifyStaticFailureState = {
-    retryAt: failureState.retryAt,
+  spotifyStaticFailureStates.set(cacheKey, {
+    retryAt: nextFailureState.retryAt,
     accountDataState:
-      fallback.profile || fallback.topTracks.length || fallback.topArtists.length ? "stale" : failureState.accountDataState,
-    accountDataMessage: failureState.accountDataMessage,
-  }
+      fallback.profile || fallback.topTracks.length || fallback.topArtists.length ? "stale" : nextFailureState.accountDataState,
+    accountDataMessage: nextFailureState.accountDataMessage,
+  })
+
+  const fallbackFailureState = spotifyStaticFailureStates.get(cacheKey)
 
   return {
     ...fallback,
-    accountDataState: spotifyStaticFailureState.accountDataState,
-    accountDataMessage: spotifyStaticFailureState.accountDataMessage,
+    accountDataState: fallbackFailureState?.accountDataState ?? "partial",
+    accountDataMessage: fallbackFailureState?.accountDataMessage ?? "Some Spotify profile and top-listening data is temporarily unavailable.",
   }
 }
 
-export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse> {
+export async function fetchSpotifyDashboard(options: SpotifyDashboardOptions = {}): Promise<SpotifyDashboardResponse> {
+  const topTimeRange = normalizeSpotifyTopTimeRange(options.topTimeRange)
+  const topLimit = normalizeSpotifyTopLimit(options.topLimit)
+  const topWindowLabel = getSpotifyTopWindowLabel(topTimeRange)
   const { clientId, clientSecret, refreshToken } = getSpotifyBaseConfig()
 
   if (!clientId || !clientSecret) {
@@ -860,7 +939,9 @@ export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse>
       message: "Add SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET to start Spotify setup.",
       accountDataState: null,
       accountDataMessage: null,
-      topWindowLabel: "past 28 days",
+      topTimeRange,
+      topWindowLabel,
+      topLimit,
       profile: null,
       playback: null,
       recentPodcast: null,
@@ -876,7 +957,9 @@ export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse>
       message: "Visit /api/spotify/login once to connect your Spotify account and generate SPOTIFY_REFRESH_TOKEN.",
       accountDataState: null,
       accountDataMessage: null,
-      topWindowLabel: "past 28 days",
+      topTimeRange,
+      topWindowLabel,
+      topLimit,
       profile: null,
       playback: null,
       recentPodcast: null,
@@ -894,7 +977,10 @@ export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse>
 
     const [playbackResult, staticResult] = await Promise.allSettled([
       fetchCurrentPlayback(tokenPayload.access_token),
-      fetchCachedSpotifyStaticData(tokenPayload.access_token),
+      fetchCachedSpotifyStaticData(tokenPayload.access_token, {
+        topTimeRange,
+        topLimit,
+      }),
     ])
 
     const livePlayback = playbackResult.status === "fulfilled" ? playbackResult.value : null
@@ -907,10 +993,10 @@ export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse>
       staticResult.status === "fulfilled"
         ? staticResult.value
         : {
-            ...getStaticCacheFallback(),
-            accountDataState: spotifyStaticFailureState?.accountDataState ?? "partial",
+            ...getStaticCacheFallback(getSpotifyStaticCacheKey(topTimeRange, topLimit), topTimeRange, topLimit),
+            accountDataState: spotifyStaticFailureStates.get(getSpotifyStaticCacheKey(topTimeRange, topLimit))?.accountDataState ?? "partial",
             accountDataMessage:
-              spotifyStaticFailureState?.accountDataMessage ??
+              spotifyStaticFailureStates.get(getSpotifyStaticCacheKey(topTimeRange, topLimit))?.accountDataMessage ??
               "Some Spotify profile and top-listening data is temporarily unavailable.",
           }
     const profile = staticData.profile
@@ -950,7 +1036,9 @@ export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse>
       message,
       accountDataState,
       accountDataMessage,
-      topWindowLabel: "past 28 days",
+      topTimeRange,
+      topWindowLabel,
+      topLimit,
       profile,
       playback,
       recentPodcast,
@@ -964,7 +1052,9 @@ export async function fetchSpotifyDashboard(): Promise<SpotifyDashboardResponse>
       message: "Spotify is temporarily unavailable.",
       accountDataState: null,
       accountDataMessage: null,
-      topWindowLabel: "past 28 days",
+      topTimeRange,
+      topWindowLabel,
+      topLimit,
       profile: null,
       playback: null,
       recentPodcast: null,

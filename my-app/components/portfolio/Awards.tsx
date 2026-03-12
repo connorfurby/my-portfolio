@@ -468,14 +468,10 @@ export default function Awards() {
                           boxShadow: `0 0 16px ${nodeMeta[tech.tier].glow}`,
                         }}
                         initial={reduceMotion ? false : { opacity: 0, scale: 0.5 }}
-                        animate={
-                          !shouldAnimate
-                            ? undefined
-                            : {
-                                opacity: spotlightTech?.name === tech.name ? 1 : 0.88,
-                                scale: spotlightTech?.name === tech.name ? 1.28 : 1,
-                              }
-                        }
+                        animate={{
+                          opacity: spotlightTech?.name === tech.name ? 1 : 0.88,
+                          scale: spotlightTech?.name === tech.name ? 1.28 : 1,
+                        }}
                         transition={{ duration: 0.28, delay: tech.delay }}
                       />
 
@@ -501,15 +497,11 @@ export default function Awards() {
                               : "linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.54), hsl(var(--glass-surface) / 0.22))",
                         }}
                         initial={reduceMotion ? false : { opacity: 0, scale: 0.7 }}
-                        animate={
-                          !shouldAnimate
-                            ? undefined
-                            : {
-                                opacity: 1,
-                                scale: spotlightTech?.name === tech.name ? 1.05 : 1,
-                                y: [0, -4, 0],
-                              }
-                        }
+                        animate={{
+                          opacity: 1,
+                          scale: spotlightTech?.name === tech.name ? 1.05 : 1,
+                          y: shouldAnimate ? [0, -4, 0] : 0,
+                        }}
                         whileHover={reduceMotion ? undefined : { scale: spotlightTech?.name === tech.name ? 1.05 : 1.02, y: -2 }}
                         transition={{
                           opacity: { duration: 0.28, delay: tech.delay },
