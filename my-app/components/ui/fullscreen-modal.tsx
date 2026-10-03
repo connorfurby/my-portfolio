@@ -137,17 +137,6 @@ export function FullscreenModal({ isOpen, onClose, images, initialIndex }: Fulls
                   transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                   className="relative h-full overflow-hidden rounded-[1.7rem] border border-border/55 bg-background/42 backdrop-blur-xl dark:bg-background/18"
                 >
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      backgroundImage: `url(${activeImage?.src})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      filter: "blur(36px)",
-                      opacity: activeImage?.isVideo ? 0.08 : 0.22,
-                      transform: "scale(1.08)",
-                    }}
-                  />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,22,0.06),rgba(6,10,22,0.24))]" />
 
                   <div className="absolute inset-5 flex items-center justify-center rounded-[1.5rem] border border-border/55 bg-background/60 dark:bg-background/10">

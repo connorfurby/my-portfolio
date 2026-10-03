@@ -82,9 +82,10 @@ type BuiltPathGeometry = {
 
 const PANELS_PER_ENTRY = 0.9
 const PARTICLE_SOURCE_SIZE = 240
-const OUTLINE_SOURCE_SIZE = 720
-const MAX_PARTICLES_STANDARD = 1200
-const MAX_PARTICLES_DEPTH = 2200
+const OUTLINE_SOURCE_SIZE = 280
+const MAX_PARTICLES_STANDARD = 560
+const MAX_PARTICLES_DEPTH = 980
+const MAX_CANVAS_DPR = 1.5
 const MOBILE_PARTICLE_DENSITY_RATIO = 0.42
 const TABLET_PARTICLE_DENSITY_RATIO = 0.7
 const CONTENT_TRANSITION = {
@@ -858,9 +859,8 @@ function drawLaserCometHead(
   trailGradient.addColorStop(1, rgba(coreColor, isActive ? 0.96 : 0.7))
 
   context.strokeStyle = trailGradient
-  context.lineWidth = 1.6 + reveal * 1.8
-  context.shadowBlur = 22 + reveal * 18
-  context.shadowColor = rgba(glowColor, 0.92)
+  context.lineWidth = 2.4 + reveal * 2.2
+  context.shadowBlur = 0
   context.beginPath()
   context.moveTo(trailStart.x, trailStart.y)
   context.lineTo(endPoint.x, endPoint.y)
@@ -877,8 +877,8 @@ function drawLaserCometHead(
   sparkleGradient.addColorStop(1, rgba(coreColor, 0))
 
   context.strokeStyle = sparkleGradient
-  context.lineWidth = 1 + reveal * 0.8
-  context.shadowBlur = 14 + reveal * 10
+  context.lineWidth = 1.2 + reveal * 0.9
+  context.shadowBlur = 0
   context.beginPath()
   context.moveTo(endPoint.x - perpendicularX * sparkleSpan, endPoint.y - perpendicularY * sparkleSpan)
   context.lineTo(endPoint.x + perpendicularX * sparkleSpan, endPoint.y + perpendicularY * sparkleSpan)
@@ -924,24 +924,19 @@ function drawLogoLaser(
 
     context.setLineDash([echoSegmentLength, Math.max(outlineLoop.totalLength, 1)])
     context.lineDashOffset = -(travelLength - segmentLength * 0.22)
-    context.shadowBlur = 18 + reveal * 18
-    context.shadowColor = rgba(glowColor, 0.62)
-    context.strokeStyle = rgba(glowColor, isActive ? 0.11 + reveal * 0.12 : 0.075 + reveal * 0.05)
-    context.lineWidth = 2.9 + reveal * 2.35
+    context.shadowBlur = 0
+    context.strokeStyle = rgba(glowColor, isActive ? 0.16 + reveal * 0.14 : 0.1 + reveal * 0.06)
+    context.lineWidth = 4.2 + reveal * 2.4
     context.stroke(outlineLoop.path)
 
     context.setLineDash([segmentLength, Math.max(outlineLoop.totalLength, 1)])
     context.lineDashOffset = -travelLength
-    context.shadowBlur = 22 + reveal * 24
-    context.shadowColor = rgba(glowColor, 0.9)
-    context.strokeStyle = rgba(glowColor, isActive ? 0.26 + reveal * 0.3 : 0.17 + reveal * 0.08)
-    context.lineWidth = 1.9 + reveal * 2.25
+    context.strokeStyle = rgba(glowColor, isActive ? 0.34 + reveal * 0.28 : 0.22 + reveal * 0.1)
+    context.lineWidth = 2.2 + reveal * 1.8
     context.stroke(outlineLoop.path)
 
-    context.shadowBlur = 9 + reveal * 12
-    context.shadowColor = rgba(coreColor, 0.74)
-    context.strokeStyle = rgba(coreColor, isActive ? 0.8 + reveal * 0.16 : 0.56)
-    context.lineWidth = 0.98 + reveal * 1.16
+    context.strokeStyle = rgba(coreColor, isActive ? 0.88 : 0.62)
+    context.lineWidth = 1.05 + reveal * 1.05
     context.stroke(outlineLoop.path)
     context.restore()
 
@@ -1227,7 +1222,7 @@ function LogoParticleField({
 
     const resizeCanvas = () => {
       const rect = container.getBoundingClientRect()
-      const devicePixelRatio = window.devicePixelRatio || 1
+      const devicePixelRatio = Math.min(window.devicePixelRatio || 1, MAX_CANVAS_DPR)
 
       sizeRef.current = {
         width: rect.width,
@@ -1374,11 +1369,9 @@ function LogoParticleField({
         const shardWidth = radius * particle.stretch
         const shardHeight = Math.max(0.52, radius * 0.86)
         const rotation = particle.rotation + (shouldAnimate ? Math.sin(time * 0.75 + particle.seed) * 0.12 : 0)
-        const glowRadius = Math.max(1.2, shardWidth * 1.45)
         const drawAlpha = Math.min(1, particle.alpha * 1.1)
         const highlightAlpha = Math.min(0.56, particle.alpha * 0.46)
 
-        drawAmbientGlow(context, particle.x, particle.y, glowRadius, foregroundGlassColor, drawAlpha * 0.12)
         context.save()
         context.translate(particle.x, particle.y)
         context.rotate(rotation)
@@ -1396,7 +1389,9 @@ function LogoParticleField({
     }
 
     const render = (timestamp: number) => {
-      renderFrame(timestamp)
+      if (!document.hidden) {
+        renderFrame(timestamp)
+      }
 
       if (shouldAnimate) {
         frameRef.current = window.requestAnimationFrame(render)
@@ -1445,7 +1440,7 @@ function LogoParticleField({
         mouseRef.current.active = false
         mouseRef.current.pressed = false
       }}
-      className="group relative flex h-full min-h-[22rem] items-center justify-center overflow-hidden lg:min-h-[28rem]"
+      className="particle-stage group relative flex h-full min-h-[22rem] items-center justify-center overflow-hidden lg:min-h-[28rem]"
     >
       <div
         className="absolute inset-0 opacity-100"
@@ -1522,7 +1517,7 @@ function ExperienceEntryCard({
             {entry.bullets.map((bullet) => (
               <motion.div
                 key={bullet}
-                className="rounded-[1.1rem] border border-border/55 bg-background/62 px-3.5 py-3 text-sm leading-6 text-muted-foreground backdrop-blur-xl dark:border-white/10 dark:bg-background/18"
+                className="rounded-[1.1rem] border border-border/55 bg-background/82 px-3.5 py-3 text-sm leading-6 text-muted-foreground dark:border-white/10 dark:bg-background/55"
                 initial={{ opacity: 0, x: 14 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
@@ -1542,7 +1537,7 @@ export default function ExperienceShowcase({ items }: ExperienceShowcaseProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const [activeTab, setActiveTab] = useState(items[0]?.value ?? "")
   const [activeEntryIndex, setActiveEntryIndex] = useState(0)
-  const [progress, setProgress] = useState(0)
+  const progressRef = useRef<HTMLDivElement | null>(null)
   const reduceMotion = useReducedMotion()
   const isMobile = useMediaQuery("(max-width: 767px)")
 
@@ -1617,7 +1612,9 @@ export default function ExperienceShowcase({ items }: ExperienceShowcaseProps) {
     const rawProgress = getSectionScrollProgress(section)
     const globalStep = Math.min(totalSteps - 1, Math.floor(rawProgress * totalSteps))
 
-    setProgress(rawProgress)
+    if (progressRef.current) {
+      progressRef.current.style.transform = `scaleX(${Math.max(rawProgress, 0.04)})`
+    }
 
     let cumulative = 0
 
@@ -1785,10 +1782,10 @@ export default function ExperienceShowcase({ items }: ExperienceShowcaseProps) {
         <Tabs value={activeTab} onValueChange={scrollToTab} className="portfolio-container w-full">
           <div className="mb-3">
             <div className="progress-rail mx-auto mb-2.5 h-0.5 w-full max-w-5xl overflow-hidden rounded-full bg-muted/80">
-              <motion.div
-                className="progress-fill h-full rounded-full"
-                animate={{ width: `${Math.max(progress * 100, 4)}%` }}
-                transition={CONTENT_TRANSITION}
+              <div
+                ref={progressRef}
+                className="progress-fill h-full w-full origin-left rounded-full"
+                style={{ transform: "scaleX(0.04)" }}
               />
             </div>
 

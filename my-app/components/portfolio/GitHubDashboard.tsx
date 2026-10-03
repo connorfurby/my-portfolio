@@ -616,7 +616,7 @@ export default function GitHubDashboard() {
             >
               <Card className="surface-card relative overflow-hidden rounded-[2rem] border-border bg-card">
                 <motion.div
-                  className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.22),transparent_70%)] blur-3xl"
+                  className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.22),transparent_70%)]"
                   animate={isIntegrationsVisible ? { x: [0, 16, 0], y: [0, -10, 0] } : undefined}
                   transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
                 />
@@ -881,7 +881,7 @@ export default function GitHubDashboard() {
             <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(24rem,0.95fr)]">
               <Card className="surface-card relative flex h-full items-center overflow-hidden rounded-[1.3rem] border-border bg-card">
                 <motion.div
-                  className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.22),transparent_70%)] blur-3xl"
+                  className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.22),transparent_70%)]"
                   animate={isIntegrationsVisible ? { x: [0, 16, 0], y: [0, -10, 0] } : undefined}
                   transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
                 />

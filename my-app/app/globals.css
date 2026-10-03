@@ -366,77 +366,32 @@ body {
       radial-gradient(circle at 82% 10%, hsl(var(--spotlight-secondary) / 0.08), transparent 26%),
       radial-gradient(circle at 50% 100%, hsl(var(--primary) / 0.05), transparent 34%),
       linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background) / 0.98) 52%, hsl(var(--muted) / 0.42) 100%);
-    background-attachment: fixed;
+    background-attachment: scroll;
     overflow-x: hidden;
   }
 }
 
-/* Shared liquid-glass scrollbar styling for all scrollable surfaces. */
-html,
-body,
-* {
+html {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--scrollbar-thumb) / 0.92) hsl(var(--scrollbar-track) / 0.42);
+  scrollbar-color: hsl(var(--scrollbar-thumb) / 0.9) transparent;
 }
 
-*::-webkit-scrollbar {
-  width: 0.9rem;
-  height: 0.9rem;
+html::-webkit-scrollbar {
+  width: 0.7rem;
+  height: 0.7rem;
 }
 
-*::-webkit-scrollbar-track {
-  border-radius: 9999px;
-  border: 1px solid hsl(var(--scrollbar-track-border) / 0.36);
-  background:
-    linear-gradient(180deg, hsl(var(--scrollbar-track) / 0.68), hsl(var(--scrollbar-track) / 0.28)),
-    linear-gradient(135deg, hsl(var(--glass-inner) / 0.08), transparent 58%);
-  box-shadow:
-    inset 0 1px 0 hsl(var(--glass-inner) / 0.22),
-    inset 0 0 0 1px hsl(var(--foreground) / 0.03),
-    0 10px 24px hsl(var(--glass-shadow) / 0.08);
+html::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-*::-webkit-scrollbar-thumb {
-  min-height: 3rem;
+html::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
   border-radius: 9999px;
-  background:
-    linear-gradient(180deg, hsl(var(--glass-inner) / 0.24), hsl(var(--glass-inner) / 0.05)) padding-box,
-    linear-gradient(180deg, hsl(var(--scrollbar-thumb) / 0.96), hsl(var(--scrollbar-thumb-secondary) / 0.84)) border-box;
-  box-shadow:
-    inset 0 1px 0 hsl(var(--glass-inner) / 0.42),
-    0 0 0 1px hsl(var(--glass-stroke) / 0.28),
-    0 12px 28px hsl(var(--glass-shadow) / 0.18),
-    0 0 18px hsl(var(--scrollbar-thumb) / 0.18);
-  transition:
-    background 180ms ease,
-    box-shadow 180ms ease,
-    filter 180ms ease;
+  background: hsl(var(--scrollbar-thumb) / 0.72) padding-box;
 }
 
-*::-webkit-scrollbar-thumb:hover {
-  background:
-    linear-gradient(180deg, hsl(var(--glass-inner) / 0.3), hsl(var(--glass-inner) / 0.08)) padding-box,
-    linear-gradient(180deg, hsl(var(--scrollbar-thumb) / 1), hsl(var(--scrollbar-thumb-secondary) / 0.94)) border-box;
-  box-shadow:
-    inset 0 1px 0 hsl(var(--glass-inner) / 0.5),
-    0 0 0 1px hsl(var(--glass-stroke) / 0.34),
-    0 16px 30px hsl(var(--glass-shadow) / 0.22),
-    0 0 24px hsl(var(--scrollbar-thumb) / 0.24);
-}
-
-*::-webkit-scrollbar-thumb:active {
-  background:
-    linear-gradient(180deg, hsl(var(--glass-inner) / 0.2), hsl(var(--glass-inner) / 0.02)) padding-box,
-    linear-gradient(180deg, hsl(var(--scrollbar-thumb-secondary) / 0.96), hsl(var(--scrollbar-thumb) / 0.88)) border-box;
-  box-shadow:
-    inset 0 1px 0 hsl(var(--glass-inner) / 0.32),
-    0 0 0 1px hsl(var(--glass-stroke) / 0.3),
-    0 10px 20px hsl(var(--glass-shadow) / 0.18),
-    0 0 16px hsl(var(--scrollbar-thumb-secondary) / 0.18);
-}
-
-*::-webkit-scrollbar-corner {
+html::-webkit-scrollbar-corner {
   background: transparent;
 }
 
@@ -446,14 +401,12 @@ body,
   overflow: hidden;
   border: 1px solid hsl(var(--glass-stroke) / 0.48);
   background:
-    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.84), hsl(var(--glass-surface) / 0.64)),
+    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.96), hsl(var(--glass-surface) / 0.92)),
     linear-gradient(135deg, hsl(var(--glass-inner) / 0.12), transparent 44%);
   box-shadow:
     0 1px 0 hsl(var(--glass-inner) / 0.56),
     0 18px 42px hsl(var(--glass-shadow) / 0.09),
     inset 0 1px 0 hsl(var(--glass-inner) / 0.7);
-  backdrop-filter: blur(var(--glass-frost)) saturate(132%);
-  -webkit-backdrop-filter: blur(var(--glass-frost)) saturate(132%);
 }
 
 .liquid-panel::before,
@@ -492,14 +445,12 @@ body,
 .liquid-chip {
   border: 1px solid hsl(var(--glass-stroke) / 0.42);
   background:
-    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.86), hsl(var(--glass-surface) / 0.66)),
+    linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.96), hsl(var(--glass-surface) / 0.9)),
     linear-gradient(135deg, hsl(var(--glass-inner) / 0.12), transparent 50%);
   box-shadow:
     0 1px 0 hsl(var(--glass-inner) / 0.54),
     0 10px 24px hsl(var(--glass-shadow) / 0.08),
     inset 0 1px 0 hsl(var(--glass-inner) / 0.7);
-  backdrop-filter: blur(16px) saturate(122%);
-  -webkit-backdrop-filter: blur(16px) saturate(122%);
 }
 
 .liquid-divider {
@@ -516,8 +467,7 @@ body,
   inset: auto 10% -40% 10%;
   height: 40%;
   border-radius: 9999px;
-  background: radial-gradient(circle, hsl(var(--spotlight) / 0.08), transparent 72%);
-  filter: blur(18px);
+  background: radial-gradient(circle, hsl(var(--spotlight) / 0.14), transparent 72%);
   pointer-events: none;
   z-index: 0;
 }
@@ -562,25 +512,15 @@ body,
   position: absolute;
   inset: -8%;
   background:
-    radial-gradient(circle at 18% 20%, hsl(var(--spotlight) / 0.12), transparent 28%),
-    radial-gradient(circle at 82% 18%, hsl(var(--spotlight-secondary) / 0.12), transparent 24%),
-    radial-gradient(circle at 52% 82%, hsl(var(--primary) / 0.08), transparent 28%);
-  filter: blur(54px);
+    radial-gradient(circle at 18% 20%, hsl(var(--spotlight) / 0.16), transparent 32%),
+    radial-gradient(circle at 82% 18%, hsl(var(--spotlight-secondary) / 0.14), transparent 28%),
+    radial-gradient(circle at 52% 82%, hsl(var(--primary) / 0.1), transparent 32%);
   opacity: 0.9;
-  animation: ambient-stage-drift 26s ease-in-out infinite;
+  animation: ambient-stage-drift 32s ease-in-out infinite;
 }
 
 .ambient-stage::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(to right, hsl(var(--foreground) / 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, hsl(var(--foreground) / 0.03) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: radial-gradient(circle at center, black 42%, transparent 92%);
-  opacity: 0.4;
-  animation: ambient-grid-pulse 14s ease-in-out infinite;
+  content: none;
 }
 
 .ambient-dot {
@@ -601,10 +541,9 @@ body,
   align-items: center;
   gap: 0.55rem;
   border: 1px solid hsl(var(--foreground) / 0.08);
-  background: hsl(var(--background) / 0.5);
+  background: hsl(var(--background) / 0.72);
   padding: 0.38rem 0.62rem;
   border-radius: 9999px;
-  backdrop-filter: blur(10px);
   box-shadow: 0 8px 20px hsl(var(--foreground) / 0.05);
 }
 
@@ -655,8 +594,7 @@ body,
 .ambient-orb {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(65px);
-  opacity: 0.16;
+  opacity: 0.55;
 }
 
 .ambient-float-slow {
@@ -676,7 +614,7 @@ body,
   left: -6%;
   height: 24rem;
   width: 24rem;
-  background: radial-gradient(circle, hsl(var(--spotlight) / 0.55) 0%, transparent 70%);
+  background: radial-gradient(circle, hsl(var(--spotlight) / 0.28) 0%, transparent 70%);
 }
 
 .ambient-orb-two {
@@ -684,7 +622,7 @@ body,
   right: -8%;
   height: 22rem;
   width: 22rem;
-  background: radial-gradient(circle, hsl(var(--spotlight-secondary) / 0.5) 0%, transparent 68%);
+  background: radial-gradient(circle, hsl(var(--spotlight-secondary) / 0.24) 0%, transparent 68%);
 }
 
 .ambient-orb-three {
@@ -692,7 +630,7 @@ body,
   left: 32%;
   height: 26rem;
   width: 26rem;
-  background: radial-gradient(circle, hsl(var(--primary) / 0.32) 0%, transparent 70%);
+  background: radial-gradient(circle, hsl(var(--primary) / 0.18) 0%, transparent 70%);
 }
 
 .ambient-noise {
@@ -712,41 +650,26 @@ body,
   inset: 0;
   z-index: -2;
   background:
-    linear-gradient(to right, hsl(var(--foreground) / 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, hsl(var(--foreground) / 0.04) 1px, transparent 1px),
-    radial-gradient(circle at 20% 15%, hsl(var(--spotlight) / 0.04), transparent 24%),
-    radial-gradient(circle at 80% 10%, hsl(var(--spotlight-secondary) / 0.03), transparent 22%);
-  background-size: 56px 56px, 56px 56px, auto, auto;
-  mask-image: radial-gradient(circle at center, black 52%, transparent 94%);
+    linear-gradient(to right, hsl(var(--foreground) / 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(var(--foreground) / 0.035) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at center, black 46%, transparent 88%);
   pointer-events: none;
-  opacity: 0.58;
+  opacity: 0.35;
 }
 
 .portfolio-shell::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.08;
-  background-image:
-    radial-gradient(circle at 14% 10%, hsl(var(--spotlight) / 0.18), transparent 24%),
-    radial-gradient(circle at 84% 4%, hsl(var(--spotlight-secondary) / 0.14), transparent 20%),
-    radial-gradient(circle at 50% 105%, hsl(var(--primary) / 0.08), transparent 30%);
-  filter: blur(44px);
-  pointer-events: none;
+  content: none;
 }
 
 .interactive-tilt {
-  transform-style: preserve-3d;
   transition:
     transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 320ms ease,
     border-color 320ms ease;
-  will-change: transform;
 }
 
 .interactive-tilt:hover {
-  transform: translateY(-4px) rotateX(4deg) rotateY(-4deg);
+  transform: translateY(-6px);
 }
 
 .interactive-spot {
@@ -778,8 +701,8 @@ body,
     0 18px 42px hsl(var(--glass-shadow) / 0.14),
     inset 0 1px 0 hsl(var(--glass-inner) / 0.72),
     inset 0 -1px 0 hsl(var(--glass-inner) / 0.16);
-  backdrop-filter: blur(28px) saturate(138%);
-  -webkit-backdrop-filter: blur(28px) saturate(138%);
+  backdrop-filter: blur(12px) saturate(1.25);
+  -webkit-backdrop-filter: blur(12px) saturate(1.25);
 }
 
 .header-warp {
@@ -789,8 +712,7 @@ body,
 .header-warp-orb {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(28px);
-  opacity: 0.3;
+  opacity: 0.45;
 }
 
 .header-warp-orb-one {
@@ -896,13 +818,8 @@ body,
 }
 
 .progress-rail {
-  box-shadow:
-    inset 0 1px 0 hsl(var(--glass-inner) / 0.18),
-    inset 0 0 0 1px hsl(var(--glass-stroke) / 0.3);
-  background:
-    linear-gradient(180deg, hsl(var(--glass-surface) / 0.32), hsl(var(--glass-surface) / 0.14));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: inset 0 0 0 1px hsl(var(--glass-stroke) / 0.3);
+  background: hsl(var(--glass-surface) / 0.4);
 }
 
 .progress-fill {
@@ -962,15 +879,24 @@ body,
   .header-warp-orb-two,
   .text-gradient,
   .ambient-stage::before,
-  .ambient-stage::after {
+  .chip-float,
+  .hero-sheen,
+  .hero-float-orb,
+  .page-progress-bar,
+  .pointer-aura {
     animation: none !important;
+  }
+
+  .pointer-aura {
+    display: none;
   }
 }
 
 @media (max-width: 1023px) {
   .hero-ring-one,
   .hero-ring-two,
-  .hero-grid {
+  .hero-grid,
+  .pointer-aura {
     display: none;
   }
 
@@ -978,7 +904,7 @@ body,
     background-attachment: scroll;
   }
 
-  .ambient-stage::after,
+  .ambient-stage::before,
   .portfolio-shell::before {
     opacity: 0.22;
   }
@@ -1154,5 +1080,119 @@ body,
   }
   100% {
     opacity: 0.24;
+  }
+}
+
+.backdrop-blur-sm,
+.backdrop-blur,
+.backdrop-blur-md,
+.backdrop-blur-lg,
+.backdrop-blur-xl,
+.backdrop-blur-2xl,
+.backdrop-blur-3xl {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
+
+.particle-stage {
+  contain: paint;
+}
+
+.page-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 70;
+  height: 2px;
+  pointer-events: none;
+}
+
+.page-progress-bar {
+  height: 100%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, hsl(var(--spotlight)), hsl(var(--spotlight-secondary)));
+}
+
+.pointer-aura {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  width: 22rem;
+  height: 22rem;
+  margin-top: -11rem;
+  margin-left: -11rem;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(circle, hsl(var(--spotlight) / 0.16), transparent 64%);
+  opacity: 0.85;
+  transform: translate3d(-100vw, -100vh, 0);
+}
+
+.chip-float {
+  animation: chip-float 5.5s ease-in-out infinite;
+}
+
+.hero-float-orb {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.hero-float-orb-a {
+  top: 2.5rem;
+  right: -1.5rem;
+  width: 8rem;
+  height: 8rem;
+  background: radial-gradient(circle, hsl(var(--spotlight) / 0.28), transparent 68%);
+  animation: ambient-float-slow 8s ease-in-out infinite;
+}
+
+.hero-float-orb-b {
+  bottom: 2.5rem;
+  left: -1.75rem;
+  width: 9rem;
+  height: 9rem;
+  background: radial-gradient(circle, hsl(var(--spotlight-secondary) / 0.22), transparent 68%);
+  animation: ambient-float-medium 9s ease-in-out infinite;
+}
+
+.hero-sheen {
+  position: absolute;
+  inset-inline: 8%;
+  top: 0;
+  height: 1px;
+  z-index: 2;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.75), transparent);
+  animation: sheen-slide 7s ease-in-out infinite;
+}
+
+@keyframes chip-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -3px, 0);
+  }
+}
+
+@keyframes sheen-slide {
+  0%,
+  100% {
+    transform: translate3d(-6%, 0, 0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate3d(6%, 0, 0);
+    opacity: 0.9;
   }
 }

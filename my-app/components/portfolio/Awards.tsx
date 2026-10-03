@@ -291,7 +291,7 @@ export default function Awards() {
 
               {shouldAnimate ? (
                 <motion.div
-                  className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[52%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 blur-3xl sm:w-[72%] sm:opacity-70"
+                  className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[52%] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-60 sm:w-[72%] sm:opacity-70"
                   style={{
                     background: `conic-gradient(from 90deg, transparent 0deg, hsl(${activeCluster.accent} / 0.22) 58deg, transparent 128deg, hsl(${activeCluster.accentSecondary} / 0.16) 196deg, transparent 320deg)`,
                   }}

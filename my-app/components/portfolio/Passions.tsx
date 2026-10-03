@@ -91,7 +91,7 @@ export default function Passions() {
   return (
     <div ref={sectionRef} className="relative z-30">
       <motion.div
-        className="pointer-events-none absolute inset-x-0 top-6 h-28 bg-[radial-gradient(circle_at_center,hsl(var(--spotlight)/0.18),transparent_68%)] blur-3xl"
+        className="pointer-events-none absolute inset-x-0 top-6 h-28 bg-[radial-gradient(circle_at_center,hsl(var(--spotlight)/0.18),transparent_68%)]"
         animate={shouldAnimate ? { opacity: [0.36, 0.76, 0.36], scale: [0.96, 1.04, 0.96] } : undefined}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -109,12 +109,12 @@ export default function Passions() {
             }}
           />
           <motion.div
-            className="absolute -left-8 top-8 h-40 w-40 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.28),transparent_72%)] blur-3xl"
+            className="absolute -left-8 top-8 h-40 w-40 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.28),transparent_72%)]"
             animate={shouldAnimate ? { x: [0, 26, 0], y: [0, 18, 0], scale: [1, 1.08, 1] } : undefined}
             transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
-            className="absolute -right-8 bottom-6 h-44 w-44 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.24),transparent_70%)] blur-3xl"
+            className="absolute -right-8 bottom-6 h-44 w-44 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.24),transparent_70%)]"
             animate={shouldAnimate ? { x: [0, -22, 0], y: [0, -14, 0], scale: [1, 1.06, 1] } : undefined}
             transition={{ duration: 19, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
           />
@@ -167,7 +167,7 @@ export default function Passions() {
                 transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
               />
               <motion.div
-                className="absolute left-1/2 top-1/2 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0deg,hsl(var(--spotlight)/0.14)_55deg,transparent_120deg,hsl(var(--spotlight-secondary)/0.1)_180deg,transparent_245deg)] blur-3xl"
+                className="absolute left-1/2 top-1/2 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0deg,hsl(var(--spotlight)/0.14)_55deg,transparent_120deg,hsl(var(--spotlight-secondary)/0.1)_180deg,transparent_245deg)]"
                 animate={shouldAnimate ? { rotate: 360 } : undefined}
                 transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
               />
@@ -331,7 +331,7 @@ export default function Passions() {
               return (
                 <motion.div
                   key={node.title}
-                  className="absolute z-30 -translate-x-1/2 -translate-y-1/2 will-change-transform"
+                  className="absolute z-30 -translate-x-1/2 -translate-y-1/2"
                   style={{ left: `${node.x}%`, top: `${node.y}%` }}
                   animate={shouldAnimate ? { x: [0, node.driftX, 0], y: [0, node.driftY, 0] } : undefined}
                   transition={{
@@ -392,7 +392,7 @@ export default function Passions() {
 
           <div className="relative overflow-hidden rounded-[1.75rem] border border-foreground/10 bg-[linear-gradient(160deg,hsl(var(--background)/0.82),hsl(var(--background)/0.5))] p-4 shadow-[0_24px_70px_hsl(var(--foreground)/0.14)] backdrop-blur-xl sm:p-5 lg:p-5">
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/25 to-transparent" />
-            <div className="pointer-events-none absolute right-0 top-0 h-36 w-36 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.16),transparent_72%)] blur-3xl" />
+            <div className="pointer-events-none absolute right-0 top-0 h-36 w-36 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.16),transparent_72%)]" />
 
             <div className="relative flex h-full flex-col gap-4">
               <div className="flex items-start justify-between gap-4">

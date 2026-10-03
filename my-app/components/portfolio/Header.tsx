@@ -111,14 +111,12 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
               </div>
 
               <div className="ml-auto hidden items-center gap-2 sm:flex">
-                <motion.div
-                  className="liquid-chip hidden rounded-full px-3 py-1 text-xs text-muted-foreground xl:flex xl:items-center xl:gap-2"
-                  animate={{ y: [0, -1, 0] }}
-                  transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+                <div
+                  className="chip-float liquid-chip hidden rounded-full px-3 py-1 text-xs text-muted-foreground 2xl:flex 2xl:items-center 2xl:gap-2"
                 >
                   <Sparkles className="h-3.5 w-3.5" />
                   Open to software opportunities
-                </motion.div>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"

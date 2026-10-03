@@ -16,6 +16,7 @@ import Experience from "@/components/portfolio/Experience"
 import Header from "@/components/portfolio/Header"
 import { navItems, projects } from "@/components/portfolio/data"
 import type { Project, SectionId } from "@/components/portfolio/types"
+import MotionLayer from "@/components/portfolio/MotionLayer"
 import { PORTFOLIO_SCROLL_OFFSET, getElementPageTop, scrollToSection, sectionIds } from "@/components/portfolio/utils"
 import { useScrollFrameSync } from "@/components/portfolio/useScrollFrameSync"
 import { FullscreenModal } from "@/components/ui/fullscreen-modal"
@@ -149,33 +150,18 @@ export default function Portfolio() {
     }
   }, [carouselApis, scrollNext])
 
-  useEffect(() => {
-    if (!sectionIds.includes(activeSection)) {
-      setActiveSection("about")
-    }
-  }, [activeSection])
-
   useScrollFrameSync(() => {
-    const sections = sectionIds
-      .map((sectionId) => {
-        const element = document.getElementById(sectionId)
+    let nextSection: SectionId = "about"
 
-        return element ? { id: sectionId, element } : null
-      })
-      .filter((entry): entry is { id: SectionId; element: HTMLElement } => Boolean(entry))
+    for (const sectionId of sectionIds) {
+      const element = document.getElementById(sectionId)
 
-    if (!sections.length) {
-      return
-    }
+      if (!element) {
+        continue
+      }
 
-    const markerY = window.scrollY + PORTFOLIO_SCROLL_OFFSET + 8
-    let nextSection = sections[0]?.id ?? "about"
-
-    for (const section of sections) {
-      if (getElementPageTop(section.element) <= markerY) {
-        nextSection = section.id
-      } else {
-        break
+      if (getElementPageTop(element) <= window.scrollY + PORTFOLIO_SCROLL_OFFSET + 8) {
+        nextSection = sectionId
       }
     }
 
@@ -183,7 +169,8 @@ export default function Portfolio() {
   })
 
   return (
-    <div className="portfolio-shell min-h-screen bg-background text-foreground">
+    <div id="portfolio-root" className="portfolio-shell min-h-screen bg-background text-foreground">
+      <MotionLayer />
       <div className="ambient-stage" aria-hidden="true">
         <div className="ambient-orb ambient-orb-one ambient-float-slow" />
         <div className="ambient-orb ambient-orb-two ambient-float-medium" />
@@ -228,10 +215,18 @@ export default function Portfolio() {
 
         <div className="portfolio-container-wide bg-background/20 py-8">
           <Experience onApiReady={registerCarouselApi} onOpenFullscreen={openProjectFullscreen} />
-          <Education />
-          <Awards />
-          <GitHubDashboard />
-          <Contact />
+          <div className="cv-auto">
+            <Education />
+          </div>
+          <div className="cv-auto">
+            <Awards />
+          </div>
+          <div className="cv-auto">
+            <GitHubDashboard />
+          </div>
+          <div className="cv-auto">
+            <Contact />
+          </div>
         </div>
       </main>
 

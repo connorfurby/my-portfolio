@@ -280,7 +280,7 @@ export default function NowSection() {
             <div className="flex flex-col gap-6">
               <Card className="surface-card liquid-glow relative overflow-hidden rounded-[2rem] border-border bg-card">
                 <motion.div
-                  className="absolute -left-12 top-10 h-36 w-36 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.2),transparent_70%)] blur-3xl"
+                  className="absolute -left-12 top-10 h-36 w-36 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.2),transparent_70%)]"
                   animate={isNearViewport ? { x: [0, 18, 0], y: [0, -14, 0] } : undefined}
                   transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                 />

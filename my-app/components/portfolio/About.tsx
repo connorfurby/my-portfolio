@@ -183,22 +183,10 @@ export default function About() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.18, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          <motion.div
-            className="absolute -right-6 top-10 size-20 rounded-full bg-primary/10 blur-2xl"
-            animate={{ y: [0, -10, 0], x: [0, 4, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute -left-6 bottom-10 size-24 rounded-full bg-secondary/70 blur-2xl"
-            animate={{ y: [0, 10, 0], x: [0, -6, 0] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          />
+          <div className="hero-float-orb hero-float-orb-a" aria-hidden="true" />
+          <div className="hero-float-orb hero-float-orb-b" aria-hidden="true" />
           <Card className="liquid-panel liquid-panel-strong relative max-w-[34rem] overflow-hidden rounded-[2rem] transition-transform duration-500 hover:-translate-y-1">
-            <motion.div
-              className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent"
-              animate={{ opacity: [0.35, 0.8, 0.35], x: ["-10%", "10%", "-10%"] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            />
+            <div className="hero-sheen absolute" aria-hidden="true" />
             <CardHeader className="gap-4 border-b border-border/50 pb-5">
               <div className="flex items-center justify-between gap-4">
                 <div>

@@ -53,7 +53,7 @@ export default function Contact() {
           viewport={{ once: true, amount: 0.2 }}
         >
           <motion.div
-            className="absolute -left-10 top-8 size-28 rounded-full bg-primary/12 blur-3xl"
+            className="absolute -left-10 top-8 size-28 rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.22),transparent_68%)]"
             animate={{ x: [0, 20, 0], y: [0, -12, 0] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           />

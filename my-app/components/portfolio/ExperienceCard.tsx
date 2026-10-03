@@ -132,17 +132,6 @@ export default function ExperienceCard({
                   {project.images.map((image, imageIndex) => (
                     <CarouselItem key={`${project.title}-${imageIndex}`} className="h-full pl-0">
                       <div className="relative h-full">
-                        <div
-                          className="absolute inset-0"
-                          style={{
-                            backgroundImage: `url(${image.src})`,
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                            filter: "blur(24px)",
-                            opacity: image.isVideo ? 0.12 : 0.24,
-                            transform: "scale(1.08)",
-                          }}
-                        />
                         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,22,0.04),rgba(6,10,22,0.18))]" />
 
                         <div className="absolute inset-4 flex items-center justify-center">

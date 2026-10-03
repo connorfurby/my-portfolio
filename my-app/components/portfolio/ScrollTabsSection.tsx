@@ -48,7 +48,7 @@ export default function ScrollTabsSection({
 }: ScrollTabsSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const [activeTab, setActiveTab] = useState(items[0]?.value ?? "")
-  const [progress, setProgress] = useState(0)
+  const progressRef = useRef<HTMLDivElement | null>(null)
   const reduceMotion = useReducedMotion()
   const isMobile = useMediaQuery("(max-width: 767px)")
 
@@ -122,6 +122,11 @@ export default function ScrollTabsSection({
     }
 
     const rawProgress = getSectionScrollProgress(section)
+
+    if (progressRef.current) {
+      progressRef.current.style.transform = `scaleX(${Math.max(rawProgress, 0.04)})`
+    }
+
     const normalizedWeights = items.map((item) => Math.max(item.scrollWeight ?? 1, 0.01))
     const totalWeight = normalizedWeights.reduce((sum, weight) => sum + weight, 0)
 
@@ -143,7 +148,6 @@ export default function ScrollTabsSection({
 
     const nextValue = items[nextIndex]?.value ?? items[0]?.value ?? ""
 
-    setProgress(rawProgress)
     setActiveTab((current) => (current === nextValue ? current : nextValue))
   }, [isMobile, items])
 
@@ -236,10 +240,10 @@ export default function ScrollTabsSection({
         <Tabs value={activeTab} onValueChange={scrollToTab} className="portfolio-container w-full">
           <div className="mb-3">
             <div className="progress-rail mx-auto mb-2.5 h-0.5 w-full max-w-5xl overflow-hidden rounded-full bg-muted/80">
-              <motion.div
-                className="progress-fill h-full rounded-full"
-                animate={{ width: `${Math.max(progress * 100, 4)}%` }}
-                transition={CONTENT_TRANSITION}
+              <div
+                ref={progressRef}
+                className="progress-fill h-full w-full origin-left rounded-full"
+                style={{ transform: "scaleX(0.04)" }}
               />
             </div>
             <TabsList
