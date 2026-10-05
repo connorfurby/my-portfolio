@@ -164,17 +164,17 @@ export default function ExperienceCard({
 
               <CarouselPrevious
                 data-carousel-prev="true"
-                className="absolute left-2 top-1/2 z-20 -translate-y-1/2 border-border/55 bg-background/88 backdrop-blur-xl sm:left-3"
+                className="absolute left-2 top-1/2 z-20 -translate-y-1/2 bg-card sm:left-3"
               />
               <CarouselNext
                 data-carousel-next="true"
-                className="absolute right-2 top-1/2 z-20 -translate-y-1/2 border-border/55 bg-background/88 backdrop-blur-xl sm:right-3"
+                className="absolute right-2 top-1/2 z-20 -translate-y-1/2 bg-card sm:right-3"
               />
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => onOpenFullscreen(project)}
-                className="absolute right-3 top-3 z-20 rounded-full border-border/55 bg-background/88 backdrop-blur-xl"
+                className="absolute right-3 top-3 z-20 bg-card"
               >
                 <Expand className="h-4 w-4" />
               </Button>

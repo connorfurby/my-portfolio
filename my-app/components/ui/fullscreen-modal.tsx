@@ -87,59 +87,50 @@ export function FullscreenModal({ isOpen, onClose, images, initialIndex }: Fulls
             type="button"
             aria-label="Close fullscreen viewer"
             onClick={onClose}
-            className="absolute inset-0 bg-[hsl(var(--glass-shadow)/0.62)] backdrop-blur-xl"
+            className="ui-scrim absolute inset-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           />
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 28 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 12 }}
-            transition={{ type: "spring", stiffness: 220, damping: 24 }}
-            className="liquid-panel liquid-panel-strong relative z-10 flex h-[94vh] w-[min(96vw,92rem)] max-w-[96vw] flex-col overflow-hidden rounded-[2rem]"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            className="ui-modal relative z-10 flex h-[min(92vh,56rem)] w-[min(96vw,88rem)] flex-col overflow-hidden rounded-[1.5rem]"
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_16%,rgba(88,132,255,0.18),transparent_28%),radial-gradient(circle_at_82%_14%,rgba(68,214,192,0.16),transparent_24%),linear-gradient(180deg,rgba(6,10,22,0.04),rgba(6,10,22,0.18))]" />
-
-            <div className="relative flex items-center justify-between gap-4 border-b border-border/55 px-5 py-4">
-              <div>
-                <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                  Expanded Viewer
+            <div className="relative flex items-center justify-between gap-4 border-b border-border/60 px-5 py-3.5">
+              <div className="min-w-0">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  Project
                 </div>
-                <div className="mt-1 text-sm text-foreground">
+                <div className="mt-1 truncate text-sm text-foreground">
                   {activeImage?.alt ?? "Project media"}
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="rounded-full border border-border/55 bg-background/82 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground backdrop-blur-xl">
-                  {activeIndex + 1}/{totalImages}
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="rounded-full border border-border/80 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                  {activeIndex + 1} / {totalImages}
                 </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={onClose}
-                  className="h-9 w-9 rounded-full border-border/55 bg-background/88 backdrop-blur-xl"
-                >
+                <Button variant="outline" size="icon" onClick={onClose} aria-label="Close viewer">
                   <Minimize2 className="h-4 w-4" />
                 </Button>
               </div>
             </div>
 
-            <div className="relative min-h-0 flex-1 px-4 py-4">
+            <div className="relative min-h-0 flex-1 px-3 py-3 sm:px-4">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={`${activeIndex}-${activeImage?.src ?? "empty"}`}
-                  initial={{ opacity: 0, scale: 0.975, y: 18 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.985, y: -10 }}
-                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                  className="relative h-full overflow-hidden rounded-[1.7rem] border border-border/55 bg-background/42 backdrop-blur-xl dark:bg-background/18"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                  className="ui-stage relative h-full overflow-hidden rounded-2xl"
                 >
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,22,0.06),rgba(6,10,22,0.24))]" />
-
-                  <div className="absolute inset-5 flex items-center justify-center rounded-[1.5rem] border border-border/55 bg-background/60 dark:bg-background/10">
+                  <div className="absolute inset-3 flex items-center justify-center sm:inset-5">
                     {activeImage?.isVideo ? (
                       <video
                         src={activeImage.src}
@@ -147,7 +138,7 @@ export function FullscreenModal({ isOpen, onClose, images, initialIndex }: Fulls
                         loop
                         muted
                         playsInline
-                        className="max-h-full max-w-full rounded-[1.2rem] object-contain shadow-[0_24px_64px_rgba(0,0,0,0.26)]"
+                        className="max-h-full max-w-full rounded-xl object-contain"
                       />
                     ) : (
                       <div className="relative h-full w-full">
@@ -155,8 +146,8 @@ export function FullscreenModal({ isOpen, onClose, images, initialIndex }: Fulls
                           src={activeImage?.src ?? ""}
                           alt={activeImage?.alt ?? "Project media"}
                           fill
-                          sizes="95vw"
-                          className="object-contain p-6 drop-shadow-[0_24px_64px_rgba(0,0,0,0.28)]"
+                          sizes="90vw"
+                          className="object-contain p-4"
                         />
                       </div>
                     )}
@@ -170,7 +161,8 @@ export function FullscreenModal({ isOpen, onClose, images, initialIndex }: Fulls
                     variant="outline"
                     size="icon"
                     onClick={() => setActiveIndex((current) => (current - 1 + totalImages) % totalImages)}
-                    className="absolute left-8 top-1/2 z-20 -translate-y-1/2 rounded-full border-border/55 bg-background/88 backdrop-blur-xl"
+                    className="absolute left-6 top-1/2 z-20 -translate-y-1/2 bg-card"
+                    aria-label="Previous image"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -178,7 +170,8 @@ export function FullscreenModal({ isOpen, onClose, images, initialIndex }: Fulls
                     variant="outline"
                     size="icon"
                     onClick={() => setActiveIndex((current) => (current + 1) % totalImages)}
-                    className="absolute right-8 top-1/2 z-20 -translate-y-1/2 rounded-full border-border/55 bg-background/88 backdrop-blur-xl"
+                    className="absolute right-6 top-1/2 z-20 -translate-y-1/2 bg-card"
+                    aria-label="Next image"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
@@ -189,13 +182,13 @@ export function FullscreenModal({ isOpen, onClose, images, initialIndex }: Fulls
             <AnimatePresence mode="wait">
               <motion.div
                 key={`${activeIndex}-${activeImage?.description ?? "caption"}`}
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.22 }}
-                className="relative border-t border-border/55 px-5 py-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
+                className="border-t border-border/60 px-6 py-4"
               >
-                <p className="mx-auto max-w-3xl text-center text-sm leading-6 text-muted-foreground">
+                <p className="mx-auto max-w-2xl text-center text-sm leading-6 text-muted-foreground">
                   {activeImage?.description}
                 </p>
               </motion.div>

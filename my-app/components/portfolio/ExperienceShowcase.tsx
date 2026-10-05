@@ -1789,31 +1789,11 @@ export default function ExperienceShowcase({ items }: ExperienceShowcaseProps) {
               />
             </div>
 
-            <TabsList className="mx-auto grid h-auto w-full max-w-5xl grid-cols-3 gap-1.5 rounded-[1.2rem] p-1.5 shadow-none">
+            <TabsList className="mx-auto flex h-auto w-fit max-w-full flex-wrap justify-center gap-1 rounded-full p-1 shadow-none">
               {items.map((item) => (
-                <motion.div
-                  key={item.value}
-                  className="flex"
-                  animate={
-                    reduceMotion
-                      ? undefined
-                      : item.value === activeTab
-                        ? { y: -2, scale: 1.01 }
-                        : { y: 0, scale: 1 }
-                  }
-                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <TabsTrigger value={item.value} className="relative flex-1 overflow-hidden rounded-[0.95rem] px-2.5 py-1.5 text-center text-sm">
-                    {item.value === activeTab ? (
-                      <motion.span
-                        layoutId="experience-active-tab-pill"
-                        className="liquid-chip absolute inset-0 rounded-[0.95rem] border border-foreground/10 bg-background/82"
-                        transition={{ type: "spring", stiffness: 360, damping: 28 }}
-                      />
-                    ) : null}
-                    <span className="relative z-10">{item.label}</span>
-                  </TabsTrigger>
-                </motion.div>
+                <TabsTrigger key={item.value} value={item.value} className="h-8 px-3.5">
+                  {item.label}
+                </TabsTrigger>
               ))}
             </TabsList>
           </div>
