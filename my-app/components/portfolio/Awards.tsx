@@ -181,7 +181,7 @@ export default function Awards() {
               <button
                 type="button"
                 onClick={() => setAutoRotate((current) => !current)}
-                className="liquid-chip inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-medium"
+                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-border/70 bg-card px-3 text-xs font-medium"
                 aria-pressed={autoRotate}
               >
                 {autoRotate && !reduceMotion ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
@@ -247,7 +247,7 @@ export default function Awards() {
             <div className="flex flex-col gap-2.5 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-2xl">
                 <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em]">
+                  <Badge variant="outline" className="border-border/70">
                     Interactive Skill Map
                   </Badge>
                   <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
@@ -265,7 +265,7 @@ export default function Awards() {
 
               <div className="flex w-full max-w-sm flex-wrap gap-1.5 rounded-[1rem] border border-border/45 bg-background/20 px-2.5 py-2">
                 {activeCluster.focus.slice(0, 3).map((item) => (
-                  <Badge key={item} variant="secondary" className="rounded-full px-2.5 py-1 text-[10px] uppercase tracking-[0.16em]">
+                  <Badge key={item} variant="secondary" className="border-border/70">
                     {item}
                   </Badge>
                 ))}
@@ -482,7 +482,7 @@ export default function Awards() {
                         onFocus={() => setSpotlightTechName(tech.name)}
                         onClick={() => setSpotlightTechName(tech.name)}
                         className={cn(
-                          "absolute z-20 rounded-full border px-2 py-0.5 text-[9px] font-medium shadow-[0_14px_30px_hsl(var(--glass-shadow)/0.12)] backdrop-blur-xl transition-all duration-300 sm:px-2.5 sm:py-1 sm:text-[10px]",
+                          "absolute z-20 rounded-full border px-2 py-0.5 text-[9px] font-medium transition-all duration-300 sm:px-2.5 sm:py-1 sm:text-[10px]",
                           isCompactSkillMap ? compactNodePlacementClassName[tech.labelPlacement] : nodePlacementClassName[tech.labelPlacement],
                           spotlightTech?.name === tech.name
                             ? "border-transparent text-foreground shadow-[0_18px_34px_hsl(var(--glass-shadow)/0.18)]"

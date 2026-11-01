@@ -622,12 +622,12 @@ export default function GitHubDashboard() {
                 />
                 <CardContent className="relative flex flex-col gap-4 p-6 sm:p-7">
                   <div className="flex flex-wrap items-center gap-2.5">
-                    <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/75 px-4 py-1 font-mono text-[11px] uppercase tracking-[0.24em]">
+                    <Badge variant="outline" className="border-border/70">
                       <Sparkles className="mr-2 h-3.5 w-3.5" />
                       Public API powered
                     </Badge>
                     {githubData ? (
-                      <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/75 px-4 py-1 font-mono text-[11px] uppercase tracking-[0.24em]">
+                      <Badge variant="outline" className="border-border/70">
                         Updated {formatRelative(githubData.updatedAt)}
                       </Badge>
                     ) : null}
@@ -786,7 +786,7 @@ export default function GitHubDashboard() {
                         <div className="space-y-3">
                           <div className="flex items-center justify-between gap-3">
                             <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Language mix</div>
-                            <div className="rounded-full border border-foreground/10 bg-background/60 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                            <div className="rounded-lg border border-border/70 bg-foreground/[0.03] px-2.5 py-1 text-[11px] text-muted-foreground">
                               {githubData.stats.languageCount} tracked
                             </div>
                           </div>
@@ -814,7 +814,7 @@ export default function GitHubDashboard() {
                         <div className="space-y-2.5">
                           <div className="flex items-center justify-between gap-3">
                             <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Active repositories</div>
-                            <div className="rounded-full border border-foreground/10 bg-background/60 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                            <div className="rounded-lg border border-border/70 bg-foreground/[0.03] px-2.5 py-1 text-[11px] text-muted-foreground">
                               {githubData.stats.activeRepos} active
                             </div>
                           </div>
@@ -905,11 +905,11 @@ export default function GitHubDashboard() {
                   <div className="flex h-full flex-col justify-center gap-3 p-3.5 sm:p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                        <Badge variant="outline" className="border-border/70">
                           Personal Spotify
                         </Badge>
                         {isIntegrationsVisible ? (
-                          <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                          <Badge variant="outline" className="border-border/70">
                             Live refresh
                           </Badge>
                         ) : null}
@@ -920,16 +920,16 @@ export default function GitHubDashboard() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                      <Badge variant="outline" className="border-border/70">
                         {spotifyData.playback?.label ?? "Spotify"}
                       </Badge>
                       {spotifyData.playback?.explicit ? (
-                        <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                        <Badge variant="outline" className="border-border/70">
                           Explicit
                         </Badge>
                       ) : null}
                       {spotifyData.profile?.product ? (
-                        <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                        <Badge variant="outline" className="border-border/70">
                           {spotifyData.profile.product}
                         </Badge>
                       ) : null}
@@ -1187,7 +1187,7 @@ export default function GitHubDashboard() {
                           <div className="flex-1 overflow-y-auto p-5 sm:p-6">
                             <div className="mb-4 flex flex-col gap-3 pr-10 text-left">
                               <div className="flex flex-wrap items-center gap-2">
-                                <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                                <Badge variant="outline" className="border-border/70">
                                   Spotify details
                                 </Badge>
                               </div>
@@ -1316,7 +1316,7 @@ export default function GitHubDashboard() {
                                         {spotifySelectedDetails.topWindowLabel} • top {spotifySelectedDetails.topLimit}
                                       </div>
                                     </div>
-                                    <div className="rounded-full border border-foreground/10 bg-background/60 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                                    <div className="rounded-lg border border-border/70 bg-foreground/[0.03] px-2.5 py-1 text-[11px] text-muted-foreground">
                                       {spotifySelectedDetails.topTracks.length} tracks
                                     </div>
                                   </div>
@@ -1384,7 +1384,7 @@ export default function GitHubDashboard() {
                                         {spotifySelectedDetails.topWindowLabel} • top {spotifySelectedDetails.topLimit}
                                       </div>
                                     </div>
-                                    <div className="rounded-full border border-foreground/10 bg-background/60 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                                    <div className="rounded-lg border border-border/70 bg-foreground/[0.03] px-2.5 py-1 text-[11px] text-muted-foreground">
                                       {spotifySelectedDetails.topArtists.length} artists
                                     </div>
                                   </div>

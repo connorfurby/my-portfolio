@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { Expand, Sparkles } from "lucide-react"
+import { Expand } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -53,54 +53,46 @@ export default function ExperienceCard({
   const activeImage = project.images[activeImageIndex] ?? project.images[0]
 
   return (
-    <Card className="liquid-panel liquid-panel-strong mb-4 overflow-hidden rounded-[1.75rem] pt-0 xl:flex xl:h-[calc(100vh-14rem)] xl:min-h-[31rem] xl:max-h-[calc(100vh-14rem)] xl:flex-col">
-      <CardHeader className="gap-2 pb-2 pt-3">
+    <Card className="mb-4 overflow-hidden rounded-2xl xl:flex xl:h-[calc(100vh-14rem)] xl:min-h-[31rem] xl:max-h-[calc(100vh-14rem)] xl:flex-col">
+      <CardHeader className="gap-3 pb-3 pt-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="flex max-w-[32rem] flex-col gap-1.5">
+          <div className="flex max-w-[36rem] flex-col gap-2">
             <div className="flex flex-wrap gap-1.5">
-              <Badge variant="outline" className="rounded-full px-3 py-1 font-mono text-[11px] uppercase tracking-[0.22em]">
-                Featured Project
-              </Badge>
               {project.stack?.slice(0, 4).map((item) => (
-                <Badge key={item} variant="secondary" className="rounded-full px-3 py-1">
+                <Badge key={item} variant="secondary">
                   {item}
                 </Badge>
               ))}
             </div>
-            <CardTitle className="text-[1.4rem] tracking-tight xl:text-[1.38rem]">{project.title}</CardTitle>
-            <CardDescription className="max-w-[30rem] text-sm leading-[1.25rem]">
-              {project.description}
-            </CardDescription>
+            <CardTitle className="text-[1.45rem] tracking-tight xl:text-[1.5rem]">{project.title}</CardTitle>
+            <CardDescription className="max-w-[32rem] text-sm leading-6">{project.description}</CardDescription>
           </div>
 
           {project.spotlight ? (
-            <div className="liquid-panel liquid-soft w-full max-w-none rounded-[1.1rem] p-2.5 sm:max-w-[15rem]">
-              <div className="mb-1 flex items-center gap-2 text-sm font-medium">
-                <Sparkles className="h-4 w-4 text-primary" />
+            <div className="w-full max-w-none rounded-xl border border-border/70 bg-foreground/[0.03] p-3 sm:max-w-[15rem]">
+              <div className="mb-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 Why it stands out
               </div>
-              <p className="text-sm leading-[1.2rem] text-muted-foreground">{project.spotlight}</p>
+              <p className="text-sm leading-5 text-muted-foreground">{project.spotlight}</p>
             </div>
           ) : null}
         </div>
       </CardHeader>
 
-      <CardContent className="grid flex-1 gap-3 px-4 pb-4 xl:min-h-0 xl:grid-cols-[minmax(240px,0.82fr)_minmax(0,1.18fr)] xl:overflow-hidden">
-        <div className="liquid-panel liquid-soft flex min-h-0 flex-col rounded-[1.25rem] p-3 xl:pr-4">
-          <div className="mb-2 flex items-center justify-between gap-3">
+      <CardContent className="grid flex-1 gap-4 px-5 pb-5 xl:min-h-0 xl:grid-cols-[minmax(240px,0.82fr)_minmax(0,1.18fr)] xl:overflow-hidden">
+        <div className="flex min-h-0 flex-col rounded-xl border border-border/70 bg-foreground/[0.02] p-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
             <span className="text-sm font-semibold">Key Contributions</span>
-            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-              {project.images.length} media items
-            </span>
+            <span className="text-[11px] text-muted-foreground">{project.images.length} media</span>
           </div>
-          <ul className="flex min-h-0 list-disc flex-col gap-1.5 overflow-visible pl-5 pr-1 text-sm leading-[1.35rem] text-muted-foreground xl:overflow-y-auto">
+          <ul className="flex min-h-0 list-disc flex-col gap-2 overflow-visible pl-5 pr-1 text-sm leading-6 text-muted-foreground xl:overflow-y-auto">
             {project.bullets.map((bullet) => (
               <li key={bullet}>{bullet}</li>
             ))}
           </ul>
         </div>
 
-        <div className="liquid-panel flex min-h-0 flex-col rounded-[1.25rem] p-2">
+        <div className="flex min-h-0 flex-col">
           <Carousel
             className="mx-auto flex w-full min-h-0 flex-1 flex-col"
             opts={{ loop: true }}
@@ -112,7 +104,7 @@ export default function ExperienceCard({
             }}
           >
             <div
-              className="relative min-h-[15rem] flex-1 overflow-hidden rounded-[1.15rem] border border-border/55 bg-muted/70 sm:min-h-[17rem] dark:bg-muted/55"
+              className="relative min-h-[15rem] flex-1 overflow-hidden rounded-xl border border-border/70 bg-muted/50 sm:min-h-[17rem]"
               tabIndex={0}
               aria-label={`${project.title} media viewer. Use left and right arrow keys to change slides.`}
               onKeyDown={(event) => {
@@ -132,9 +124,7 @@ export default function ExperienceCard({
                   {project.images.map((image, imageIndex) => (
                     <CarouselItem key={`${project.title}-${imageIndex}`} className="h-full pl-0">
                       <div className="relative h-full">
-                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,10,22,0.04),rgba(6,10,22,0.18))]" />
-
-                        <div className="absolute inset-4 flex items-center justify-center">
+                        <div className="absolute inset-3 flex items-center justify-center sm:inset-4">
                           {image.isVideo ? (
                             <video
                               src={image.src}
@@ -142,7 +132,7 @@ export default function ExperienceCard({
                               loop
                               muted
                               playsInline
-                              className="max-h-full max-w-full rounded-[1rem] object-contain shadow-[0_18px_46px_rgba(0,0,0,0.24)]"
+                              className="max-h-full max-w-full rounded-lg object-contain"
                             />
                           ) : (
                             <div className="relative h-full w-full">
@@ -151,7 +141,7 @@ export default function ExperienceCard({
                                 alt={image.alt}
                                 fill
                                 sizes="(max-width: 768px) 100vw, (max-width: 1280px) 55vw, 42vw"
-                                className="object-contain drop-shadow-[0_18px_42px_rgba(0,0,0,0.22)]"
+                                className="object-contain"
                               />
                             </div>
                           )}
@@ -175,16 +165,17 @@ export default function ExperienceCard({
                 size="icon"
                 onClick={() => onOpenFullscreen(project)}
                 className="absolute right-3 top-3 z-20 bg-card"
+                aria-label="Expand media"
               >
                 <Expand className="h-4 w-4" />
               </Button>
             </div>
 
             <div className="mt-2 flex items-center justify-between gap-3 px-1">
-              <div className="min-w-0 flex-1 text-center text-[11px] leading-[1rem] text-muted-foreground">
+              <div className="min-w-0 flex-1 text-center text-[11px] leading-4 text-muted-foreground">
                 {activeImage?.description}
               </div>
-              <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              <span className="shrink-0 text-[10px] text-muted-foreground">
                 {activeImageIndex + 1}/{project.images.length}
               </span>
             </div>

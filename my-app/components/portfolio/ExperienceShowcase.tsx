@@ -1473,9 +1473,9 @@ function ExperienceEntryCard({
   const [densityMode, setDensityMode] = useState<ParticleDensityMode>("standard")
 
   return (
-    <Card className="interactive-tilt interactive-spot liquid-panel liquid-panel-strong h-full overflow-hidden rounded-[2rem]">
-      <CardContent className="grid h-full gap-4 p-0 lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)]">
-        <div className="relative min-h-[22rem] overflow-hidden rounded-t-[2rem] rounded-b-[1.3rem] px-5 py-5 lg:min-h-[28rem] lg:rounded-l-[2rem] lg:rounded-r-none lg:px-6 lg:py-6">
+    <Card className="h-full overflow-hidden rounded-2xl">
+      <CardContent className="grid h-full gap-0 p-0 lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)]">
+        <div className="relative min-h-[22rem] overflow-hidden border-b border-border/60 px-4 py-4 lg:min-h-[28rem] lg:border-b-0 lg:border-r lg:px-5 lg:py-5">
           <LogoParticleField
             entry={entry}
             isActive={isActive}
@@ -1483,11 +1483,11 @@ function ExperienceEntryCard({
           />
         </div>
 
-        <div className="flex h-full flex-col justify-between gap-4 p-4 lg:p-5 lg:pl-2">
+        <div className="flex h-full flex-col justify-between gap-4 p-4 lg:p-5">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               {(entry.stats ?? []).slice(0, 3).map((stat) => (
-                <Badge key={stat} variant="secondary" className="rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.16em]">
+                <Badge key={stat} variant="secondary">
                   {stat}
                 </Badge>
               ))}
@@ -1495,36 +1495,32 @@ function ExperienceEntryCard({
                 type="button"
                 onClick={() => setDensityMode((current) => (current === "depth" ? "standard" : "depth"))}
                 className={cn(
-                  "rounded-full border px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] transition-all duration-300",
+                  "rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors",
                   densityMode === "depth"
-                    ? "liquid-chip border-transparent text-foreground"
-                    : "border-border/45 bg-background/20 text-muted-foreground hover:bg-background/35"
+                    ? "border-foreground/20 bg-foreground text-background"
+                    : "border-border/70 text-muted-foreground hover:bg-foreground/[0.04]"
                 )}
                 aria-pressed={densityMode === "depth"}
               >
-                Depth mode {densityMode === "depth" ? "on" : "off"}
+                Depth {densityMode === "depth" ? "on" : "off"}
               </button>
             </div>
 
             <div className="mt-3">
-              <h3 className="text-[1.45rem] font-semibold tracking-tight md:text-[1.7rem]">{entry.title}</h3>
+              <h3 className="font-display text-[1.4rem] font-semibold tracking-tight md:text-[1.65rem]">{entry.title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{entry.subtitle}</p>
               {entry.summary ? <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{entry.summary}</p> : null}
             </div>
           </div>
 
-          <div className="grid gap-2.5">
+          <div className="grid gap-2">
             {entry.bullets.map((bullet) => (
-              <motion.div
+              <div
                 key={bullet}
-                className="rounded-[1.1rem] border border-border/55 bg-background/82 px-3.5 py-3 text-sm leading-6 text-muted-foreground dark:border-white/10 dark:bg-background/55"
-                initial={{ opacity: 0, x: 14 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.4 }}
-                transition={{ duration: 0.35 }}
+                className="rounded-xl border border-border/70 bg-foreground/[0.02] px-3.5 py-3 text-sm leading-6 text-muted-foreground"
               >
                 {bullet}
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

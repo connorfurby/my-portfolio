@@ -49,26 +49,21 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="portfolio-container-wide py-2">
-          <div className="header-glass pointer-events-auto relative flex h-16 items-center gap-3 overflow-hidden rounded-[1.85rem] border border-border/55 px-4 md:px-6">
-            <div className="header-warp pointer-events-none absolute inset-0 overflow-hidden">
-              <div className="header-warp-orb header-warp-orb-one" />
-              <div className="header-warp-orb header-warp-orb-two" />
-              <div className="header-warp-sheen" />
-            </div>
-
+        <div className="portfolio-container-wide py-3">
+          <div className="header-glass pointer-events-auto relative flex h-14 items-center gap-3 rounded-2xl border border-border/60 px-3 md:px-4">
             <div className="relative flex h-full w-full items-center gap-3">
-              <motion.div className="mr-2 flex items-center gap-3" whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
-                <div className="liquid-chip flex size-10 items-center justify-center rounded-[1.15rem] transition-transform duration-300 hover:scale-[1.03]">
-                  <Image src="/imgs/logo.png" alt="Logo" width={22} height={22} className="size-[22px]" />
+              <button
+                type="button"
+                className="mr-1 flex items-center gap-2.5 text-left"
+                onClick={() => onNavigate("about")}
+              >
+                <div className="flex size-8 items-center justify-center rounded-lg border border-border/70 bg-card">
+                  <Image src="/imgs/logo.png" alt="" width={18} height={18} className="size-[18px]" />
                 </div>
-                <div className="hidden flex-col sm:flex">
-                  <span className="font-display text-base font-semibold tracking-[-0.03em]">Connor Furby</span>
-                  <span className="font-accent text-sm italic leading-none text-muted-foreground">
-                    Portfolio
-                  </span>
-                </div>
-              </motion.div>
+                <span className="hidden font-display text-sm font-semibold tracking-[-0.03em] sm:inline">
+                  Connor Furby
+                </span>
+              </button>
 
               <nav className="mx-auto hidden items-center justify-center gap-0.5 md:flex">
                 {navItems.map((item) => {
@@ -80,7 +75,7 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
                       key={item.name}
                       variant="ghost"
                       className={cn(
-                        "h-8 rounded-full px-3.5 text-sm font-medium text-muted-foreground",
+                        "h-8 rounded-lg px-3 text-sm font-medium text-muted-foreground",
                         isActive && "bg-foreground text-background hover:bg-foreground hover:text-background"
                       )}
                       onClick={() => onNavigate(sectionId)}
@@ -98,7 +93,6 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
                   aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
                   aria-expanded={mobileMenuOpen}
                   aria-controls="mobile-portfolio-menu"
-                  className="bg-card"
                   onClick={() => setMobileMenuOpen((current) => !current)}
                 >
                   {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -112,7 +106,7 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
                   aria-label="Open appearance settings"
                   aria-expanded={appearanceMenuOpen}
                   onClick={() => setAppearanceMenuOpen(true)}
-                  className="rounded-full gap-2.5"
+                  className="gap-2"
                 >
                   <Palette className="h-4 w-4" />
                   Appearance

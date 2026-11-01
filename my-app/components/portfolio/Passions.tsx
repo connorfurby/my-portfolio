@@ -96,7 +96,7 @@ export default function Passions() {
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <div className="relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-[linear-gradient(135deg,hsl(var(--background)/0.92),hsl(var(--background)/0.68))] p-4 shadow-[0_28px_90px_hsl(var(--foreground)/0.12)] backdrop-blur-2xl sm:p-5 lg:p-6">
+      <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card p-4 sm:p-5 lg:p-6">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 opacity-80 [background-image:radial-gradient(circle_at_18%_16%,hsl(var(--spotlight)/0.18),transparent_24%),radial-gradient(circle_at_82%_18%,hsl(var(--spotlight-secondary)/0.16),transparent_22%),radial-gradient(circle_at_50%_88%,hsl(var(--primary)/0.1),transparent_28%)]" />
           <div
@@ -122,12 +122,8 @@ export default function Passions() {
 
         <div className="relative mb-4 max-w-3xl">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <Badge variant="outline" className="rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em]">
-              Beyond Coding
-            </Badge>
-            <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-              {mindmapNodes.length} interest nodes
-            </span>
+            <div className="section-eyebrow">Beyond Coding</div>
+            <span className="text-[11px] text-muted-foreground">{mindmapNodes.length} interest nodes</span>
           </div>
           <h3 className="text-[1.3rem] font-semibold tracking-[-0.04em] md:text-[1.55rem]">
             The interests that shape how I think
@@ -138,18 +134,18 @@ export default function Passions() {
         </div>
 
         <div className="relative grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(300px,0.8fr)] xl:gap-5">
-          <div className="relative min-h-[23rem] overflow-hidden rounded-[1.75rem] border border-foreground/10 bg-[linear-gradient(155deg,hsl(var(--background)/0.7),hsl(var(--background)/0.24))] p-4 sm:min-h-[25rem] sm:p-5 lg:min-h-[27rem]">
+          <div className="relative min-h-[23rem] overflow-hidden rounded-2xl border border-border/80 bg-card p-4 sm:min-h-[25rem] sm:p-5 lg:min-h-[27rem]">
             <div className="absolute left-4 top-4 z-30 flex flex-wrap gap-2 sm:left-6 sm:top-6">
               <Badge
                 variant="outline"
-                className="rounded-full border-foreground/10 bg-background/65 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground backdrop-blur-xl"
+                className="border-border/70 text-muted-foreground"
               >
                 <Sparkles className="mr-1.5 h-3.5 w-3.5" />
                 Live interest graph
               </Badge>
               <Badge
                 variant="outline"
-                className="rounded-full border-foreground/10 bg-background/55 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground backdrop-blur-xl"
+                className="border-border/70 text-muted-foreground"
               >
                 {mindmapNodes.length} nodes
               </Badge>
@@ -350,7 +346,7 @@ export default function Passions() {
                     onClick={() => setActiveTitle(node.title)}
                     whileHover={reduceMotion ? undefined : { scale: 1.06, y: -3 }}
                     whileTap={{ scale: 0.96 }}
-                    className={`group relative flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-xl transition-all duration-300 sm:h-11 sm:w-11 lg:h-[3rem] lg:w-[3rem] ${
+                    className={`group relative flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-300 sm:h-11 sm:w-11 lg:h-[3rem] lg:w-[3rem] ${
                       isActive
                         ? "border-foreground/25 bg-background/88 shadow-[0_0_0_1px_hsl(var(--foreground)/0.06),0_16px_42px_hsl(var(--foreground)/0.24)]"
                         : "border-foreground/10 bg-background/62 shadow-[0_0_0_1px_hsl(var(--foreground)/0.03),0_12px_30px_hsl(var(--foreground)/0.12)] hover:border-foreground/20 hover:bg-background/75"
@@ -374,7 +370,7 @@ export default function Passions() {
                       <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     </span>
                     <span
-                      className={`pointer-events-none absolute left-1/2 top-full mt-2 w-max max-w-[6.25rem] -translate-x-1/2 rounded-2xl border border-foreground/10 bg-background/88 px-2 py-1 text-center text-[8px] font-medium leading-tight text-foreground shadow-[0_10px_24px_hsl(var(--foreground)/0.16)] backdrop-blur-xl transition-all duration-300 sm:max-w-[7rem] sm:text-[9px] ${
+                      className={`pointer-events-none absolute left-1/2 top-full mt-2 w-max max-w-[6.25rem] -translate-x-1/2 rounded-2xl border border-foreground/10 bg-background/88 px-2 py-1 text-center text-[8px] font-medium leading-tight text-foreground shadow-[0_10px_24px_hsl(var(--foreground)/0.16)] transition-all duration-300 sm:max-w-[7rem] sm:text-[9px] ${
                         isActive ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0"
                       }`}
                     >
@@ -385,12 +381,12 @@ export default function Passions() {
               )
             })}
 
-            <div className="pointer-events-none absolute bottom-4 left-4 z-30 rounded-full border border-foreground/10 bg-background/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground backdrop-blur-xl sm:bottom-6 sm:left-6">
+            <div className="pointer-events-none absolute bottom-4 left-4 z-30 rounded-lg border border-border/70 bg-card px-3 py-1.5 text-[11px] text-muted-foreground sm:bottom-6 sm:left-6">
               Orbit, hover, explore
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-foreground/10 bg-[linear-gradient(160deg,hsl(var(--background)/0.82),hsl(var(--background)/0.5))] p-4 shadow-[0_24px_70px_hsl(var(--foreground)/0.14)] backdrop-blur-xl sm:p-5 lg:p-5">
+          <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card p-4 sm:p-5">
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/25 to-transparent" />
             <div className="pointer-events-none absolute right-0 top-0 h-36 w-36 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.16),transparent_72%)]" />
 
@@ -432,12 +428,7 @@ export default function Passions() {
                       </div>
                       <div className="text-sm font-medium text-foreground">What keeps the energy high</div>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className="rounded-full border-border/55 bg-background/84 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/85 backdrop-blur-xl dark:border-white/12 dark:bg-background/72"
-                    >
-                      Active
-                    </Badge>
+                    <Badge variant="secondary">Active</Badge>
                   </div>
                 </div>
 
