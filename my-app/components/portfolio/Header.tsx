@@ -138,38 +138,36 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
               >
                 <div
                   id="mobile-portfolio-menu"
-                  className="ui-modal relative overflow-hidden rounded-[1.35rem] px-4 py-4"
+                  className="ui-modal relative overflow-hidden rounded-2xl px-4 py-4"
                 >
                   <div className="mb-4 flex items-start justify-between gap-4">
                     <div>
                       <div className="font-display text-lg font-semibold tracking-[-0.03em] text-foreground">Menu</div>
-                      <div className="mt-1 text-sm text-muted-foreground">Navigate through the portfolio sections</div>
+                      <div className="mt-1 text-sm text-muted-foreground">Jump to any section</div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        aria-label="Close menu"
-                        className="bg-card"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      aria-label="Close menu"
+                      className="bg-card"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
 
-                  <div className="mb-4 liquid-soft rounded-[1.35rem] border border-border/55 p-3">
+                  <div className="mb-4 rounded-xl border border-border/70 bg-foreground/[0.03] p-3">
                     <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                       <Palette className="h-4 w-4 text-primary" />
                       Appearance
                     </div>
                     <div className="mt-1 text-sm text-muted-foreground">
-                      Open the appearance modal for theme mode and accent controls.
+                      Theme mode and accent color.
                     </div>
 
                     <Button
                       variant="outline"
-                      className="mt-3 w-full justify-start rounded-2xl px-4"
+                      className="mt-3 w-full justify-start px-4"
                       onClick={() => {
                         setMobileMenuOpen(false)
                         window.setTimeout(() => setAppearanceMenuOpen(true), 30)
@@ -180,7 +178,7 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
                     </Button>
                   </div>
 
-                  <nav className="grid gap-2">
+                  <nav className="grid gap-1.5">
                     {navItems.map((item) => {
                       const sectionId = item.href.slice(1) as SectionId
 
@@ -188,7 +186,7 @@ export default function Header({ navItems, activeSection, onNavigate }: HeaderPr
                         <Button
                           key={item.name}
                           variant={activeSection === sectionId ? "default" : "ghost"}
-                          className="justify-start rounded-2xl px-4 py-6 text-base"
+                          className="h-11 justify-start px-4 text-base"
                           onClick={() => {
                             setMobileMenuOpen(false)
                             window.setTimeout(() => onNavigate(sectionId), 30)

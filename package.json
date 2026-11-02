@@ -1,13 +1,13 @@
 {
+  "name": "my-portfolio",
+  "private": true,
   "engines": {
     "node": "24.x"
   },
-  "dependencies": {
-    "@radix-ui/react-dialog": "^1.1.2",
-    "@radix-ui/react-slot": "^1.1.0",
-    "@radix-ui/react-tabs": "^1.1.1",
-    "framer-motion": "^11.11.4",
-    "lucide-react": "^0.451.0",
-    "next-themes": "^0.3.0"
+  "scripts": {
+    "dev": "npm run dev --prefix my-app",
+    "build": "npm run build --prefix my-app",
+    "start": "npm run start --prefix my-app",
+    "lint": "npm run lint --prefix my-app"
   }
 }

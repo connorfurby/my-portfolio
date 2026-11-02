@@ -118,18 +118,18 @@ export default function Portfolio() {
       <main className="w-full">
         <About />
 
-        <div className="portfolio-container-wide bg-background py-8">
+        <div className="portfolio-container-wide bg-background pb-8 pt-10 md:pt-14">
           <Experience onApiReady={registerCarouselApi} onOpenFullscreen={openProjectFullscreen} />
-          <div className="cv-auto">
+          <div className="cv-auto mt-4 border-t border-border/40 pt-10 md:mt-6 md:pt-14">
             <Education />
           </div>
-          <div className="cv-auto">
+          <div className="cv-auto mt-4 border-t border-border/40 pt-10 md:mt-6 md:pt-14">
             <Awards />
           </div>
-          <div className="cv-auto">
+          <div className="cv-auto mt-4 border-t border-border/40 pt-10 md:mt-6 md:pt-14">
             <GitHubDashboard />
           </div>
-          <div className="cv-auto">
+          <div className="cv-auto mt-4 border-t border-border/40 pt-10 md:mt-6 md:pt-14">
             <Contact />
           </div>
         </div>

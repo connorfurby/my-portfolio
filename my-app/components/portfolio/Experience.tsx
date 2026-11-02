@@ -25,7 +25,7 @@ export default function Experience({ onApiReady, onOpenFullscreen }: ExperienceP
           <SectionHeading
             eyebrow="Selected Work"
             title="Projects and experience that show how I actually build"
-            description="A mix of shipped projects, internship work, and hands-on product building. On desktop, the section stays pinned just long enough to compare projects without crowding the viewport."
+            description="Shipped projects, internship work, and independent builds — the clearest signal for how I think about product, systems, and craft."
           />
         }
         items={projects.map((project) => ({

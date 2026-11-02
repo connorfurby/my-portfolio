@@ -423,7 +423,7 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
                 </div>
               </div>
             </div>
-            <Badge className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-100">
+            <Badge className="rounded-lg border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-cyan-100">
               Interactive
             </Badge>
           </div>
@@ -440,26 +440,26 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
                 key={command.name}
                 type="button"
                 onClick={() => setInputValue(command.name)}
-                className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-slate-300 transition-colors hover:bg-white/[0.08]"
+                className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-slate-300 transition-colors hover:bg-white/[0.08]"
               >
                 {command.name}
               </button>
             ))}
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1">
+            <span className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1">
               {resolvedTheme === "light" ? "Light" : "Dark"} mode
             </span>
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1">
+            <span className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1">
               {isAccentReady ? `${currentAccentLabel} accent` : "Loading accent"}
             </span>
             {props.githubRepoCount ? (
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1">
+              <span className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1">
                 {props.githubRepoCount} repos
               </span>
             ) : null}
             {props.spotifyTrack?.title ? (
-              <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1">
+              <span className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1">
                 Now playing: {props.spotifyTrack.title}
               </span>
             ) : null}
@@ -471,7 +471,7 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
                 variant={resolvedTheme === "light" ? "secondary" : "outline"}
                 size="sm"
                 onClick={() => setTheme("light")}
-                className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
+                className="h-8 rounded-lg border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
               >
                 <Sun className="mr-1.5 h-3.5 w-3.5" />
                 Light
@@ -481,14 +481,14 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
                 variant={resolvedTheme === "dark" ? "secondary" : "outline"}
                 size="sm"
                 onClick={() => setTheme("dark")}
-                className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
+                className="h-8 rounded-lg border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
               >
                 <Moon className="mr-1.5 h-3.5 w-3.5" />
                 Dark
               </Button>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-500">
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-slate-500">
                 <Palette className="h-3 w-3 text-cyan-300" />
                 Accent
               </span>
@@ -498,7 +498,7 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
                   type="button"
                   onClick={() => setAccentTheme(theme.id)}
                   className={cn(
-                    "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] text-slate-100 transition-colors",
+                    "flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] text-slate-100 transition-colors",
                     accentTheme === theme.id ? "border-cyan-300/40 bg-white/[0.12]" : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08]"
                   )}
                 >
@@ -558,7 +558,7 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
                             asChild
                             variant="outline"
                             size="sm"
-                            className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
+                            className="h-8 rounded-lg border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
                           >
                             <a href={action.href} target="_blank" rel="noreferrer">
                               {action.label}
@@ -583,7 +583,7 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
                                 scrollToSection(action.section)
                               }
                             }}
-                            className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
+                            className="h-8 rounded-lg border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
                           >
                             {action.label}
                           </Button>
@@ -598,7 +598,7 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
                             variant="outline"
                             size="sm"
                             onClick={() => runCommand(action.command ?? "")}
-                            className="h-8 rounded-full border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
+                            className="h-8 rounded-lg border-white/10 bg-white/[0.04] px-3 text-xs text-slate-100 hover:bg-white/[0.08]"
                           >
                             {action.label}
                           </Button>
@@ -675,7 +675,7 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
                 type="submit"
                 variant="outline"
                 size="sm"
-                className="h-9 rounded-full border-white/10 bg-white/[0.06] px-4 text-slate-100 hover:bg-white/[0.1]"
+                className="h-9 rounded-lg border-white/10 bg-white/[0.06] px-4 text-slate-100 hover:bg-white/[0.1]"
               >
                 Run
                 <CornerDownLeft className="ml-2 h-3.5 w-3.5" />

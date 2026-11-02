@@ -13,7 +13,6 @@ import {
   GitBranch,
   Linkedin,
   Music4,
-  Sparkles,
   Users,
   X,
 } from "lucide-react"
@@ -556,7 +555,7 @@ export default function GitHubDashboard() {
         <SectionHeading
           eyebrow="Integrations"
           title="A live hub around the work"
-          description="AI chat, LinkedIn, a terminal-style interface, GitHub signal, and Spotify listening data arranged like a live product surface."
+          description="Chat the portfolio, skim LinkedIn, drive a terminal, check GitHub activity, and peek at Spotify — useful signal, not dashboard clutter."
         />
       </div>
 
