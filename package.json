@@ -3,11 +3,5 @@
   "private": true,
   "engines": {
     "node": "24.x"
-  },
-  "scripts": {
-    "dev": "npm run dev --prefix my-app",
-    "build": "npm run build --prefix my-app",
-    "start": "npm run start --prefix my-app",
-    "lint": "npm run lint --prefix my-app"
   }
 }
