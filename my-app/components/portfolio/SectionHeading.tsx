@@ -25,9 +25,10 @@ export default function SectionHeading({
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
       {eyebrow ? <div className="section-eyebrow">{eyebrow}</div> : null}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3.5">
         <h2 className="section-title">{title}</h2>
         <p className="section-subtitle">{description}</p>
+        <div className={`section-rule mt-1 ${align === "center" ? "mx-auto max-w-xs" : "max-w-sm"}`} />
       </div>
     </motion.div>
   )

@@ -239,16 +239,16 @@ export default function ScrollTabsSection({
       <div className={cn("sticky top-20 pb-6", stickyOffsetClassName)}>
         <Tabs value={activeTab} onValueChange={scrollToTab} className="portfolio-container w-full">
           <div className="mb-3">
-            <div className="progress-rail mx-auto mb-2.5 h-0.5 w-full max-w-5xl overflow-hidden rounded-full bg-muted/80">
+            <div className="progress-rail mx-auto mb-3 w-full max-w-5xl">
               <div
                 ref={progressRef}
-                className="progress-fill h-full w-full origin-left rounded-full"
+                className="progress-fill"
                 style={{ transform: "scaleX(0.04)" }}
               />
             </div>
             <TabsList
               className={cn(
-                "h-auto gap-1 rounded-full p-1 shadow-none",
+                "h-auto gap-1 rounded-xl p-1 shadow-none",
                 listClassName,
                 "mx-auto flex w-fit max-w-full flex-wrap justify-center"
               )}

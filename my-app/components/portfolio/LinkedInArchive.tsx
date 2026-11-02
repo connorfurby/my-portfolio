@@ -237,10 +237,10 @@ function LinkedInImageSlot({ slot }: { slot: LinkedInArchiveImageSlot }) {
       ) : null}
       <div className={cn("absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent", hasError && "opacity-0")} />
       <div className={cn("absolute inset-0 flex flex-col justify-between p-4 transition-opacity duration-300", hasError ? "opacity-100" : "opacity-0")}>
-        <div className="self-start rounded-full border border-white/25 bg-white/15 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.22em] text-white backdrop-blur-xl">
+        <div className="self-start rounded-lg border border-white/25 bg-black/40 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-white">
           PNG slot
         </div>
-        <div className="rounded-[1rem] border border-white/20 bg-black/35 p-3 text-white backdrop-blur-xl">
+        <div className="rounded-xl border border-white/20 bg-black/55 p-3 text-white">
           <div className="mb-1 flex items-center gap-2 text-sm font-semibold">
             <Images className="h-4 w-4" />
             Add image here
@@ -256,7 +256,7 @@ function LinkedInImageSlot({ slot }: { slot: LinkedInArchiveImageSlot }) {
 export default function LinkedInArchive() {
   return (
     <div className="w-full">
-      <Card className="surface-card relative overflow-hidden rounded-[2rem] border-border bg-card">
+      <Card className="relative overflow-hidden rounded-2xl">
         <CardHeader className="border-b border-foreground/8 pb-4">
           <CardTitle className="flex items-center gap-2 text-xl">
             <Linkedin className="h-5 w-5 text-[#0A66C2]" />
@@ -277,21 +277,17 @@ export default function LinkedInArchive() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.28, delay: index * 0.04 }}
                     whileHover={{ y: -4 }}
-                    className="rounded-[1.65rem] border border-foreground/10 bg-background/80 p-5 shadow-[0_20px_60px_hsl(var(--glass-shadow)/0.08)] sm:p-6"
+                    className="rounded-2xl border border-border/70 bg-card p-5 sm:p-6"
                   >
                     {post.repostedFrom ? (
-                      <motion.div
-                        animate={{ opacity: [0.72, 1, 0.72], x: [0, 2, 0] }}
-                        transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
-                        className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/15 bg-[#0A66C2]/8 px-3 py-1.5 text-xs font-medium text-[#0A66C2]"
-                      >
+                      <div className="mb-4 inline-flex items-center gap-2 rounded-lg border border-[#0A66C2]/20 bg-[#0A66C2]/8 px-3 py-1.5 text-xs font-medium text-[#0A66C2]">
                         <Repeat2 className="h-3.5 w-3.5" />
                         Connor Furby reposted {post.repostedFrom}
-                      </motion.div>
+                      </div>
                     ) : null}
 
                     <div className="flex items-start gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0A66C2,#5DA9F6)] text-sm font-semibold text-white shadow-[0_12px_28px_rgba(10,102,194,0.35)]">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#0A66C2] text-sm font-semibold text-white">
                         {getInitials(displayAuthor)}
                       </div>
 
@@ -299,7 +295,7 @@ export default function LinkedInArchive() {
                         <div className="flex flex-wrap items-center gap-2">
                           <div className="truncate text-[15px] font-semibold text-foreground">{displayAuthor}</div>
                           {post.repostedFrom ? (
-                            <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/70 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                            <Badge variant="outline">
                               Repost
                             </Badge>
                           ) : null}

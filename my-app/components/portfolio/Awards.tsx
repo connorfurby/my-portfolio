@@ -165,16 +165,14 @@ export default function Awards() {
   }, [autoRotate, shouldAnimate])
 
   const stackMapContent = (
-    <Card className="liquid-panel liquid-panel-strong overflow-hidden rounded-[2.05rem]">
+    <Card className="overflow-hidden rounded-2xl">
       <CardContent className="p-0">
         <div className="grid xl:h-[calc(100vh-15rem)] xl:grid-cols-[minmax(205px,0.5fr)_minmax(0,1.5fr)]">
-          <div className="border-b border-border/40 p-3.5 xl:border-b-0 xl:border-r">
+          <div className="border-b border-border/60 p-4 xl:border-b-0 xl:border-r">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
-                  Skill Clusters
-                </p>
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                <p className="section-eyebrow">Skill Clusters</p>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
                   Jump between the parts of my stack that show up together most often.
                 </p>
               </div>
@@ -200,10 +198,10 @@ export default function Awards() {
                     type="button"
                     onClick={() => setActiveClusterId(cluster.id)}
                     className={cn(
-                      "group relative w-full overflow-hidden rounded-[1.1rem] border px-2.5 py-2 text-left transition-all duration-300",
+                      "group relative w-full overflow-hidden rounded-xl border px-2.5 py-2 text-left transition-colors duration-200",
                       isActive
-                        ? "border-transparent bg-background/65 shadow-[0_20px_44px_hsl(var(--glass-shadow)/0.14)]"
-                        : "border-border/45 bg-background/25 hover:-translate-y-0.5 hover:bg-background/40"
+                        ? "border-border/80 bg-foreground/[0.05]"
+                        : "border-transparent hover:bg-foreground/[0.04]"
                     )}
                     style={
                       isActive
@@ -243,36 +241,31 @@ export default function Awards() {
             </div>
           </div>
 
-          <div className="flex min-h-0 flex-col p-3.5 lg:p-4">
-            <div className="flex flex-col gap-2.5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex min-h-0 flex-col p-4">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-2xl">
                 <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="border-border/70">
-                    Interactive Skill Map
-                  </Badge>
-                  <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                    {activeCluster.technologies.length} connected skills
-                  </span>
-                  <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                    {totalNodeCount}+ mapped total
+                  <Badge variant="outline">Interactive Skill Map</Badge>
+                  <span className="text-[12px] text-muted-foreground">
+                    {activeCluster.technologies.length} connected · {totalNodeCount}+ mapped
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold tracking-tight md:text-[1.45rem]">{activeCluster.title}</h3>
+                <h3 className="font-display text-lg font-semibold tracking-tight md:text-[1.45rem]">{activeCluster.title}</h3>
                 <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
                   {activeCluster.summary}
                 </p>
               </div>
 
-              <div className="flex w-full max-w-sm flex-wrap gap-1.5 rounded-[1rem] border border-border/45 bg-background/20 px-2.5 py-2">
+              <div className="flex w-full max-w-sm flex-wrap gap-1.5 rounded-xl border border-border/70 bg-foreground/[0.02] px-2.5 py-2">
                 {activeCluster.focus.slice(0, 3).map((item) => (
-                  <Badge key={item} variant="secondary" className="border-border/70">
+                  <Badge key={item} variant="secondary">
                     {item}
                   </Badge>
                 ))}
               </div>
             </div>
 
-            <div ref={stackMapRef} className="relative mt-3 min-h-[17.5rem] flex-1 overflow-hidden rounded-[1.55rem] border border-border/45 bg-background/20 p-2.5 sm:p-3 xl:min-h-0 lg:min-h-[19.5rem]">
+            <div ref={stackMapRef} className="relative mt-3 min-h-[17.5rem] flex-1 overflow-hidden rounded-xl border border-border/70 bg-foreground/[0.02] p-2.5 sm:p-3 xl:min-h-0 lg:min-h-[19.5rem]">
               <div
                 className="absolute inset-0 opacity-80"
                 style={{
@@ -482,43 +475,30 @@ export default function Awards() {
                         onFocus={() => setSpotlightTechName(tech.name)}
                         onClick={() => setSpotlightTechName(tech.name)}
                         className={cn(
-                          "absolute z-20 rounded-full border px-2 py-0.5 text-[9px] font-medium transition-all duration-300 sm:px-2.5 sm:py-1 sm:text-[10px]",
+                          "absolute z-20 rounded-lg border px-2 py-0.5 text-[9px] font-medium transition-colors duration-200 sm:px-2.5 sm:py-1 sm:text-[10px]",
                           isCompactSkillMap ? compactNodePlacementClassName[tech.labelPlacement] : nodePlacementClassName[tech.labelPlacement],
                           spotlightTech?.name === tech.name
-                            ? "border-transparent text-foreground shadow-[0_18px_34px_hsl(var(--glass-shadow)/0.18)]"
-                            : "border-border/55 text-foreground/90 hover:border-foreground/25 dark:border-white/10 dark:hover:border-white/18"
+                            ? "border-primary/40 bg-card text-foreground"
+                            : "border-border/70 bg-card/95 text-foreground/90 hover:border-foreground/25"
                         )}
                         style={{
                           left: `${tech.x}%`,
                           top: `${tech.y}%`,
-                          background:
-                            spotlightTech?.name === tech.name
-                              ? `linear-gradient(135deg, hsl(${activeCluster.accent} / 0.24), hsl(${activeCluster.accentSecondary} / 0.14))`
-                              : "linear-gradient(180deg, hsl(var(--glass-surface-strong) / 0.54), hsl(var(--glass-surface) / 0.22))",
                         }}
                         initial={reduceMotion ? false : { opacity: 0, scale: 0.7 }}
                         animate={{
                           opacity: 1,
-                          scale: spotlightTech?.name === tech.name ? 1.05 : 1,
-                          y: shouldAnimate ? [0, -4, 0] : 0,
+                          scale: spotlightTech?.name === tech.name ? 1.04 : 1,
                         }}
-                        whileHover={reduceMotion ? undefined : { scale: spotlightTech?.name === tech.name ? 1.05 : 1.02, y: -2 }}
+                        whileHover={reduceMotion ? undefined : { scale: spotlightTech?.name === tech.name ? 1.04 : 1.02 }}
                         transition={{
                           opacity: { duration: 0.28, delay: tech.delay },
-                          scale: { duration: 0.24 },
-                          y: { duration: tech.duration, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: tech.delay },
+                          scale: { duration: 0.2 },
                         }}
                       >
-                        <span
-                          className="absolute -inset-[1px] rounded-full opacity-0 blur-md transition-opacity duration-300"
-                          style={{
-                            background: `radial-gradient(circle, ${nodeMeta[tech.tier].glow} 0%, transparent 72%)`,
-                            opacity: spotlightTech?.name === tech.name ? 0.7 : 0,
-                          }}
-                        />
                         <span className="relative z-10 flex items-center gap-1.5 whitespace-nowrap sm:gap-2">
                           <span
-                            className={cn("rounded-full", nodeMeta[tech.tier].dotClassName)}
+                            className={cn("h-1.5 w-1.5 rounded-full", nodeMeta[tech.tier].dotClassName)}
                             style={{ backgroundColor: nodeMeta[tech.tier].glow }}
                           />
                           {tech.name}
@@ -530,26 +510,23 @@ export default function Awards() {
               </AnimatePresence>
             </div>
 
-            <div className="mt-2.5 rounded-[1.05rem] border border-border/45 bg-background/20 px-3 py-3">
+            <div className="mt-2.5 rounded-xl border border-border/70 bg-foreground/[0.02] px-3.5 py-3">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+                  <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                     <Sparkles className="h-4 w-4" />
                     Selected Skill
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <div className="text-sm font-semibold tracking-tight">{spotlightTech.name}</div>
-                    <Badge
-                      variant="outline"
-                      className="rounded-full border-border/55 bg-background/68 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] dark:border-white/10 dark:bg-background/30"
-                    >
+                    <Badge variant="outline">
                       {activeCluster.shortLabel}
                     </Badge>
                   </div>
                 </div>
 
                 <div className="min-w-0 lg:max-w-[60%]">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <div className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                     Linked projects
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1.5">
@@ -557,7 +534,6 @@ export default function Awards() {
                       <Badge
                         key={project}
                         variant="secondary"
-                        className="rounded-full px-2.5 py-1 text-[10px] uppercase tracking-[0.14em]"
                       >
                         {project}
                       </Badge>

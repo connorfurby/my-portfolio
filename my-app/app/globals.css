@@ -753,7 +753,9 @@ html::-webkit-scrollbar-corner {
   @apply text-3xl tracking-tight md:text-5xl;
   font-family: var(--font-display), var(--font-sans), Arial, Helvetica, sans-serif;
   font-weight: 600;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+  text-wrap: balance;
 }
 
 .section-eyebrow {
@@ -776,6 +778,49 @@ html::-webkit-scrollbar-corner {
 
 .section-subtitle {
   @apply max-w-3xl text-sm leading-7 text-muted-foreground md:text-base;
+}
+
+.progress-rail {
+  height: 2px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: hsl(var(--foreground) / 0.08);
+}
+
+.progress-fill {
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  border-radius: inherit;
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--spotlight-secondary)));
+}
+
+.studio-field {
+  border: 1px solid hsl(var(--border) / 0.8);
+  background: hsl(var(--background));
+  border-radius: 0.75rem;
+  color: hsl(var(--foreground));
+  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.studio-field::placeholder {
+  color: hsl(var(--muted-foreground) / 0.75);
+}
+
+.studio-field:hover {
+  border-color: hsl(var(--border));
+}
+
+.studio-field:focus {
+  border-color: hsl(var(--primary) / 0.5);
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12);
+  outline: none;
+}
+
+.section-rule {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, hsl(var(--border)), transparent 88%);
 }
 
 .portfolio-container {

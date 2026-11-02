@@ -45,9 +45,9 @@ export default function Contact() {
 
   return (
     <AnimatedSection id="contact" className="mb-12 pt-12" delay={0.05}>
-      <div className="grid gap-5 xl:grid-cols-[minmax(250px,0.52fr)_minmax(0,1.48fr)]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(250px,0.5fr)_minmax(0,1.5fr)]">
         <motion.div
-          className="flex flex-col gap-5 px-1 py-2"
+          className="flex flex-col gap-6 px-1 py-2"
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
@@ -59,11 +59,19 @@ export default function Contact() {
             description="For internships, product-minded engineering roles, collaborations, or just a strong shared interest in building, this should be the easiest part of the site."
           />
 
-          <div className="grid gap-3">
-            {contactFocuses.map((focus) => (
-              <div key={focus.title} className="border-b border-border/40 pb-3 last:border-b-0 last:pb-0">
-                <div className="text-sm font-medium text-foreground">{focus.title}</div>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">{focus.description}</p>
+          <div className="space-y-0">
+            {contactFocuses.map((focus, index) => (
+              <div
+                key={focus.title}
+                className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 border-t border-border/50 py-4 first:border-t-0 first:pt-0"
+              >
+                <span className="pt-0.5 font-mono text-[10px] tracking-wider text-primary/80">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <div className="text-sm font-medium text-foreground">{focus.title}</div>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{focus.description}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -96,23 +104,24 @@ export default function Contact() {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
-          <Card className="rounded-2xl">
-            <CardContent className="p-5 sm:p-6">
+          <Card className="overflow-hidden rounded-2xl">
+            <div className="border-b border-border/60 bg-foreground/[0.02] px-5 py-5 sm:px-6">
               <SectionHeading
                 eyebrow="Message"
                 title="Send a message with context"
                 description="This opens a prefilled email so the outreach stays personal, but the form makes it much easier to send something useful on the first try."
               />
-
-              <form onSubmit={handleSubmit} className="mt-4 grid gap-3">
-                <div className="grid gap-3 md:grid-cols-2">
+            </div>
+            <CardContent className="p-5 sm:p-6">
+              <form onSubmit={handleSubmit} className="grid gap-4">
+                <div className="grid gap-4 md:grid-cols-2">
                   <label className="grid gap-2">
                     <span className="text-sm font-medium">Name</span>
                     <input
                       value={name}
                       onChange={(event) => setName(event.target.value)}
                       placeholder="Your name"
-                      className="rounded-xl border border-border/70 bg-background px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-primary/40"
+                      className="studio-field h-11 px-3.5 text-sm"
                     />
                   </label>
                   <label className="grid gap-2">
@@ -122,7 +131,7 @@ export default function Contact() {
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
                       placeholder="name@company.com"
-                      className="rounded-xl border border-border/70 bg-background px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-primary/40"
+                      className="studio-field h-11 px-3.5 text-sm"
                     />
                   </label>
                 </div>
@@ -133,7 +142,7 @@ export default function Contact() {
                     value={organization}
                     onChange={(event) => setOrganization(event.target.value)}
                     placeholder="Team, company, project, or reason for reaching out"
-                    className="rounded-xl border border-border/70 bg-background px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-primary/40"
+                    className="studio-field h-11 px-3.5 text-sm"
                   />
                 </label>
 
@@ -144,11 +153,11 @@ export default function Contact() {
                     onChange={(event) => setMessage(event.target.value)}
                     placeholder="A few lines about the opportunity, project, or conversation you have in mind."
                     rows={5}
-                    className="resize-none rounded-xl border border-border/70 bg-background px-3.5 py-3 text-sm leading-6 outline-none transition-colors focus:border-primary/40"
+                    className="studio-field resize-none px-3.5 py-3 text-sm leading-6"
                   />
                 </label>
 
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3 pt-1">
                   <Button type="submit" className="px-5">
                     Send Message
                     <Send className="h-4 w-4" />
@@ -171,9 +180,9 @@ export default function Contact() {
                     Your message was prepared in email with the details from the form.
                   </div>
                 ) : (
-                  <div className="rounded-xl border border-border/50 bg-foreground/[0.02] px-4 py-3 text-sm leading-6 text-muted-foreground">
+                  <p className="text-sm leading-6 text-muted-foreground">
                     The form launches a prefilled email draft so you can send through your own inbox while still keeping the outreach structured.
-                  </div>
+                  </p>
                 )}
               </form>
             </CardContent>

@@ -4,7 +4,6 @@ import { Sparkles } from "lucide-react"
 import { motion, useReducedMotion } from "framer-motion"
 
 import { passions } from "@/components/portfolio/data"
-import { useMediaQuery } from "@/components/portfolio/useMediaQuery"
 import { useNearViewport } from "@/components/portfolio/useNearViewport"
 import type { Passion } from "@/components/portfolio/types"
 import { Badge } from "@/components/ui/badge"
@@ -35,21 +34,6 @@ const passionLayout: Record<string, MindmapLayout> = {
   Food: { x: 68, y: 82, driftX: 5, driftY: 7, duration: 14, delay: 0.25 },
 }
 
-const particleSpecs = [
-  { x: 8, y: 20, size: 4, opacity: 0.55, driftX: 12, driftY: -10, duration: 14, delay: 0.2 },
-  { x: 14, y: 78, size: 5, opacity: 0.42, driftX: 10, driftY: -14, duration: 16, delay: 0.7 },
-  { x: 22, y: 12, size: 3, opacity: 0.6, driftX: -8, driftY: 8, duration: 12, delay: 0.1 },
-  { x: 28, y: 54, size: 4, opacity: 0.45, driftX: 14, driftY: -4, duration: 15, delay: 0.9 },
-  { x: 36, y: 30, size: 6, opacity: 0.28, driftX: -12, driftY: -8, duration: 17, delay: 0.4 },
-  { x: 44, y: 78, size: 3, opacity: 0.58, driftX: 9, driftY: 11, duration: 13, delay: 0.8 },
-  { x: 58, y: 16, size: 4, opacity: 0.52, driftX: 8, driftY: -10, duration: 16, delay: 0.35 },
-  { x: 62, y: 42, size: 5, opacity: 0.34, driftX: -10, driftY: 9, duration: 18, delay: 0.55 },
-  { x: 70, y: 12, size: 3, opacity: 0.5, driftX: -7, driftY: 12, duration: 15, delay: 0.95 },
-  { x: 78, y: 58, size: 4, opacity: 0.46, driftX: 12, driftY: -8, duration: 14, delay: 0.25 },
-  { x: 86, y: 24, size: 6, opacity: 0.3, driftX: -8, driftY: 6, duration: 17, delay: 0.65 },
-  { x: 90, y: 76, size: 4, opacity: 0.5, driftX: -10, driftY: -10, duration: 16, delay: 0.15 },
-] as const
-
 const crossLinks = [
   ["Reading", "Music"],
   ["Running", "Water Sports"],
@@ -77,7 +61,6 @@ const nodeLookup = Object.fromEntries(mindmapNodes.map((node) => [node.title, no
 
 export default function Passions() {
   const reduceMotion = useReducedMotion()
-  const isMobile = useMediaQuery("(max-width: 767px)")
   const [activeTitle, setActiveTitle] = useState("Software Development")
   const { ref: sectionRef, isNearViewport } = useNearViewport<HTMLDivElement>({ rootMargin: "280px 0px" })
   const shouldAnimate = !reduceMotion && isNearViewport
@@ -86,39 +69,11 @@ export default function Passions() {
   const svgId = useId().replace(/:/g, "")
   const connectionGradientId = `${svgId}-mindmap-connection`
   const linkGlowId = `${svgId}-mindmap-glow`
-  const visibleParticleSpecs = isMobile ? particleSpecs.filter((_, index) => index % 2 === 0) : particleSpecs
 
   return (
     <div ref={sectionRef} className="relative z-30">
-      <motion.div
-        className="pointer-events-none absolute inset-x-0 top-6 h-28 bg-[radial-gradient(circle_at_center,hsl(var(--spotlight)/0.18),transparent_68%)]"
-        animate={shouldAnimate ? { opacity: [0.36, 0.76, 0.36], scale: [0.96, 1.04, 0.96] } : undefined}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-
       <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card p-4 sm:p-5 lg:p-6">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 opacity-80 [background-image:radial-gradient(circle_at_18%_16%,hsl(var(--spotlight)/0.18),transparent_24%),radial-gradient(circle_at_82%_18%,hsl(var(--spotlight-secondary)/0.16),transparent_22%),radial-gradient(circle_at_50%_88%,hsl(var(--primary)/0.1),transparent_28%)]" />
-          <div
-            className="absolute inset-0 opacity-30"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, hsl(var(--foreground) / 0.05) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--foreground) / 0.05) 1px, transparent 1px)",
-              backgroundSize: "34px 34px",
-              maskImage: "radial-gradient(circle at center, black 45%, transparent 100%)",
-            }}
-          />
-          <motion.div
-            className="absolute -left-8 top-8 h-40 w-40 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.28),transparent_72%)]"
-            animate={shouldAnimate ? { x: [0, 26, 0], y: [0, 18, 0], scale: [1, 1.08, 1] } : undefined}
-            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute -right-8 bottom-6 h-44 w-44 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.24),transparent_70%)]"
-            animate={shouldAnimate ? { x: [0, -22, 0], y: [0, -14, 0], scale: [1, 1.06, 1] } : undefined}
-            transition={{ duration: 19, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-          />
-        </div>
+        <div className="pointer-events-none absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_18%_16%,hsl(var(--spotlight)/0.12),transparent_28%),radial-gradient(circle_at_82%_18%,hsl(var(--spotlight-secondary)/0.1),transparent_26%)]" />
 
         <div className="relative mb-4 max-w-3xl">
           <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -152,51 +107,8 @@ export default function Passions() {
             </div>
 
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
-              <motion.div
-                className="absolute left-1/2 top-1/2 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-foreground/10"
-                animate={shouldAnimate ? { rotate: 360 } : undefined}
-                transition={{ duration: 38, repeat: Infinity, ease: "linear" }}
-              />
-              <motion.div
-                className="absolute left-1/2 top-1/2 h-[62%] w-[62%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-foreground/10"
-                animate={shouldAnimate ? { rotate: -360 } : undefined}
-                transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
-              />
-              <motion.div
-                className="absolute left-1/2 top-1/2 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0deg,hsl(var(--spotlight)/0.14)_55deg,transparent_120deg,hsl(var(--spotlight-secondary)/0.1)_180deg,transparent_245deg)]"
-                animate={shouldAnimate ? { rotate: 360 } : undefined}
-                transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
-              />
-
-              {visibleParticleSpecs.map((particle, index) => (
-                <motion.span
-                  key={`passion-particle-${index}`}
-                  className="absolute rounded-full bg-foreground/80 shadow-[0_0_16px_hsl(var(--spotlight)/0.38)]"
-                  style={{
-                    left: `${particle.x}%`,
-                    top: `${particle.y}%`,
-                    width: particle.size,
-                    height: particle.size,
-                    opacity: particle.opacity,
-                  }}
-                  animate={
-                    !shouldAnimate
-                      ? undefined
-                      : {
-                          x: [0, particle.driftX, 0],
-                          y: [0, particle.driftY, 0],
-                          scale: [0.7, 1.25, 0.7],
-                          opacity: [particle.opacity * 0.45, particle.opacity, particle.opacity * 0.45],
-                        }
-                  }
-                  transition={{
-                    duration: particle.duration,
-                    delay: particle.delay,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-              ))}
+              <div className="absolute left-1/2 top-1/2 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/60" />
+              <div className="absolute left-1/2 top-1/2 h-[62%] w-[62%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-border/50" />
             </div>
 
             <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">

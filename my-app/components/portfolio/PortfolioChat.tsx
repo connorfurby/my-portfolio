@@ -169,22 +169,18 @@ export default function PortfolioChat() {
 
   return (
     <div className="grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
-      <Card className="surface-card liquid-glow rounded-[2rem] border-border bg-card">
-        <CardContent className="flex h-full flex-col gap-6 p-8">
-          <div className="flex flex-wrap items-center gap-3">
-            <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/75 px-4 py-1 font-mono text-[11px] uppercase tracking-[0.24em]">
-              <Bot className="mr-2 h-3.5 w-3.5" />
+      <Card className="rounded-2xl">
+        <CardContent className="flex h-full flex-col gap-6 p-6 sm:p-8">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">
+              <Bot className="mr-1.5 h-3.5 w-3.5" />
               Portfolio assistant
             </Badge>
-            <Badge variant="outline" className="rounded-full border-foreground/10 bg-background/75 px-4 py-1 font-mono text-[11px] uppercase tracking-[0.24em]">
-              Live with Gemini
-            </Badge>
+            <Badge variant="secondary">Live with Gemini</Badge>
           </div>
 
-          <div className="space-y-4">
-            <div className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">
-              Interactive Q&amp;A
-            </div>
+          <div className="space-y-3">
+            <div className="section-eyebrow">Interactive Q&amp;A</div>
             <h3 className="font-display text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">
               Explore the portfolio through conversation
             </h3>
@@ -199,7 +195,7 @@ export default function PortfolioChat() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: 0.35 }}
-              className="rounded-[1.5rem] border border-foreground/10 bg-background/45 p-4"
+              className="rounded-xl border border-border/70 bg-foreground/[0.02] p-4"
             >
               <div className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                 <Compass className="h-4 w-4 text-primary" />
@@ -214,7 +210,7 @@ export default function PortfolioChat() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: 0.35, delay: 0.05 }}
-              className="rounded-[1.5rem] border border-foreground/10 bg-background/45 p-4"
+              className="rounded-xl border border-border/70 bg-foreground/[0.02] p-4"
             >
               <div className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
                 <CheckCircle2 className="h-4 w-4 text-primary" />
@@ -227,7 +223,7 @@ export default function PortfolioChat() {
           </div>
 
           <div className="space-y-3">
-            <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+            <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
               Try asking
             </div>
             <div className="flex flex-wrap gap-2">
@@ -240,7 +236,7 @@ export default function PortfolioChat() {
                   viewport={{ once: true, amount: 0.5 }}
                   transition={{ duration: 0.24, delay: index * 0.05 }}
                   onClick={() => submitQuestion(question)}
-                  className="rounded-full border border-foreground/10 bg-background/55 px-3 py-1.5 text-left text-xs text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:bg-background/75 hover:text-foreground"
+                  className="rounded-lg border border-border/70 bg-card px-3 py-1.5 text-left text-xs text-muted-foreground transition-colors hover:border-foreground/20 hover:text-foreground"
                 >
                   {question}
                 </motion.button>
@@ -255,7 +251,7 @@ export default function PortfolioChat() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {uniqueSources.slice(0, 6).map((source) => (
-                  <Badge key={source.id} variant="outline" className="rounded-full border-foreground/10 bg-background/65 px-3 py-1 text-[10px] uppercase tracking-[0.18em]">
+                  <Badge key={source.id} variant="outline">
                     {formatSourceLabel(source)}
                   </Badge>
                 ))}
@@ -265,16 +261,11 @@ export default function PortfolioChat() {
         </CardContent>
       </Card>
 
-      <Card className="surface-card rounded-[2rem] border-border bg-card">
+      <Card className="rounded-2xl">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-xl">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-foreground/10 bg-background/60">
-              <motion.div
-                className="absolute inset-0 rounded-full bg-primary/10"
-                animate={{ scale: [1, 1.16, 1], opacity: [0.22, 0.1, 0.22] }}
-                transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-              />
-              <WandSparkles className="relative h-4.5 w-4.5 text-primary" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/70 bg-foreground/[0.03]">
+              <WandSparkles className="h-4.5 w-4.5 text-primary" />
             </div>
             <div className="space-y-1">
               <div>Ask the portfolio assistant</div>
@@ -287,7 +278,7 @@ export default function PortfolioChat() {
         <CardContent className="flex flex-col gap-4">
           <div
             ref={messagesContainerRef}
-            className="max-h-[30rem] min-h-[24rem] space-y-4 overflow-y-auto rounded-[1.7rem] border border-foreground/10 bg-background/35 p-4"
+            className="max-h-[30rem] min-h-[24rem] space-y-4 overflow-y-auto rounded-xl border border-border/70 bg-foreground/[0.02] p-4"
           >
             {messages.map((message, index) => (
               <motion.div
@@ -299,10 +290,10 @@ export default function PortfolioChat() {
               >
                 <div
                   className={cn(
-                    "max-w-[92%] rounded-[1.35rem] px-4 py-3 text-sm leading-7 shadow-[0_14px_36px_hsl(var(--glass-shadow)/0.06)]",
+                    "max-w-[92%] rounded-2xl px-4 py-3 text-sm leading-7",
                     message.role === "user"
                       ? "bg-foreground text-background"
-                      : "border border-foreground/10 bg-background/78 text-foreground"
+                      : "border border-border/70 bg-card text-foreground"
                   )}
                 >
                   <div className="mb-1.5 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] opacity-70">
@@ -375,35 +366,12 @@ export default function PortfolioChat() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex justify-start"
               >
-                <div className="max-w-[92%] rounded-[1.35rem] border border-foreground/10 bg-background/78 px-4 py-3 text-sm text-muted-foreground shadow-[0_14px_36px_hsl(var(--glass-shadow)/0.06)]">
+                <div className="max-w-[92%] rounded-2xl border border-border/70 bg-card px-4 py-3 text-sm text-muted-foreground">
                   <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] opacity-70">
                     <Bot className="h-3 w-3" />
                     Assistant
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5">
-                      {[0, 1, 2].map((dot) => (
-                        <motion.span
-                          key={dot}
-                          className="h-2 w-2 rounded-full bg-primary/70"
-                          animate={{ y: [0, -4, 0], opacity: [0.35, 1, 0.35] }}
-                          transition={{
-                            duration: 0.9,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: dot * 0.12,
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <motion.span
-                      className="text-sm"
-                      animate={{ opacity: [0.55, 1, 0.55] }}
-                      transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      Thinking through the portfolio...
-                    </motion.span>
-                  </div>
+                  <p className="text-sm">Thinking through the portfolio...</p>
                 </div>
               </motion.div>
             ) : null}
@@ -416,8 +384,7 @@ export default function PortfolioChat() {
               submitQuestion(input)
             }}
           >
-            <div className="relative overflow-hidden rounded-[1.7rem] border border-foreground/10 bg-background/45">
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+            <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-foreground/[0.02]">
               <textarea
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
@@ -428,13 +395,13 @@ export default function PortfolioChat() {
                   }
                 }}
                 placeholder="Ask about projects, technologies, internships, leadership, education, impact, or what Connor is learning next..."
-                className="min-h-[8rem] w-full resize-none bg-transparent px-4 py-4 pr-24 text-sm text-foreground outline-none placeholder:text-muted-foreground/80"
+                className="min-h-[7.5rem] w-full resize-none bg-transparent px-4 py-4 pr-28 text-sm text-foreground outline-none placeholder:text-muted-foreground/80"
               />
               <div className="absolute bottom-3 right-3">
                 <Button
                   type="submit"
                   disabled={isLoading || !input.trim()}
-                  className="h-11 rounded-full px-5 text-sm shadow-[0_14px_32px_hsl(var(--glass-shadow)/0.16)]"
+                  className="h-10 px-4 text-sm"
                 >
                   Send
                   <SendHorizonal className="ml-2 h-4 w-4" />

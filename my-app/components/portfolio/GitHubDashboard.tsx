@@ -561,24 +561,24 @@ export default function GitHubDashboard() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-3 grid h-auto w-full max-w-5xl grid-cols-2 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          <TabsTrigger value="ai-chat" className="gap-2">
+        <TabsList className="mb-4 flex h-auto w-fit max-w-full flex-wrap justify-start gap-1 rounded-xl p-1">
+          <TabsTrigger value="ai-chat" className="h-8 gap-2 px-3.5">
             <Bot className="h-4 w-4" />
             AI Chat
           </TabsTrigger>
-          <TabsTrigger value="linkedin" className="gap-2">
+          <TabsTrigger value="linkedin" className="h-8 gap-2 px-3.5">
             <Linkedin className="h-4 w-4" />
             LinkedIn
           </TabsTrigger>
-          <TabsTrigger value="terminal" className="gap-2">
+          <TabsTrigger value="terminal" className="h-8 gap-2 px-3.5">
             <Command className="h-4 w-4" />
             Terminal
           </TabsTrigger>
-          <TabsTrigger value="github" className="gap-2">
+          <TabsTrigger value="github" className="h-8 gap-2 px-3.5">
             <FolderGit2 className="h-4 w-4" />
             GitHub
           </TabsTrigger>
-          <TabsTrigger value="spotify" className="gap-2">
+          <TabsTrigger value="spotify" className="h-8 gap-2 px-3.5">
             <Music4 className="h-4 w-4" />
             Spotify
           </TabsTrigger>
@@ -614,29 +614,17 @@ export default function GitHubDashboard() {
               viewport={{ once: true, amount: 0.18 }}
               className="flex flex-col"
             >
-              <Card className="surface-card relative overflow-hidden rounded-[2rem] border-border bg-card">
-                <motion.div
-                  className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight)/0.22),transparent_70%)]"
-                  animate={isIntegrationsVisible ? { x: [0, 16, 0], y: [0, -10, 0] } : undefined}
-                  transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
-                />
+              <Card className="relative overflow-hidden rounded-2xl">
                 <CardContent className="relative flex flex-col gap-4 p-6 sm:p-7">
                   <div className="flex flex-wrap items-center gap-2.5">
-                    <Badge variant="outline" className="border-border/70">
-                      <Sparkles className="mr-2 h-3.5 w-3.5" />
-                      Public API powered
-                    </Badge>
+                    <Badge variant="outline">Public API powered</Badge>
                     {githubData ? (
-                      <Badge variant="outline" className="border-border/70">
-                        Updated {formatRelative(githubData.updatedAt)}
-                      </Badge>
+                      <Badge variant="secondary">Updated {formatRelative(githubData.updatedAt)}</Badge>
                     ) : null}
                   </div>
 
                   <div className="space-y-2.5">
-                    <div className="font-mono text-xs uppercase tracking-[0.28em] text-muted-foreground">
-                      GitHub presence
-                    </div>
+                    <div className="section-eyebrow">GitHub presence</div>
                     <div className="font-display text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">
                       {githubData?.profile.name ?? "Connor Furby"}
                     </div>
@@ -655,20 +643,19 @@ export default function GitHubDashboard() {
                           key={card.key}
                           whileHover={{ y: -4 }}
                           transition={{ duration: 0.2 }}
-                          className="relative overflow-hidden rounded-[1.35rem] border border-foreground/10 bg-background/55 p-3.5"
+                          className="relative overflow-hidden rounded-xl border border-border/70 bg-foreground/[0.02] p-3.5"
                         >
-                          <div className={`absolute inset-0 bg-gradient-to-br ${card.accent}`} />
                           <div className="relative flex items-start justify-between gap-3">
                             <div>
-                              <div className="mb-1.5 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                              <div className="mb-1.5 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                                 {card.label}
                               </div>
                               <div className="font-display text-[2rem] font-semibold leading-none tracking-[-0.05em]">
                                 {value}
                               </div>
                             </div>
-                            <div className="flex h-9 w-9 items-center justify-center rounded-2xl border border-foreground/10 bg-background/75">
-                              <Icon className="h-4 w-4" />
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/70 bg-card">
+                              <Icon className="h-4 w-4 text-primary" />
                             </div>
                           </div>
                         </motion.div>
@@ -676,7 +663,7 @@ export default function GitHubDashboard() {
                     })}
                   </div>
 
-                  <div className="rounded-[1.35rem] border border-foreground/10 bg-background/45 p-4">
+                  <div className="rounded-xl border border-border/70 bg-foreground/[0.02] p-4">
                     {githubLoading ? (
                       <div className="space-y-4">
                         <div className="h-10 w-32 rounded bg-foreground/8 animate-pulse" />
@@ -724,19 +711,19 @@ export default function GitHubDashboard() {
                     )}
                   </div>
 
-                  <div className="flex flex-wrap gap-2.5">
-                    <Button asChild className="rounded-full px-5">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <Button asChild className="px-5">
                       <a href={githubData?.profile.htmlUrl ?? "https://github.com/connorfurby"} target="_blank" rel="noreferrer">
                         Visit GitHub
                       </a>
                     </Button>
-                    <div className="rounded-full border border-foreground/10 bg-background/60 px-4 py-2 text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       {githubLoading
                         ? "Loading GitHub footprint..."
                         : githubError
                           ? "Showing fallback state"
-                          : `On GitHub since ${formatMonthYear(githubData?.profile.createdAt ?? new Date().toISOString())} • ${githubData?.stats.activeRepos ?? 0} active repos`}
-                    </div>
+                          : `On GitHub since ${formatMonthYear(githubData?.profile.createdAt ?? new Date().toISOString())} · ${githubData?.stats.activeRepos ?? 0} active repos`}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -748,7 +735,7 @@ export default function GitHubDashboard() {
               viewport={{ once: true, amount: 0.18 }}
               className="flex flex-col"
             >
-              <Card className="surface-card rounded-[2rem] border-border bg-card">
+              <Card className="rounded-2xl">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <GitBranch className="h-5 w-5 text-primary" />
@@ -1002,26 +989,26 @@ export default function GitHubDashboard() {
                       </div>
                     ) : null}
 
-                    <div className="flex flex-wrap gap-2.5">
+                    <div className="flex flex-wrap items-center gap-2.5">
                       {spotifyData.playback?.url ? (
-                        <Button asChild className="rounded-full px-4">
+                        <Button asChild className="px-4">
                           <a href={spotifyData.playback.url} target="_blank" rel="noreferrer">
                             Open in Spotify
                           </a>
                         </Button>
                       ) : null}
                       {spotifyData.profile?.profileUrl ? (
-                        <Button asChild variant="outline" className="rounded-full px-4">
+                        <Button asChild variant="outline" className="px-4">
                           <a href={spotifyData.profile.profileUrl} target="_blank" rel="noreferrer">
                             Open Profile
                           </a>
                         </Button>
                       ) : null}
-                      <div className="rounded-full border border-foreground/10 bg-background/60 px-3 py-1.5 text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         {spotifyData.playback?.playedAt
                           ? `Played ${formatRelative(spotifyData.playback.playedAt)}`
                           : spotifyData.playback?.message ?? spotifyData.message}
-                      </div>
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1043,7 +1030,7 @@ export default function GitHubDashboard() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="rounded-full px-3"
+                      className="px-3"
                       onClick={() => setIsSpotifyDetailsOpen(true)}
                     >
                       More data

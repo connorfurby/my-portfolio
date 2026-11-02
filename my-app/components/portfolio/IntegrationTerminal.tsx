@@ -403,7 +403,7 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
   }
 
   return (
-    <Card className="surface-card overflow-hidden rounded-[2rem] border-white/10 bg-[linear-gradient(180deg,rgba(5,12,24,0.96),rgba(9,18,34,0.94))] text-slate-100">
+    <Card className="overflow-hidden rounded-2xl border-white/10 bg-[linear-gradient(180deg,rgba(5,12,24,0.96),rgba(9,18,34,0.94))] text-slate-100">
       <CardContent className="p-0">
         <div className="border-b border-white/10 px-4 py-4 sm:px-5">
           <div className="flex flex-wrap items-center justify-between gap-3">

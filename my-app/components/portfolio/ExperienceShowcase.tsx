@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
-import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 
 import type { ExperienceEntry } from "@/components/portfolio/types"
 import { clamp as clampProgress, getSectionScrollProgress, scrollToSectionProgress } from "@/components/portfolio/utils"
@@ -1645,14 +1645,12 @@ export default function ExperienceShowcase({ items }: ExperienceShowcaseProps) {
     return (
       <section ref={sectionRef} className="relative mb-16 pt-6">
         <div className="portfolio-container w-full">
-          <div className="mb-5 max-w-3xl">
-            <Badge variant="outline" className="rounded-full px-4 py-1 font-mono text-[11px] uppercase tracking-[0.22em]">
-              Real-world Experience
-            </Badge>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] md:text-5xl">
+          <div className="mb-6 max-w-3xl">
+            <div className="section-eyebrow">Real-world Experience</div>
+            <h2 className="section-title mt-3">
               Internships, work, and volunteering in motion
             </h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
+            <p className="section-subtitle mt-3">
               A mobile-friendly experience deck. Switch lanes and move role by role without any pinned content hiding below the fold.
             </p>
           </div>
@@ -1684,20 +1682,17 @@ export default function ExperienceShowcase({ items }: ExperienceShowcaseProps) {
                     exit={reduceMotion ? undefined : { opacity: 0, y: -10 }}
                     transition={CONTENT_TRANSITION}
                   >
-                    <Card className="liquid-panel liquid-panel-strong overflow-hidden rounded-[2rem]">
+                    <Card className="overflow-hidden rounded-2xl">
                       <CardContent className="p-4">
-                        <div className="mb-4 flex flex-col gap-3 border-b border-border/40 pb-4">
+                        <div className="mb-4 flex flex-col gap-3 border-b border-border/60 pb-4">
                           <div>
-                            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                              <Sparkles className="h-4 w-4" />
-                              {activeItem.eyebrow}
-                            </div>
+                            <div className="section-eyebrow">{activeItem.eyebrow}</div>
                             <p className="mt-2 text-sm leading-6 text-muted-foreground">{activeItem.description}</p>
                           </div>
 
-                          <div className="flex items-center justify-between gap-3 rounded-[1.1rem] border border-border/45 bg-background/35 px-3 py-3">
+                          <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-foreground/[0.02] px-3 py-3">
                             <div className="min-w-0">
-                              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Entry deck</div>
+                              <div className="text-[11px] text-muted-foreground">Entry deck</div>
                               <div className="mt-1 text-sm font-medium text-foreground">
                                 {clampedEntryIndex + 1} of {activeEntries.length}: {entry?.title}
                               </div>
@@ -1707,7 +1702,6 @@ export default function ExperienceShowcase({ items }: ExperienceShowcaseProps) {
                                 type="button"
                                 variant="outline"
                                 size="icon"
-                                className="rounded-full"
                                 onClick={() =>
                                   setActiveEntryIndex((current) =>
                                     activeEntries.length ? (current - 1 + activeEntries.length) % activeEntries.length : 0
@@ -1721,7 +1715,6 @@ export default function ExperienceShowcase({ items }: ExperienceShowcaseProps) {
                                 type="button"
                                 variant="outline"
                                 size="icon"
-                                className="rounded-full"
                                 onClick={() =>
                                   setActiveEntryIndex((current) =>
                                     activeEntries.length ? (current + 1) % activeEntries.length : 0
@@ -1761,31 +1754,30 @@ export default function ExperienceShowcase({ items }: ExperienceShowcaseProps) {
   return (
     <section ref={sectionRef} className="relative mb-16 pt-6" style={{ height: sectionHeight }}>
       <div className="portfolio-container w-full">
-        <div className="mb-5 max-w-3xl">
-          <Badge variant="outline" className="rounded-full px-4 py-1 font-mono text-[11px] uppercase tracking-[0.22em]">
-            Real-world Experience
-          </Badge>
-          <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] md:text-5xl">
+        <div className="mb-6 max-w-3xl">
+          <div className="section-eyebrow">Real-world Experience</div>
+          <h2 className="section-title mt-3">
             Internships, work, and volunteering in motion
           </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
+          <p className="section-subtitle mt-3">
             Scroll through one role at a time. Each lane reveals left to right so the section feels more like a product narrative than a list of resumes.
           </p>
+          <div className="section-rule mt-4 max-w-sm" />
         </div>
       </div>
 
       <div className="sticky top-20 pb-6">
         <Tabs value={activeTab} onValueChange={scrollToTab} className="portfolio-container w-full">
           <div className="mb-3">
-            <div className="progress-rail mx-auto mb-2.5 h-0.5 w-full max-w-5xl overflow-hidden rounded-full bg-muted/80">
+            <div className="progress-rail mx-auto mb-3 w-full max-w-5xl">
               <div
                 ref={progressRef}
-                className="progress-fill h-full w-full origin-left rounded-full"
+                className="progress-fill"
                 style={{ transform: "scaleX(0.04)" }}
               />
             </div>
 
-            <TabsList className="mx-auto flex h-auto w-fit max-w-full flex-wrap justify-center gap-1 rounded-full p-1 shadow-none">
+            <TabsList className="mx-auto flex h-auto w-fit max-w-full flex-wrap justify-center gap-1 rounded-xl p-1 shadow-none">
               {items.map((item) => (
                 <TabsTrigger key={item.value} value={item.value} className="h-8 px-3.5">
                   {item.label}
@@ -1810,23 +1802,20 @@ export default function ExperienceShowcase({ items }: ExperienceShowcaseProps) {
                     exit={reduceMotion ? undefined : { opacity: 0, y: -12, scale: 0.995 }}
                     transition={CONTENT_TRANSITION}
                   >
-                    <Card className="liquid-panel liquid-panel-strong overflow-hidden rounded-[2.2rem]">
+                    <Card className="overflow-hidden rounded-2xl">
                       <CardContent className="p-4 lg:p-5">
-                        <div className="mb-4 flex flex-col gap-3 border-b border-border/40 pb-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="mb-4 flex flex-col gap-3 border-b border-border/60 pb-4 lg:flex-row lg:items-center lg:justify-between">
                           <div>
-                            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-                              <Sparkles className="h-4 w-4" />
-                              {item.eyebrow}
-                            </div>
+                            <div className="section-eyebrow">{item.eyebrow}</div>
                             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{item.description}</p>
                           </div>
 
-                          <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+                          <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
                             <span>
                               {activeEntryIndex + 1}/{item.entries.length}
                             </span>
                             <ArrowRight className="h-3.5 w-3.5" />
-                            <span>{entry?.title}</span>
+                            <span className="font-medium text-foreground">{entry?.title}</span>
                           </div>
                         </div>
 
