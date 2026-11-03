@@ -238,7 +238,6 @@ export const internshipEntries: ExperienceEntry[] = [
     accent: "221 48% 20%",
     accentSecondary: "217 36% 34%",
     stats: ["6 AI tools", "75% faster research", "Team lead"],
-    particleWords: ["ILCS", "Drafting", "Auth", "Analytics"],
     bullets: [
       "Built and deployed six AI-powered legal automation tools trained on ILCS laws for research and drafting workflows.",
       "Handled more than 100 weekly queries and helped reduce attorney research time by roughly 75%.",
@@ -256,7 +255,6 @@ export const internshipEntries: ExperienceEntry[] = [
     accent: "0 86% 58%",
     accentSecondary: "5 90% 66%",
     stats: ["500+ students", "95% faster response", "15+ products"],
-    particleWords: ["Signals", "React", "Clerk", "AWS"],
     bullets: [
       "Architected a real-time mental health alert system covering 100+ problematic emotion categories for 500+ students.",
       "Helped reduce response time for at-risk cases by roughly 95% through faster signal routing and system design.",
@@ -273,12 +271,10 @@ export const workEntries: ExperienceEntry[] = [
     subtitle: "Sigma Phi Epsilon • Oct 2025 - Present",
     summary: "A leadership role centered on planning, operations, budgeting, and execution for a large member-facing organization.",
     logoText: "ΣΦΕ",
-    logoImageSrc: "/experience-logos/sigep.png",
     accent: "282 54% 42%",
     accentSecondary: "47 92% 58%",
     accentTertiary: "0 84% 56%",
     stats: ["50+ members", "$25K budget", "Weekly operations"],
-    particleWords: ["Budget", "Events", "Vendors", "Planning"],
     bullets: [
       "Led strategic planning for programming across a 50+ member chapter with multiple weekly events.",
       "Oversaw an approximately $25K budget and allocated resources across socials, logistics, and operations.",
@@ -295,7 +291,6 @@ export const workEntries: ExperienceEntry[] = [
     accent: "0 82% 52%",
     accentSecondary: "4 90% 62%",
     stats: ["50+ employees", "$4K-$10K daily", "10+ trained"],
-    particleWords: ["Ops", "Speed", "Close", "Training"],
     bullets: [
       "Led shift operations for a team of 50+ employees at the highest-grossing location in a 100+ store franchise network.",
       "Helped manage daily revenue volumes between $4K and $10K while maintaining speed and consistency.",
@@ -315,7 +310,6 @@ export const volunteerEntries: ExperienceEntry[] = [
     accent: "183 78% 44%",
     accentSecondary: "188 72% 58%",
     stats: ["80+ students", "Python camp", "Hackathon support"],
-    particleWords: ["Python", "Teaching", "Mentor", "Camp"],
     bullets: [
       "Co-led an engaging camp with 80+ participants for middle school students focused on Python programming fundamentals.",
       "Developed and implemented lesson plans, projects, and activities to introduce coding concepts.",
@@ -332,7 +326,6 @@ export const volunteerEntries: ExperienceEntry[] = [
     accent: "129 42% 56%",
     accentSecondary: "118 36% 66%",
     stats: ["20 students", "2 bootcamps", "Math + reading"],
-    particleWords: ["Tutoring", "Strategy", "Practice", "Coaching"],
     bullets: [
       "Provided SAT tutoring to 20 students across two bootcamps focused on math and reading comprehension.",
       "Developed personalized study plans and practice materials to address individual student needs.",
@@ -348,7 +341,6 @@ export const volunteerEntries: ExperienceEntry[] = [
     accent: "136 58% 24%",
     accentSecondary: "145 44% 34%",
     stats: ["Hands-on STEM", "Adaptive teaching", "Inclusive support"],
-    particleWords: ["Empathy", "STEM", "Support", "Mentorship"],
     bullets: [
       "Assisted in hands-on STEM activities for special needs high school students.",
       "Helped make technical activities more engaging, approachable, and safe for different learners.",

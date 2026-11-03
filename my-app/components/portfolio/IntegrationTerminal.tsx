@@ -245,7 +245,7 @@ function buildCommandResponse(
         type: "response",
         lines: [
           arg ? `switching theme mode to ${arg}` : "theme controls are available directly in this terminal surface.",
-          'quick commands: "theme dark", "theme light", "accent violet", "accent rose", "accent emerald"',
+          'quick commands: "theme dark", "theme light", "accent azure", "accent rose", "accent emerald"',
         ],
         actions: [
           { label: "Light", command: "theme light" },

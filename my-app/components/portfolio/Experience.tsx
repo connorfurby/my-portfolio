@@ -24,8 +24,8 @@ export default function Experience({ onApiReady, onOpenFullscreen }: ExperienceP
         heading={
           <SectionHeading
             eyebrow="Selected Work"
-            title="Projects and experience that show how I actually build"
-            description="Shipped projects, internship work, and independent builds — the clearest signal for how I think about product, systems, and craft."
+            title="Projects and roles that show how I actually build"
+            description="Shipped product work and independent builds — product sense, systems thinking, and craft in the same places."
           />
         }
         items={projects.map((project) => ({

@@ -107,11 +107,6 @@ export default function Portfolio() {
   return (
     <div id="portfolio-root" className="portfolio-shell min-h-screen bg-background text-foreground">
       <MotionLayer />
-      <div className="ambient-stage" aria-hidden="true">
-        <div className="ambient-orb ambient-orb-one ambient-float-slow" />
-        <div className="ambient-orb ambient-orb-two ambient-float-medium" />
-        <div className="ambient-noise" />
-      </div>
 
       <Header navItems={navItems} activeSection={activeSection} onNavigate={scrollToSection} />
 

@@ -6,7 +6,6 @@ import { type ThemeProviderProps } from "next-themes/dist/types"
 
 export type AccentThemeId =
   | "azure"
-  | "violet"
   | "rose"
   | "emerald"
   | "amber"
@@ -24,15 +23,6 @@ export const accentThemes = [
     swatch: {
       start: "230 88% 58%",
       end: "171 82% 52%",
-    },
-  },
-  {
-    id: "violet",
-    label: "Violet",
-    description: "Indigo blended into magenta",
-    swatch: {
-      start: "267 84% 63%",
-      end: "316 78% 64%",
     },
   },
   {

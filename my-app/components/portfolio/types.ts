@@ -34,7 +34,6 @@ export type ExperienceEntry = {
   accentSecondary?: string
   accentTertiary?: string
   stats?: string[]
-  particleWords?: string[]
 }
 
 export type Passion = {

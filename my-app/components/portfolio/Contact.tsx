@@ -56,7 +56,7 @@ export default function Contact() {
           <SectionHeading
             eyebrow="Contact"
             title="If the work feels aligned, reach out"
-            description="For internships, product-minded engineering roles, collaborations, or just a strong shared interest in building, this should be the easiest part of the site."
+            description="Internships, product engineering roles, collaborations, or a sharp idea you want a second set of hands on — this should be the easiest part of the site."
           />
 
           <div className="space-y-0">

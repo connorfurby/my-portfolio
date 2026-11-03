@@ -16,8 +16,8 @@ export default function Education() {
       heading={
         <SectionHeading
           eyebrow="Education"
-          title="Academic context that matches the current version of my work"
-          description="The university, coursework, and leadership context behind the projects and product work shown throughout the rest of the site."
+          title="The academic side of the same story"
+          description="UW–Madison, the coursework that actually shapes how I build, and the leadership work that runs alongside it."
         />
       }
       items={[
