@@ -865,14 +865,9 @@ export default function GitHubDashboard() {
             </Card>
           ) : (
             <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(24rem,0.95fr)]">
-              <Card className="surface-card relative flex h-full items-center overflow-hidden rounded-[1.3rem] border-border bg-card">
-                <motion.div
-                  className="absolute -left-10 top-8 h-28 w-28 rounded-full bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.22),transparent_70%)]"
-                  animate={isIntegrationsVisible ? { x: [0, 16, 0], y: [0, -10, 0] } : undefined}
-                  transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
-                />
+              <Card className="surface-card relative flex h-full items-center overflow-hidden rounded-2xl border-border bg-card">
                 <div className="relative grid w-full gap-0 md:grid-cols-[minmax(13rem,14rem)_1fr]">
-                  <div className="relative aspect-square w-full bg-background/60">
+                  <div className="relative aspect-square w-full bg-foreground/[0.03]">
                     {spotifyData.playback?.imageUrl ? (
                       <Image
                         src={spotifyData.playback.imageUrl}
@@ -882,8 +877,8 @@ export default function GitHubDashboard() {
                         unoptimized
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center bg-[radial-gradient(circle,hsl(var(--spotlight-secondary)/0.18),transparent_70%)]">
-                        <Music4 className="h-12 w-12 text-foreground/70" />
+                      <div className="flex h-full items-center justify-center">
+                        <Music4 className="h-12 w-12 text-muted-foreground" />
                       </div>
                     )}
                   </div>

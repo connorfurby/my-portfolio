@@ -32,7 +32,6 @@ export type ExperienceEntry = {
   logoImageSrc?: string
   accent?: string
   accentSecondary?: string
-  accentTertiary?: string
   stats?: string[]
 }
 

@@ -52,7 +52,7 @@ export default function About() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12, duration: 0.5, ease }}
           >
-            I build <span className="text-gradient">polished software</span> with real product sense.
+            I build <span className="text-gradient">full-stack products</span> with real product sense.
           </motion.h1>
 
           <motion.p

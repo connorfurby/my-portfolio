@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { Bot, CheckCircle2, Compass, MessageSquareText, SendHorizonal, Sparkles, WandSparkles } from "lucide-react"
+import { Bot, CheckCircle2, Compass, MessageSquareText, SendHorizonal } from "lucide-react"
 import { motion } from "framer-motion"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -265,10 +265,10 @@ export default function PortfolioChat() {
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-xl">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border/70 bg-foreground/[0.03]">
-              <WandSparkles className="h-4.5 w-4.5 text-primary" />
+              <MessageSquareText className="h-4.5 w-4.5 text-primary" />
             </div>
             <div className="space-y-1">
-              <div>Ask the portfolio assistant</div>
+              <div>Ask about the work</div>
               <div className="text-xs font-normal text-muted-foreground">
                 Press `Enter` to send. Use `Shift+Enter` for a new line.
               </div>
@@ -411,8 +411,8 @@ export default function PortfolioChat() {
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5" />
-                Real-time answers grounded in portfolio context
+                <Bot className="h-3.5 w-3.5" />
+                Answers stay grounded in portfolio context
               </div>
               {errorMessage ? <div className="text-xs text-destructive">{errorMessage}</div> : null}
             </div>

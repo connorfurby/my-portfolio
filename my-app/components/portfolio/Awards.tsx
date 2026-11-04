@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { motion, useReducedMotion } from "framer-motion"
 
 import Passions from "@/components/portfolio/Passions"
@@ -10,19 +10,12 @@ import { techClusters } from "@/components/portfolio/data"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
+const TOTAL_NODE_COUNT = techClusters.reduce((total, cluster) => total + cluster.technologies.length, 0)
+
 export default function Awards() {
   const reduceMotion = useReducedMotion()
   const [activeClusterId, setActiveClusterId] = useState(techClusters[0]?.id ?? "")
-
-  const activeCluster = useMemo(
-    () => techClusters.find((cluster) => cluster.id === activeClusterId) ?? techClusters[0],
-    [activeClusterId]
-  )
-
-  const totalNodeCount = useMemo(
-    () => techClusters.reduce((total, cluster) => total + cluster.technologies.length, 0),
-    []
-  )
+  const activeCluster = techClusters.find((cluster) => cluster.id === activeClusterId) ?? techClusters[0]
 
   const skillsContent = (
     <div className="overflow-hidden rounded-2xl border border-border/80 bg-card">
@@ -30,7 +23,7 @@ export default function Awards() {
         <div className="border-b border-border/60 p-4 sm:p-5 lg:border-b-0 lg:border-r">
           <p className="section-eyebrow">Skill Clusters</p>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            {totalNodeCount} skills grouped the way they show up together in real projects.
+            {TOTAL_NODE_COUNT} skills grouped the way they show up together in real projects.
           </p>
 
           <div className="mt-4 grid gap-1.5">
@@ -51,13 +44,8 @@ export default function Awards() {
                   )}
                   aria-pressed={isActive}
                 >
-                  <div
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border/70"
-                    style={{
-                      background: `linear-gradient(135deg, hsl(${cluster.accent} / 0.28), hsl(${cluster.accentSecondary} / 0.12))`,
-                    }}
-                  >
-                    <Icon className="h-4 w-4" />
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-foreground/[0.03]">
+                    <Icon className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">

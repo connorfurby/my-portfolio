@@ -139,29 +139,6 @@ body {
   --accent-surface: 223 34% 16%;
 }
 
-:root[data-accent="violet"] {
-  --accent-primary: 267 84% 63%;
-  --accent-primary-foreground: 0 0% 100%;
-  --accent-ring: 267 84% 63%;
-  --accent-spotlight: 257 92% 68%;
-  --accent-spotlight-secondary: 316 78% 64%;
-  --accent-scrollbar-thumb: 267 84% 63%;
-  --accent-scrollbar-thumb-secondary: 316 78% 64%;
-  --accent-surface: 284 100% 97%;
-}
-
-:root.dark[data-accent="violet"],
-.dark[data-accent="violet"] {
-  --accent-primary: 270 90% 72%;
-  --accent-primary-foreground: 222 37% 8%;
-  --accent-ring: 274 95% 80%;
-  --accent-spotlight: 264 92% 74%;
-  --accent-spotlight-secondary: 320 82% 70%;
-  --accent-scrollbar-thumb: 270 90% 72%;
-  --accent-scrollbar-thumb-secondary: 320 82% 70%;
-  --accent-surface: 273 30% 17%;
-}
-
 :root[data-accent="rose"] {
   --accent-primary: 344 82% 58%;
   --accent-primary-foreground: 0 0% 100%;
@@ -395,7 +372,6 @@ html::-webkit-scrollbar-corner {
   background: transparent;
 }
 
-.liquid-panel,
 .surface-card {
   position: relative;
   overflow: hidden;
@@ -404,31 +380,13 @@ html::-webkit-scrollbar-corner {
   box-shadow: none;
 }
 
-.liquid-panel::before,
 .surface-card::before {
   content: none;
 }
 
-.liquid-panel > :not(.absolute),
 .surface-card > :not(.absolute) {
   position: relative;
   z-index: 1;
-}
-
-.liquid-panel-strong {
-  background: hsl(var(--card));
-  box-shadow: none;
-}
-
-.liquid-soft {
-  background: hsl(var(--foreground) / 0.03);
-  border-color: hsl(var(--border) / 0.75);
-}
-
-.liquid-chip {
-  border: 1px solid hsl(var(--border) / 0.8);
-  background: hsl(var(--foreground) / 0.04);
-  box-shadow: none;
 }
 
 .ui-scrim {
@@ -475,25 +433,6 @@ html::-webkit-scrollbar-corner {
 .ui-segment-item[data-active="true"] {
   background: hsl(var(--foreground));
   color: hsl(var(--background));
-}
-
-.liquid-divider {
-  background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.18), transparent);
-}
-
-.liquid-glow {
-  position: relative;
-}
-
-.liquid-glow::after {
-  content: "";
-  position: absolute;
-  inset: auto 10% -40% 10%;
-  height: 40%;
-  border-radius: 9999px;
-  background: radial-gradient(circle, hsl(var(--spotlight) / 0.14), transparent 72%);
-  pointer-events: none;
-  z-index: 0;
 }
 
 .banner-gradient {
@@ -644,12 +583,6 @@ html::-webkit-scrollbar-corner {
 
 .portfolio-grid-gap {
   gap: clamp(1.5rem, 2vw, 2.5rem);
-}
-
-.hero-glow {
-  background:
-    radial-gradient(circle at center, hsl(var(--spotlight) / 0.22), transparent 45%),
-    radial-gradient(circle at 70% 30%, hsl(var(--spotlight-secondary) / 0.16), transparent 35%);
 }
 
 .text-gradient {

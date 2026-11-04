@@ -94,16 +94,16 @@ export const projects: Project[] = [
       "Worked through sprint planning, retrospectives, and iterative delivery to keep the product moving from concept to completion.",
     ],
     images: [
-      { src: "/imgs/slidecentral/slcimg1.png", alt: "Homepage; authentication highlighted", description: "Home Page (Signed in)" },
-      { src: "/imgs/slidecentral/slcimg2.png", alt: "Maze generation process", description: "Home Page (Authentication highlighted)" },
-      { src: "/imgs/slidecentral/slcimg3.png", alt: "Maze generation process", description: "Main slideshow view (w/ fullscreen capabilities)" },
-      { src: "/imgs/slidecentral/slcimg4.png", alt: "Maze generation process", description: "Activity creation prompts" },
-      { src: "/imgs/slidecentral/slcimg5.png", alt: "Maze generation process", description: "Student side basics" },
-      { src: "/imgs/slidecentral/slcimg6.png", alt: "Maze generation process", description: "Dashboard view populated w/ activities" },
-      { src: "/imgs/slidecentral/slcimg7.png", alt: "Maze generation process", description: "Activity Dashboard" },
-      { src: "/imgs/slidecentral/slcimg8.png", alt: "Maze generation process", description: "Slide generation options" },
-      { src: "/imgs/slidecentral/slcimg9.png", alt: "Maze generation process", description: "Basic slide generation form" },
-      { src: "/imgs/slidecentral/slcimg10.png", alt: "Maze generation process", description: "Activity dashboard with generated slides per activity" },
+      { src: "/imgs/slidecentral/slcimg1.png", alt: "SlideCentral home page while signed in", description: "Home Page (Signed in)" },
+      { src: "/imgs/slidecentral/slcimg2.png", alt: "SlideCentral home page with authentication highlighted", description: "Home Page (Authentication highlighted)" },
+      { src: "/imgs/slidecentral/slcimg3.png", alt: "SlideCentral main slideshow view with fullscreen controls", description: "Main slideshow view (w/ fullscreen capabilities)" },
+      { src: "/imgs/slidecentral/slcimg4.png", alt: "SlideCentral activity creation prompts", description: "Activity creation prompts" },
+      { src: "/imgs/slidecentral/slcimg5.png", alt: "SlideCentral student-facing basics", description: "Student side basics" },
+      { src: "/imgs/slidecentral/slcimg6.png", alt: "SlideCentral dashboard populated with activities", description: "Dashboard view populated w/ activities" },
+      { src: "/imgs/slidecentral/slcimg7.png", alt: "SlideCentral activity dashboard", description: "Activity Dashboard" },
+      { src: "/imgs/slidecentral/slcimg8.png", alt: "SlideCentral slide generation options", description: "Slide generation options" },
+      { src: "/imgs/slidecentral/slcimg9.png", alt: "SlideCentral basic slide generation form", description: "Basic slide generation form" },
+      { src: "/imgs/slidecentral/slcimg10.png", alt: "SlideCentral activity dashboard with generated slides", description: "Activity dashboard with generated slides per activity" },
     ],
   },
   {
@@ -271,9 +271,8 @@ export const workEntries: ExperienceEntry[] = [
     subtitle: "Sigma Phi Epsilon • Oct 2025 - Present",
     summary: "A leadership role centered on planning, operations, budgeting, and execution for a large member-facing organization.",
     logoText: "ΣΦΕ",
-    accent: "282 54% 42%",
+    accent: "216 24% 46%",
     accentSecondary: "47 92% 58%",
-    accentTertiary: "0 84% 56%",
     stats: ["50+ members", "$25K budget", "Weekly operations"],
     bullets: [
       "Led strategic planning for programming across a 50+ member chapter with multiple weekly events.",
@@ -410,7 +409,7 @@ export const courseworkGroups: CourseworkGroup[] = [
   },
 ]
 
-export const skills = [
+export const skills: string[] = [
   "Programming (Python, Java, TypeScript, JavaScript)",
   "Web Development (React, Next.js, Tailwind CSS, Node.js, Express, SQL)",
   "Data Structures and Algorithms",
@@ -439,7 +438,7 @@ export const skillGroups: SkillGroup[] = [
   },
 ]
 
-export const achievements = [
+export const achievements: string[] = [
   "4.0 GPA at the University of Wisconsin-Madison",
   "Illinois Global Scholar",
   "College and Career Pathway Endorsement in Information Technology",
@@ -548,8 +547,8 @@ export const techClusters: TechCluster[] = [
     shortLabel: "Creative",
     summary: "A mix of design sense and technical experimentation across games, animation, media, and immersive product presentation.",
     icon: Orbit,
-    accent: "312 76% 61%",
-    accentSecondary: "230 88% 64%",
+    accent: "190 88% 46%",
+    accentSecondary: "216 24% 52%",
     technologies: [
       { name: "Game Design", tier: "core" },
       { name: "Level Design", tier: "core" },
@@ -567,10 +566,10 @@ export const techClusters: TechCluster[] = [
     proofs: [
       "Contributed UI, levels, and trailer production to Ice Dodo, a game with more than 600,000 users.",
       "Makes projects feel distinctive by blending motion, visuals, and personality into otherwise technical builds.",
-      "Enjoys turning straightforward project sections into more cinematic experiences with animation and layout craft.",
+      "Uses animation and layout craft to make product sections clearer and more memorable without adding noise.",
     ],
     projects: ["Ice Dodo", "Animated Cityscape", "Personal Portfolio Site"],
-    focus: ["Memorable experiences", "Motion-rich UI", "Creative engineering"],
+    focus: ["Clear experiences", "Motion with purpose", "Creative engineering"],
   },
   {
     id: "ai-automation",
@@ -578,8 +577,8 @@ export const techClusters: TechCluster[] = [
     shortLabel: "AI + Tools",
     summary: "An expanding cluster focused on applied AI, workflow automation, and learning quickly inside real product constraints.",
     icon: Bot,
-    accent: "258 78% 64%",
-    accentSecondary: "171 82% 54%",
+    accent: "221 88% 58%",
+    accentSecondary: "171 72% 48%",
     technologies: [
       { name: "Vercel AI SDK", tier: "core" },
       { name: "AI Product Research", tier: "core" },

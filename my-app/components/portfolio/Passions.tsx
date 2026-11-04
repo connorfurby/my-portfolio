@@ -22,10 +22,10 @@ export default function Passions() {
       <div className="border-b border-border/60 px-5 py-5 sm:px-6 sm:py-6">
         <div className="section-eyebrow">Beyond Coding</div>
         <h3 className="mt-3 font-display text-[1.35rem] font-semibold tracking-[-0.04em] md:text-[1.6rem]">
-          The interests that keep the work human
+          Outside the IDE
         </h3>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-          Outside the IDE: lakes, books, music, people, and the habits that keep building from turning into burnout.
+          Lakes, books, music, people, and the habits that keep building sustainable.
         </p>
       </div>
 

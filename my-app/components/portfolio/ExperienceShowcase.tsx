@@ -30,16 +30,8 @@ const PANELS_PER_ENTRY = 0.92
 const CONTENT_TRANSITION = { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const }
 
 function ExperienceMark({ entry }: { entry: ExperienceEntry }) {
-  const accent = entry.accent ?? "227 91% 66%"
-  const accentSecondary = entry.accentSecondary ?? "171 82% 60%"
-
   return (
-    <div
-      className="relative flex h-full min-h-[18rem] items-center justify-center overflow-hidden lg:min-h-[24rem]"
-      style={{
-        background: `radial-gradient(circle at 30% 25%, hsl(${accent} / 0.22), transparent 42%), radial-gradient(circle at 78% 70%, hsl(${accentSecondary} / 0.16), transparent 40%), hsl(var(--foreground) / 0.02)`,
-      }}
-    >
+    <div className="relative flex h-full min-h-[18rem] items-center justify-center overflow-hidden bg-foreground/[0.02] lg:min-h-[24rem]">
       <div className="relative z-10 flex flex-col items-center gap-4 px-6 text-center">
         <div className="relative flex size-28 items-center justify-center overflow-hidden rounded-2xl border border-border/70 bg-card sm:size-32">
           {entry.logoImageSrc ? (

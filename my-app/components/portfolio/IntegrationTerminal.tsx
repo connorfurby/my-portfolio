@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { Command, CornerDownLeft, Moon, Palette, Sparkles, Sun, TerminalSquare } from "lucide-react"
+import { Command, CornerDownLeft, Moon, Palette, Sun, TerminalSquare } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import { contactLinks, educationProfile, internshipEntries, projects, techClusters } from "@/components/portfolio/data"
@@ -431,7 +431,7 @@ export default function IntegrationTerminal(props: IntegrationTerminalProps) {
 
         <div className="border-b border-white/10 px-4 py-4 sm:px-5">
           <div className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
-            <Sparkles className="h-4 w-4 text-cyan-300" />
+            <TerminalSquare className="h-4 w-4 text-cyan-300" />
             Run commands for projects, resume, contact, GitHub, LinkedIn, Spotify, and site appearance.
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
